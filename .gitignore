@@ -1,0 +1,10 @@
+# 构建产物 / 依赖（每次开机都会被删，装回来就有，不进仓库）
+node_modules/
+dist/
+target/
+*.log
+log/
+
+# 系统杂物
+Thumbs.db
+Desktop.ini

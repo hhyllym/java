@@ -1,7 +1,7 @@
 # AGENTS.md — java-main 工作区总览（给 AI 看的）
 
 > 这台电脑每次开机都会重置。AI 先读这个，再读 `mlp-login-vue\AGENTS.md`（详细版）。
-> 最后更新：2026-10-14
+> 最后更新：2026-10-16
 
 ## 目录里有什么
 
@@ -11,13 +11,11 @@
 | `mlp-login-vue\AGENTS.md` | ⭐ **详细速读笔记，先看这个**（含首页图鉴 / 分级分类搜索） |
 | `mlp-login-vue\src\home.js` | 首页图鉴接口封装（/api/home/* 、/api/category、/api/pony） |
 | `backend-src\` | **后端源码备份**：pom.xml + src\ + sql\。D 盘会被重置，改完后端必须同步回来 |
-| `恢复后端.bat` | D 盘后端被还原成空壳时：把 backend-src 拷回去 + 依次执行两个建库 SQL |
+| `启动脚本\恢复后端.bat` | D 盘后端被还原成空壳时：把 backend-src 拷回去 + 依次执行两个建库 SQL。**支持 `恢复后端.bat auto` 静默模式**（跳过按键等待），已被 启动后端.bat 自动调用 |
 | `推送GitHub.bat` | 提交 + 先 fetch/merge 远程 + 推送（要粘贴 Token） |
-| `启动全部.bat` 等 5 个 | **只是转发**到 `mlp-login-vue\` 里的同名真身脚本 |
+| `启动脚本\` 里的 启动/停止/环境检测等 .bat | **只是转发**到 `mlp-login-vue\` 里的同名真身脚本（双击从这里启动即可） |
 | `AI项目生成步骤.txt` | 实训步骤清单（AGENTS.md 里说的「第 5 步」就是它） |
-| `小马宝莉登录.html` | 最早的单文件原型，已不用，留作纪念 |
-| `java-main\` | 空目录（旧备份残留） |
-| `mlp-login-vue.rar` / `java-main.rar` | 旧备份压缩包，**用户已在网页上从 GitHub 删掉、本地也清掉了**（2026-10-14）。别再恢复回来，否则推送会和远程起冲突。原件在 `桌面\java-main.zip` |
+| `java-main.rar` | 旧备份压缩包，已于 2026-10-16 删除（原件在 `桌面\java-main.zip`）。**别再恢复回来**，否则推送会和远程起冲突 |
 
 ## 后端在哪
 
@@ -26,13 +24,26 @@
 - 账号：`/api/auth/captcha`、`/api/auth/register`、`/api/auth/login`（`src/auth.js`）
 - **首页图鉴**：`/api/home/overview`、`/api/home/search?keyword=&categoryId=&page=&size=`、
   `/api/category/tree`、`/api/pony/{id}`（`src/home.js`）——分级分类 + 关键词搜索
+- **我的账号**：`/api/user/profile?id=`（`src/user.js`）——注册时间 / 加入天数 / 同名图鉴小马
 - 登录只用「小马名字 + 密码 + 验证码」，**不用邮箱也不用手机号**（用户明确要求，别加回去）
 - 详见 `mlp-login-vue\AGENTS.md` 第 5 节（5.1 账号 / 5.6 首页图鉴）
 
+## 编译 / 环境（踩过的坑都在这）
+
+见 **`启动脚本\环境备忘.md`**。两个最容易卡住的点先记在这：
+
+1. Maven 不在 PATH 里，且 **必须用 `mvn.cmd`**（Git Bash 里跑无后缀的 `mvn` 会报
+   `找不到或无法加载主类 org.codehaus.plexus.classworlds.launcher.Launcher`）：
+   `D:\IntelliJ IDEA 2024.3.2.2\plugins\maven\lib\maven3\bin\mvn.cmd`
+2. 启动后端前 **`unset SERVER__PORT`**，否则 Spring Boot 会把它当 `server.port`，
+   Tomcat 跑去抢随机端口并报 `APPLICATION FAILED TO START`。
+   杀进程用 PowerShell `Stop-Process`（`taskkill //PID` 在 Git Bash 里参数会被转坏）。
+
 ## 一句话启动
 
-双击 `mlp-login-vue\启动全部.bat`（后端 8081 + 前端 5173）。
-停止：`mlp-login-vue\停止全部.bat`。环境有问题：`mlp-login-vue\环境检测.bat`。
+双击 `启动脚本\启动全部.bat`（后端 8081 + 前端 5173）。
+**D 盘空壳不用管**：启动后端.bat 发现 AuthController.java 缺失会自动调 `启动脚本\恢复后端.bat auto` 装回代码 + 重建库，然后正常编译启动（2026-10-16 已实测演练通过）。
+停止：`启动脚本\停止全部.bat`。环境有问题：`启动脚本\环境检测.bat`。
 
 ## 本机没有浏览器
 

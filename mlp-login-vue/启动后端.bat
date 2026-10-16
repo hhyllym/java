@@ -54,15 +54,23 @@ if not defined BACKEND_DIR (
 echo [1/4] 后端目录 : %BACKEND_DIR%
 
 rem ---------- 1.1) 检查登录注册代码在不在（这台机器会重置 D 盘，代码可能被还原掉） ----------
-if not exist "%BACKEND_DIR%\src\main\java\com\fenglin\springboottest\controller\AuthController.java" (
-    echo.
-    echo [注意] 这个后端里找不到 AuthController.java，说明代码被还原成空壳了。
-    echo        请先双击 恢复后端.bat 把登录 / 注册代码装回去，再运行本脚本。
-    echo        现在硬启动也能起来，但前端的登录和注册一定会 404。
+rem 空壳就自动调 恢复后端.bat 装回代码，不再要求手动双击
+if exist "%BACKEND_DIR%\src\main\java\com\fenglin\springboottest\controller\AuthController.java" goto :code_ok
+echo.
+echo [注意] 后端里找不到 AuthController.java，代码被还原成空壳了。
+echo        自动调用 恢复后端.bat 把登录 / 注册代码装回 ...
+echo.
+if exist "%~dp0..\启动脚本\恢复后端.bat" (
+    call "%~dp0..\启动脚本\恢复后端.bat" auto
+) else (
+    echo [X] 找不到 %~dp0..\启动脚本\恢复后端.bat
+    echo     请手动双击 恢复后端.bat 之后再运行本脚本，否则登录注册一定 404。
     echo.
     echo 按任意键继续 ...
     pause >nul
 )
+echo.
+:code_ok
 
 rem ---------- 2) 定位 JDK ----------
 if not defined JAVA_HOME if exist "C:\Program Files\Zulu\zulu-21\bin\java.exe" set "JAVA_HOME=C:\Program Files\Zulu\zulu-21"

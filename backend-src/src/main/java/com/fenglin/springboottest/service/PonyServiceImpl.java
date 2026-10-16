@@ -188,6 +188,23 @@ public class PonyServiceImpl implements PonyService {
         return data;
     }
 
+    @Override
+    public PonyVO findByName(String name) {
+        String n = name == null ? "" : name.trim();
+        if (n.isEmpty()) {
+            return null;
+        }
+        // 先按中文名精确匹配，再按英文名（别名）匹配，都不区分大小写
+        List<Pony> rows = ponyMapper.selectList(new LambdaQueryWrapper<Pony>()
+                .and(w -> w.eq(Pony::getName, n)
+                        .or()
+                        .apply("LOWER(`alias`) = {0}", n.toLowerCase()))
+                .orderByAsc(Pony::getSortNo)
+                .orderByAsc(Pony::getId)
+                .last("limit 1"));
+        return rows.isEmpty() ? null : toVOList(rows).get(0);
+    }
+
     /**
      * Pony → PonyVO，并批量补齐标签和所属分类（避免 N+1 查询）。
      */

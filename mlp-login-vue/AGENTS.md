@@ -232,6 +232,42 @@
 - 改分类/标签数据只需改 `sql\mlp_home.sql` 再执行一次；它是「先 DELETE id<=999 的参考资料再 INSERT」，
   **不会动 `t_user` 里的注册账号**（只对 `t_search_word` 是 `INSERT IGNORE`，已有的搜索次数不会被清零）。
 
+### ✅ 5.7 「我的账号」页 · 接后端（2026-10-14 新增）
+
+**改动前**：`DashboardView.vue` 只显示本地 `session.name`，一点后端数据都没有。
+**改动后**：复用首页图鉴数据，做成「账号 + 你的同名小马」。
+
+#### 接口
+
+`GET /api/user/profile?id=1`（封装在 `src/user.js` 的 `apiProfile(id)`）
+
+```json
+{ "code": 200, "msg": "ok", "data": {
+    "id": 1, "name": "碧琪",
+    "createTime": "2026-10-14 09:05",
+    "days": 1,
+    "pony": { "id": 2, "name": "碧琪", "alias": "Pinkie Pie", "mark": "pinkie",
+              "emoji": "🎈", "color": "#f7a8c4", "rarity": "稀有",
+              "tags": ["派对", ...], "categories": [{ "parentName": "种族", "name": "陆马", ... }] }
+}}
+```
+
+- `days` 用 `ChronoUnit.DAYS.between(注册日, 今天) + 1`，**注册当天算第 1 天**，最小 1。
+- `pony` 是 `PonyService.findByName(账号名)` 的结果：先按中文名精确匹配，再按 `LOWER(alias)` 匹配英文别名，
+  取 `limit 1`；图鉴里没有同名的就返回 `null`（前端给引导文案，不是错误）。
+- 账号不存在 → `code 400`「没有找到这个账号，重新登录试试」。
+
+#### 前端
+
+- `DashboardView.vue` 重写：头像 / 名字 / 上次登录、注册时间 + 加入天数两栏、
+  同名小马卡片（CutieMark 或 emoji、稀有度角标、可点分类）、「去图鉴逛逛 / 退出登录」；
+  三种状态都处理了（loading / 有同名 / 没有同名 / 接口报错）。
+- **首页加了深链**（`HomeView.applyQuery`）：`/home?category=12` 直接落分类（一级二级都吃）、
+  `/home?pony=2` 直接弹详情。账号页点小马/点分类就是靠这两个 query 跳过去的。
+  ⚠️ `created()` 因此改成了 `async` 并 `await loadOverview()` 之后才 `applyQuery()`——
+  分类树还没到手时判定不出一级还是二级，调换顺序就失效。
+- 新增样式：`.dash-kv / .dash-sec / .dash-pony / .dash-face / .dash-tip / .dash-actions`。
+
 ---
 
 ## 6. 文件地图（前端）

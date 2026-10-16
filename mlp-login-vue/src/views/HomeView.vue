@@ -254,11 +254,32 @@ export default {
         : '这个分类下还没有小马 🥺'
     }
   },
-  created() {
-    this.loadOverview()
+  async created() {
     this.loadPage(true)
+    await this.loadOverview()   // 先拿分类树，applyQuery 要用它判断一级/二级
+    this.applyQuery()
   },
   methods: {
+    /** 支持从别的页面带参进来：/home?pony=2 直接开详情，/home?category=12 直接筛分类 */
+    async applyQuery() {
+      const q = this.$route.query || {}
+      if (q.category) {
+        const id = Number(q.category)
+        const l1 = this.categoryTree.find(c => c.id === id)
+        const parent = this.categoryTree.find(c => (c.children || []).some(s => s.id === id))
+        if (parent) {
+          this.level1Id = parent.id
+          this.categoryId = id
+          this.loadPage(true)
+        } else if (l1) {
+          this.pickLevel1(id)
+        }
+      }
+      if (q.pony) {
+        const res = await apiPonyDetail(Number(q.pony))
+        if (res.code === 200) this.detail = res.data
+      }
+    },
     hasMark(mark) {
       return MARKS.indexOf(mark) >= 0
     },

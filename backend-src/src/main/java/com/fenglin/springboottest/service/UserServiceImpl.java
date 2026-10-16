@@ -9,7 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -21,6 +24,38 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private PonyService ponyService;
+
+    @Override
+    public Result<?> profile(Long id) {
+        if (id == null) {
+            return Result.fail("缺少账号 id");
+        }
+        User user = userMapper.selectById(id);
+        if (user == null) {
+            return Result.fail("没有找到这个账号，重新登录试试");
+        }
+
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("id", user.getId());
+        data.put("name", user.getName());
+
+        LocalDateTime ct = user.getCreateTime();
+        if (ct == null) {
+            data.put("createTime", "");
+            data.put("days", 1L);
+        } else {
+            data.put("createTime", ct.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+            // 加入天数：注册当天算第 1 天
+            data.put("days", Math.max(1L, ChronoUnit.DAYS.between(ct.toLocalDate(), LocalDate.now()) + 1));
+        }
+
+        // 名字（或英文名）和图鉴条目对上的话，把那只小马一起带回去
+        data.put("pony", ponyService.findByName(user.getName()));
+        return Result.ok(data);
+    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)

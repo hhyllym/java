@@ -4,8 +4,12 @@ setlocal
 title 小马王国 - 恢复后端代码
 cd /d "%~dp0"
 
-set "SRC=%~dp0backend-src"
+set "SRC=%~dp0..\backend-src"
 set "APP_PORT=8081"
+
+rem 是否静默模式：被 启动后端.bat 调用时传 auto，跳过两次按键等待
+set "AUTO="
+if /I "%~1"=="auto" set "AUTO=1"
 
 echo ==========================================================
 echo   小马王国 - 恢复后端代码
@@ -44,7 +48,7 @@ echo.
 echo 只覆盖这些文件，target\ 和 log\ 不会动，也不会删你别的文件。
 echo.
 echo 按任意键开始，按 Ctrl+C 取消 ...
-pause >nul
+if not defined AUTO pause >nul
 echo.
 
 if not exist "%BACKEND_DIR%" mkdir "%BACKEND_DIR%" >nul 2>nul
@@ -92,6 +96,6 @@ echo.
 
 :bye
 echo 按任意键关闭本窗口 ...
-pause >nul
+if not defined AUTO pause >nul
 endlocal
 exit /b

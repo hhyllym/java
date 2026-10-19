@@ -1,0 +1,6 @@
+﻿mavenPID= started
+mavenAliveAfter30s=
+HEARTBEAT_ERR=无法连接到远程服务器
+STATUS_ERR=无法连接到远程服务器
+OFFLINE_ERR=无法连接到远程服务器
+DONE

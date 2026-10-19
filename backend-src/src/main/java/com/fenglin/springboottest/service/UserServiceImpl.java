@@ -3,7 +3,9 @@ package com.fenglin.springboottest.service;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fenglin.springboottest.common.PasswordUtil;
 import com.fenglin.springboottest.common.Result;
+import com.fenglin.springboottest.entity.Message;
 import com.fenglin.springboottest.entity.User;
+import com.fenglin.springboottest.mapper.MessageMapper;
 import com.fenglin.springboottest.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private MessageMapper messageMapper;
 
     @Autowired
     private PonyService ponyService;
@@ -84,6 +89,16 @@ public class UserServiceImpl implements UserService {
         user.setPassword(PasswordUtil.hash(salt, password));
         user.setCreateTime(LocalDateTime.now());
         userMapper.insert(user);
+
+        // 注册成功，写入一条「个人」系统欢迎通知（to_id = 新用户；区别于 to_id=-1 的全员广播）
+        Message welcome = new Message();
+        welcome.setType("NOTIFY");
+        welcome.setFromName("小马王国");
+        welcome.setToId(user.getId());
+        welcome.setContent("欢迎来到小马王国，" + name + "！记得去首页抽你的「今日幸运小马」🎲");
+        welcome.setReadFlag(0);
+        welcome.setCreateTime(LocalDateTime.now());
+        messageMapper.insert(welcome);
 
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("id", user.getId());

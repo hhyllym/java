@@ -36,6 +36,7 @@ if "%UP%"=="1" (
 rem ---------- 1) 定位后端项目 ----------
 if defined BACKEND_DIR goto :dir_ok
 for %%D in (
+    "%~dp0..\backend-src"
     "D:\workSpace\springBootTest"
     "C:\workSpace\springBootTest"
     "%~dp0..\springBootTest"
@@ -73,6 +74,11 @@ echo.
 :code_ok
 
 rem ---------- 2) 定位 JDK ----------
+rem 优先用 IntelliJ IDEA 自带的 JBR（本机实际靠它跑后端；Spring Boot 3.4 官方支持到 Java 23，JBR21 最稳）
+if not defined JAVA_HOME for /d %%J in ("C:\Program Files\JetBrains\IntelliJ IDEA*\jbr") do if not defined JAVA_HOME if exist "%%~J\bin\java.exe" set "JAVA_HOME=%%~J"
+if not defined JAVA_HOME for /d %%J in ("D:\Program Files\JetBrains\IntelliJ IDEA*\jbr") do if not defined JAVA_HOME if exist "%%~J\bin\java.exe" set "JAVA_HOME=%%~J"
+rem IntelliJ 托管的 JDK（.jdks 目录，IDEA 里 Settings 里下的那些）
+if not defined JAVA_HOME for /d %%J in ("%USERPROFILE%\.jdks\*") do if not defined JAVA_HOME if exist "%%~J\bin\java.exe" set "JAVA_HOME=%%~J"
 if not defined JAVA_HOME if exist "C:\Program Files\Zulu\zulu-21\bin\java.exe" set "JAVA_HOME=C:\Program Files\Zulu\zulu-21"
 if not defined JAVA_HOME for /d %%J in ("C:\Program Files\Zulu\*") do if not defined JAVA_HOME if exist "%%~J\bin\java.exe" set "JAVA_HOME=%%~J"
 if not defined JAVA_HOME for /d %%J in ("C:\Program Files\Java\jdk*") do if not defined JAVA_HOME if exist "%%~J\bin\java.exe" set "JAVA_HOME=%%~J"

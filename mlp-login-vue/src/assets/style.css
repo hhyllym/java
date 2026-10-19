@@ -1,3 +1,10 @@
+/* 背景渐变的四个色标：注册成 <color> 类型后支持 CSS 过渡，
+   自动切换主题时颜色是平滑渐变过去的，不会硬跳 */
+@property --bg1 { syntax: "<color>"; inherits: false; initial-value: #fde7f1; }
+@property --bg2 { syntax: "<color>"; inherits: false; initial-value: #ece4fb; }
+@property --bg3 { syntax: "<color>"; inherits: false; initial-value: #e2f3fb; }
+@property --bg4 { syntax: "<color>"; inherits: false; initial-value: #fbe3f0; }
+
 :root {
   --pink: #f7a8c4;
   --purple: #b79cf0;
@@ -17,6 +24,24 @@
   --panel: #f6f1fb;
   --track: #eeeeee;
   --cloud: rgba(255,255,255,.55);
+  /* ========== 响应式统一规格 ==========
+     手机（<768px）：占满屏宽
+     平板/电脑（≥768px）：不拉满，收着点，两侧留背景和可爱标志的位置 */
+  --app-w: 100%;
+  --app-h: calc(100vh - 24px);
+  --page-pad: 12px;
+}
+@media (min-width: 768px) {
+  :root { --app-w: 520px; --app-h: calc(100vh - 40px); --page-pad: 20px; }
+}
+@media (min-width: 1280px) {
+  :root { --app-w: 560px; --app-h: calc(100vh - 48px); --page-pad: 24px; }
+}
+/* dvh 适配手机浏览器工具栏伸缩（不支持的浏览器忽略，用上面的 vh 兜底） */
+@supports (height: 100dvh) {
+  :root { --app-h: calc(100dvh - 24px); }
+  @media (min-width: 768px) { :root { --app-h: calc(100dvh - 40px); } }
+  @media (min-width: 1280px) { :root { --app-h: calc(100dvh - 48px); } }
 }
 
 /* ========== 主题（点击卡片右上角色点切换） ========== */
@@ -24,25 +49,25 @@ body[data-theme="twilight"] {
   --pink: #c9b3f5; --purple: #8f7ae8; --blue: #9fb4f2;
   --primary: #7c5cbf; --primary-hover: #6a4ba8;
   --text: #3d3355; --muted: #8d84a8; --border: #e4dcf5; --panel: #efe9fb;
-  background-image: linear-gradient(135deg, #efe6fc 0%, #e2d9fb 45%, #dfe7fc 70%, #efe0fb 100%);
+  --bg1: #efe6fc; --bg2: #e2d9fb; --bg3: #dfe7fc; --bg4: #efe0fb;
 }
 body[data-theme="dash"] {
   --pink: #a8d8f7; --purple: #7fb8e8; --blue: #6ec6e6;
   --primary: #3f8fd6; --primary-hover: #3278b8;
   --text: #2f4358; --muted: #7e93a8; --border: #d9e9f5; --panel: #e8f3fb;
-  background-image: linear-gradient(135deg, #e0f2fc 0%, #d5e8fb 45%, #d8f4f7 70%, #e6e6fc 100%);
+  --bg1: #e0f2fc; --bg2: #d5e8fb; --bg3: #d8f4f7; --bg4: #e6e6fc;
 }
 body[data-theme="applejack"] {
   --pink: #f5c08a; --purple: #f0a868; --blue: #a8d8f7;
   --primary: #d98a3d; --primary-hover: #bf7430;
   --text: #57432f; --muted: #a08a70; --border: #f3e4d3; --panel: #fbf0e2;
-  background-image: linear-gradient(135deg, #fdeedd 0%, #fbe3cc 45%, #fdeede 70%, #fce8d8 100%);
+  --bg1: #fdeedd; --bg2: #fbe3cc; --bg3: #fdeede; --bg4: #fce8d8;
 }
 body[data-theme="fluttershy"] {
   --pink: #b8ecd2; --purple: #8fd9b8; --blue: #a8e0d0;
   --primary: #58b98a; --primary-hover: #47a376;
   --text: #35513f; --muted: #86a894; --border: #d9efe2; --panel: #e8f7ee;
-  background-image: linear-gradient(135deg, #e4f8ee 0%, #dcf2e8 45%, #e4f6f0 70%, #eef8e4 100%);
+  --bg1: #e4f8ee; --bg2: #dcf2e8; --bg3: #e4f6f0; --bg4: #eef8e4;
 }
 body[data-theme="night"] {
   --pink: #e08ac0; --purple: #9b6dd6; --blue: #6ea8d8;
@@ -51,7 +76,7 @@ body[data-theme="night"] {
   --card: #2b2440; --panel: #241e35; --track: #3a3153;
   --shadow: 0 16px 40px rgba(0,0,0,.45);
   --cloud: rgba(255,255,255,.08);
-  background-image: linear-gradient(135deg, #1e1830 0%, #251d3a 45%, #1a2333 70%, #2a1e35 100%);
+  --bg1: #1e1830; --bg2: #251d3a; --bg3: #1a2333; --bg4: #2a1e35;
 }
 
 /* 主题切换器 */
@@ -67,20 +92,47 @@ body[data-theme="night"] {
 }
 .theme-dot:hover { transform: scale(1.25); }
 .theme-dot.active { outline: 2px solid var(--primary); outline-offset: 2px; }
+/* 音效开关：比颜色圆点大一点，放 emoji 图标 */
+.theme-dot.sound-toggle {
+  width: 22px; height: 22px;
+  background: var(--panel); border-color: var(--border);
+  font-size: 11px; line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  align-self: center;
+}
+.theme-dot.sound-toggle:hover { transform: scale(1.18); }
+.theme-dot.sound-toggle.muted { opacity: .55; }
+/* 自动变色圆点：彩虹锥形渐变，缓慢旋转 */
+.theme-dot.auto { position: relative; overflow: hidden; }
+.theme-dot.auto::before {
+  content: ""; position: absolute; inset: 0; border-radius: 50%;
+  background: conic-gradient(#f7a8c4, #f7e08a, #a7e3c9, #8fc7f0, #b79cf0, #f7a8c4);
+  animation: dotSpin 5s linear infinite;
+}
+@keyframes dotSpin { to { transform: rotate(360deg); } }
 * { box-sizing: border-box; }
 html, body { height: 100%; }
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
     "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-  background: linear-gradient(135deg, #fde7f1 0%, #ece4fb 45%, #e2f3fb 70%, #fbe3f0 100%);
+  background: linear-gradient(135deg, var(--bg1) 0%, var(--bg2) 45%, var(--bg3) 70%, var(--bg4) 100%);
   background-size: 280% 280%;
   color: var(--text);
   display: flex; align-items: center; justify-content: center;
-  padding: 20px;
+  padding: var(--page-pad);
   min-height: 100vh;
   overflow: hidden;
   animation: bgShift 20s ease infinite;
+  transition: --bg1 1.4s ease, --bg2 1.4s ease, --bg3 1.4s ease, --bg4 1.4s ease;
+}
+/* 手机端：主题圆点行也收窄一点，别顶到屏幕边缘 */
+@media (max-width: 767px) {
+  .themes { padding: 10px 14px 0; }
+  .head { padding: 22px 20px 6px; }
+  .tabs { margin: 18px 20px 0; }
+  form { padding: 16px 20px 24px; }
+  .home { padding: 18px 16px 22px; }
 }
 @keyframes bgShift {
   0% { background-position: 0% 50%; }
@@ -88,12 +140,12 @@ body {
   100% { background-position: 0% 50%; }
 }
 .card {
-  width: 100%; max-width: 400px;
+  width: 100%; max-width: var(--app-w);
   background: var(--card);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   /* 首页内容比一屏长，所以在卡片内部滚动（body 是 overflow:hidden 的） */
-  max-height: calc(100vh - 40px);
+  max-height: var(--app-h);
   overflow-x: hidden;
   overflow-y: auto;
   position: relative;
@@ -171,10 +223,8 @@ input.invalid { border-color: var(--danger); }
 .captcha-row input { padding-right: 13px !important; }
 .captcha-img {
   width: 132px; height: 48px; border-radius: 11px; cursor: pointer;
-  border: 1.5px solid var(--border); flex-shrink: 0;
-  transition: border-color .15s;
+  flex-shrink: 0;
 }
-.captcha-img:hover { border-color: var(--primary); }
 .strength { height: 5px; border-radius: 4px; background: var(--track); margin-top: 8px; overflow: hidden; }
 .strength > span { display: block; height: 100%; width: 0%; transition: width .25s, background .25s; }
 .row { display: flex; align-items: center; justify-content: space-between; font-size: 13px; margin-bottom: 18px; }
@@ -217,14 +267,14 @@ button.submit:active { transform: translateY(1px); }
 }
 .logout:hover { color: var(--danger); border-color: var(--danger); }
 
-/* 导航栏 */
+/* 导航栏：允许换行，每项有最小宽度，item 多的时候自动排成两行不挤压 */
 .navbar {
-  display: flex; gap: 4px;
+  display: flex; flex-wrap: wrap; gap: 4px;
   background: var(--panel); border-radius: 12px; padding: 4px;
   margin-bottom: 18px;
 }
 .nav-item {
-  flex: 1; text-align: center; padding: 9px 0;
+  flex: 1 1 auto; min-width: 104px; text-align: center; padding: 9px 0;
   font-size: 13px; color: var(--muted); cursor: pointer;
   border-radius: 9px; user-select: none; transition: all .18s ease;
   text-decoration: none; display: block; white-space: nowrap;
@@ -299,10 +349,10 @@ button.submit:active { transform: translateY(1px); }
 
 /* ========== 首页 · 后端数据版（统计 / 分级筛选 / 详情弹窗） ========== */
 
-/* 统计条 */
-.stat-bar { display: flex; gap: 6px; margin: 14px 0 0; }
+/* 统计条：允许换行，窄屏时自动排两行，数字不再被挤扁 */
+.stat-bar { display: flex; flex-wrap: wrap; gap: 6px; margin: 14px 0 0; }
 .stat {
-  flex: 1; text-align: center; background: var(--panel);
+  flex: 1 1 40%; min-width: 76px; text-align: center; background: var(--panel);
   border-radius: 12px; padding: 8px 2px;
 }
 .stat b { display: block; font-size: 15px; color: var(--primary); line-height: 1.25; }
@@ -394,7 +444,7 @@ button.submit:active { transform: translateY(1px); }
 }
 @keyframes sheetFade { from { opacity: 0; } to { opacity: 1; } }
 .sheet {
-  width: 100%; max-width: 400px; max-height: 86vh; overflow-y: auto;
+  width: 100%; max-width: var(--app-w); max-height: var(--app-h); overflow-y: auto;
   background: var(--card); border-radius: 20px 20px 0 0;
   padding: 20px 22px 26px;
   box-shadow: 0 -10px 30px rgba(0,0,0,.18);
@@ -495,6 +545,10 @@ button.submit:active { transform: translateY(1px); }
 .dash-alias { font-size: 11.5px; color: var(--muted); margin-top: 2px !important; }
 .dash-actions { display: flex; gap: 8px; }
 .dash-actions button { flex: 1; }
+.dash-actions button.switch {
+  background: linear-gradient(135deg, #ffd98a, #f7a8c4);
+  color: #6b4a12;
+}
 
 .toast {
   position: fixed; top: 22px; left: 50%; transform: translateX(-50%) translateY(-20px);
@@ -516,9 +570,9 @@ button.submit:active { transform: translateY(1px); }
 }
 .cloud::before { width: 55px; height: 55px; top: -24px; left: 18px; }
 .cloud::after { width: 38px; height: 38px; top: -14px; left: 58px; }
-.c1 { width: 120px; height: 38px; top: 14%; left: -140px; animation: drift 38s linear infinite; }
-.c2 { width: 90px; height: 30px; top: 62%; left: -120px; opacity: .8; animation: drift 50s linear infinite 6s; }
-.c3 { width: 140px; height: 44px; top: 82%; left: -160px; opacity: .7; animation: drift 60s linear infinite 3s; }
+.c1 { width: 120px; height: 38px; top: 14%; left: -140px; }
+.c2 { width: 90px; height: 30px; top: 62%; left: -120px; opacity: .8; }
+.c3 { width: 140px; height: 44px; top: 82%; left: -160px; opacity: .7; }
 @keyframes drift { to { transform: translateX(120vw); } }
 .sparkle {
   position: absolute; color: #fff; opacity: .55;
@@ -538,6 +592,113 @@ button.submit:active { transform: translateY(1px); }
 }
 .pony svg { display: block; }
 @keyframes ponyFloat {
-  0%,100% { transform: translateY(0) rotate(-2deg); }
-  50% { transform: translateY(-14px) rotate(2deg); }
+  0%,100% { transform: translateY(0) rotate(-2deg) scale(1); }
+  50% { transform: translateY(-16px) rotate(2deg) scale(1.04); }
+}
+
+/* 云朵：横向漂移 + 独立 translate 属性做轻微上下浮动（两者不冲突） */
+.c1 { animation: drift 38s linear infinite, cloudBob 7s ease-in-out infinite; }
+.c2 { animation: drift 50s linear infinite 6s, cloudBob 9s ease-in-out infinite 1.2s; }
+.c3 { animation: drift 60s linear infinite 3s, cloudBob 11s ease-in-out infinite .6s; }
+@keyframes cloudBob {
+  0%,100% { translate: 0 -6px; }
+  50% { translate: 0 7px; }
+}
+
+/* 柔光斑：大色块缓慢漂移缩放 */
+.glow {
+  position: absolute; border-radius: 50%;
+  filter: blur(70px); opacity: .25; pointer-events: none;
+}
+.g1 { width: 38vw; height: 38vw; top: -12%; left: -8%;   background: #f7b8d0; animation: glowA 26s ease-in-out infinite; }
+.g2 { width: 32vw; height: 32vw; bottom: -14%; right: -6%; background: #b9a8ec; animation: glowB 33s ease-in-out infinite; }
+.g3 { width: 26vw; height: 26vw; top: 38%; left: 54%;   background: #a5d8f0; animation: glowC 40s ease-in-out infinite; }
+@keyframes glowA {
+  0%,100% { transform: translate(0, 0) scale(1); }
+  50%     { transform: translate(6vw, 4vh) scale(1.15); }
+}
+@keyframes glowB {
+  0%,100% { transform: translate(0, 0) scale(1.1); }
+  50%     { transform: translate(-5vw, -5vh) scale(1); }
+}
+@keyframes glowC {
+  0%,100% { transform: translate(0, 0) scale(1); }
+  50%     { transform: translate(-7vw, 6vh) scale(1.2); }
+}
+
+/* 彩虹弧：16 秒一个呼吸周期，淡入 → 停留 → 淡出 */
+.rainbow {
+  position: absolute; top: 5%; left: 50%;
+  width: min(620px, 88vw); height: auto;
+  transform: translateX(-50%);
+  opacity: 0;
+  animation: rainbowBreath 16s ease-in-out infinite;
+}
+@keyframes rainbowBreath {
+  0%,100% { opacity: 0;    transform: translateX(-50%) translateY(12px); }
+  30%     { opacity: .5;  }
+  50%     { opacity: .36; transform: translateX(-50%) translateY(-8px); }
+  70%     { opacity: .5;  }
+}
+
+/* 气球：整体匀速升空，内层左右摇摆 */
+.balloon {
+  position: absolute; bottom: -140px;
+  animation-name: balloonRise;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+@keyframes balloonRise {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-130vh); }
+}
+.balloon-bob { animation: balloonSway 5.5s ease-in-out infinite; }
+@keyframes balloonSway {
+  0%,100% { transform: translateX(-11px) rotate(-4deg); }
+  50%     { transform: translateX(11px) rotate(4deg); }
+}
+.balloon-body {
+  display: block; width: 32px; height: 40px;
+  border-radius: 50% 50% 50% 50% / 58% 58% 42% 42%;
+  opacity: .75;
+  box-shadow: inset -4px -6px 0 rgba(0,0,0,.07), inset 6px 4px 0 rgba(255,255,255,.4);
+}
+.balloon-string {
+  display: block; width: 1px; height: 36px; margin: 0 auto;
+  background: linear-gradient(rgba(120,100,150,.4), rgba(120,100,150,.05));
+}
+
+/* 流星：11 秒一轮，只在第 4%~14% 的时间可见 */
+.shooting-star {
+  position: absolute; top: 12%; left: 84%;
+  width: 90px; height: 2px; border-radius: 2px;
+  background: linear-gradient(90deg, rgba(255,255,255,0), #fff);
+  opacity: 0;
+  animation: shoot 11s ease-in infinite 4s;
+}
+@keyframes shoot {
+  0%   { opacity: 0;    transform: translate(0, 0) rotate(28deg) scaleX(.4); }
+  4%   { opacity: .95; }
+  14%  { opacity: 0;    transform: translate(-48vw, 27vh) rotate(28deg) scaleX(1); }
+  100% { opacity: 0;    transform: translate(-48vw, 27vh) rotate(28deg) scaleX(1); }
+}
+
+/* 漂浮的可爱标志：上下浮 + 轻摆；悬停停顿并放大；点击进小马课程 */
+.mark-float {
+  position: absolute; pointer-events: auto; cursor: pointer;
+  opacity: .72; z-index: 0;
+  filter: drop-shadow(0 4px 8px rgba(120, 90, 160, .18));
+  animation: markFloat 11s ease-in-out infinite;
+  transition: opacity .25s ease, scale .25s cubic-bezier(.34, 1.56, .64, 1);
+}
+.mark-float svg { display: block; width: 100%; height: auto; }
+.mark-float:hover {
+  animation-play-state: paused;   /* 悬停：漂浮停顿，方便点击 */
+  opacity: 1;
+  scale: 1.22;                    /* 独立属性，不与动画的 transform 冲突 */
+}
+.mark-float:active { scale: 1.05; }
+@keyframes markFloat {
+  0%,100% { transform: translateY(0) rotate(-7deg); }
+  50%     { transform: translateY(-18px) rotate(9deg); }
 }

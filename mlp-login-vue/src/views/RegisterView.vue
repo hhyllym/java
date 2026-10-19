@@ -67,14 +67,19 @@
         {{ submitting ? '正在创建…' : '加入我们 🎀' }}
       </button>
     </form>
+
+    <!-- AI 小马助手：登录页专属，点它开聊 -->
+    <PonyAssistant />
   </div>
 </template>
 
 <script>
 import { apiRegister } from '../auth'
+import PonyAssistant from '../components/PonyAssistant.vue'
 
 export default {
   name: 'RegisterView',
+  components: { PonyAssistant },
   inject: ['toast'],
   data() {
     return {

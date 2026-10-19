@@ -13,9 +13,17 @@
     <!-- 导航栏 -->
     <nav class="navbar">
       <router-link to="/home" class="nav-item active">🏠 首页</router-link>
-      <router-link to="/dashboard" class="nav-item">🌟 我的账号</router-link>
-      <a class="nav-item disabled" @click="comingSoon('小马图鉴')">📚 图鉴</a>
-      <a class="nav-item disabled" @click="comingSoon('魔法商店')">🍭 商店</a>
+      <router-link to="/home" class="nav-item" @click.native="scrollTop">📚 图鉴</router-link>
+      <router-link to="/learn" class="nav-item">🎓 学院</router-link>
+      <router-link to="/fortune" class="nav-item">🎲 幸运</router-link>
+      <router-link to="/shop" class="nav-item">🧧 商店</router-link>
+      <router-link to="/friends" class="nav-item">
+        👥 好友<span v-if="chatUnread > 0" class="nav-badge">{{ chatUnread > 99 ? '99+' : chatUnread }}</span>
+      </router-link>
+      <router-link to="/message" class="nav-item">
+        💬 消息<span v-if="unread > 0" class="nav-badge">{{ unread > 99 ? '99+' : unread }}</span>
+      </router-link>
+      <router-link to="/dashboard" class="nav-item">🌟 我的</router-link>
     </nav>
 
     <!-- 统计条（全部来自后端 /api/home/overview） -->
@@ -182,6 +190,9 @@
 <script>
 import { getSession, clearSession } from '../auth'
 import { apiOverview, apiSearch, apiPonyDetail } from '../home'
+import { apiUnread } from '../message'
+import { apiPresenceOffline } from '../presence'
+import { apiChatUnread } from '../chat'
 import CutieMark from '../components/CutieMark.vue'
 
 /** CutieMark.vue 里真正画了图案的几种可爱标志，其余用 emoji 兜底 */
@@ -217,6 +228,13 @@ export default {
       categoryId: null,
 
       detail: null,
+
+      /** 导航栏「消息」未读红点 */
+      unread: 0,
+
+      /** 导航栏「好友」聊天未读红点 */
+      chatUnread: 0,
+      chatTimer: null,
 
       /** 请求序号：切筛选切得快时，用它丢弃过期响应 */
       seq: 0
@@ -258,6 +276,13 @@ export default {
     this.loadPage(true)
     await this.loadOverview()   // 先拿分类树，applyQuery 要用它判断一级/二级
     this.applyQuery()
+    this.refreshUnread()
+    this.refreshChatUnread()
+    // 每 10 秒刷一次聊天未读红点（离开页面时清掉，见 beforeUnmount）
+    this.chatTimer = setInterval(this.refreshChatUnread, 10000)
+  },
+  beforeUnmount() {
+    if (this.chatTimer) clearInterval(this.chatTimer)
   },
   methods: {
     /** 支持从别的页面带参进来：/home?pony=2 直接开详情，/home?category=12 直接筛分类 */
@@ -417,10 +442,23 @@ export default {
       if (card && card.scrollTo) card.scrollTo({ top: 0, behavior: 'smooth' })
     },
 
+    /** 消息中心未读红点（原来只有调用没定义，消息红点一直不刷新，补上） */
+    async refreshUnread() {
+      const res = await apiUnread(this.session.id)
+      if (res.code === 200) this.unread = res.data || 0
+    },
+
+    /** 好友聊天未读红点 */
+    async refreshChatUnread() {
+      const res = await apiChatUnread(this.session.id)
+      if (res.code === 200) this.chatUnread = res.data || 0
+    },
+
     comingSoon(name) {
       this.toast(name + ' 还在建设中，敬请期待 🚧', 'ok')
     },
     handleLogout() {
+      apiPresenceOffline(this.session.id)
       clearSession()
       this.toast('已退出登录，拜拜 👋', 'ok')
       this.$router.push({ name: 'login' })

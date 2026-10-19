@@ -28,6 +28,21 @@ export function clearSession() {
   sessionStorage.removeItem(SESSION_KEY)
 }
 
+/** 记住上次登录的账号名（切换账号后回登录页可一键预填） */
+const LAST_ACCOUNT_KEY = 'mlp_last_account'
+
+export function rememberAccount(name) {
+  if (name) localStorage.setItem(LAST_ACCOUNT_KEY, name)
+}
+
+export function getRememberedAccount() {
+  return localStorage.getItem(LAST_ACCOUNT_KEY) || ''
+}
+
+export function forgetAccount() {
+  localStorage.removeItem(LAST_ACCOUNT_KEY)
+}
+
 /** 统一请求封装，返回 { code, msg, data } */
 async function post(path, body) {
   try {

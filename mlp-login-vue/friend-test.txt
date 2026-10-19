@@ -1,0 +1,16 @@
+[0] 清理旧数据 ok
+[1] 搜索喂喂喂 code=200 data=[{"id":2,"name":"喂喂喂","relation":"none"}]
+[2] 发申请 code=200 msg=ok
+[3] 重复申请 code=400 msg=申请已经发出去了，耐心等等对方同意
+[4] 收到的申请 code=200 data=[{"id":3,"userId":1,"name":"哇哇哇","applyMsg":"一起玩呀！","time":"19:58"}]
+[5] 同意申请 code=200 msg=ok
+[6] 哇哇哇的好友 code=200 data=[{"id":2,"name":"喂喂喂","since":"19:58"}]
+[6b] 喂喂喂的好友 code=200 data=[{"id":1,"name":"哇哇哇","since":"19:58"}]
+[7] 发消息 code=200 data={"id":3,"mine":true,"content":"你好呀，这是我的第一条聊天消息！","time":"19:58"}
+[8] 喂喂喂未读 code=200 data=2
+[9] 回复 code=200 msg=发送成功
+[10] 历史(哇哇哇视角) code=200 条数=4 data=[{"id":1,"mine":true,"content":"你好呀，这是我的第一条聊天消息！","time":"19:57"},{"id":2,"mine":false,"content":"收到收到， Friendship is Magic! ✨","time":"19:57"},{"id":3,"mine":true,"content":"你好呀，这是我的第一条聊天消息！","time":"19:58"},{"id":4,"mine":false,"content":"收到收到， Friendship is Magic! ✨","time":"19:58"}]
+[11] 哇哇哇会话 code=200 data=[{"id":2,"name":"喂喂喂","lastContent":"收到收到， Friendship is Magic! ✨","lastTime":"19:58","lastMine":false,"unread":2}]
+[11b] 哇哇哇标记已读后未读 code=200 data=0
+[12] 删好友后发消息 code=400 msg=你们还不是好友，先加个好友吧
+[13] 和好后历史条数 code=200 条数=4

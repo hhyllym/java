@@ -73,14 +73,25 @@
       </div>
       <button type="submit" class="submit">进入小马王国 🌈</button>
     </form>
+
+    <!-- 切换账号提示条 -->
+    <div v-if="switchHint" class="switch-hint">
+      🔁 正在切换账号，上次登录的是「{{ lastAccount }}」<br />
+      <span>要换别的账号，直接把名字和密码改成另一个即可</span>
+    </div>
+
+    <!-- AI 小马助手：登录页专属，点它开聊 -->
+    <PonyAssistant />
   </div>
 </template>
 
 <script>
-import { setSession, apiLogin, captchaUrl } from '../auth'
+import { setSession, apiLogin, captchaUrl, rememberAccount, getRememberedAccount } from '../auth'
+import PonyAssistant from '../components/PonyAssistant.vue'
 
 export default {
   name: 'LoginView',
+  components: { PonyAssistant },
   inject: ['toast'],
   data() {
     return {
@@ -88,14 +99,23 @@ export default {
       show: { password: false },
       errors: {},
       submitting: false,
-      captchaUrl: ''
+      captchaUrl: '',
+      switchHint: false,
+      lastAccount: ''
     }
   },
   mounted() {
     this.refreshCaptcha()
     // 注册成功跳转会带上用户名，预填登录框
     const n = this.$route.query.name
-    if (typeof n === 'string' && n) this.form.name = n
+    if (typeof n === 'string' && n) {
+      this.form.name = n
+    } else {
+      // 切换账号过来的：预填上次登录的账号名，改密码即可登另一个
+      this.lastAccount = getRememberedAccount()
+      if (this.lastAccount) this.form.name = this.lastAccount
+    }
+    this.switchHint = this.$route.query.switch === '1' && !!this.lastAccount
   },
   methods: {
     refreshCaptcha() {
@@ -127,6 +147,8 @@ export default {
       }
 
       const user = res.data
+      // 记住账号名：下次「切换账号」回登录页时可直接预填
+      rememberAccount(user.name)
       setSession({ id: user.id, name: user.name, ts: Date.now() }, this.form.remember)
       this.toast('登录成功，欢迎回家！🌟', 'ok')
       this.$router.push({ name: 'home' })
@@ -140,3 +162,23 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.switch-hint {
+  margin-top: 14px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: #fff8e6;
+  border: 1.5px solid #f3d77a;
+  color: #8a6d1f;
+  font-size: 12.5px;
+  font-weight: 700;
+  line-height: 1.6;
+  text-align: center;
+}
+.switch-hint span {
+  font-weight: 400;
+  font-size: 11.5px;
+  color: #a08a4d;
+}
+</style>

@@ -22,6 +22,14 @@ public class User implements Serializable {
     @TableField("name")
     private String name;
 
+    /** 头像 emoji（如 🐲🌙☀️），空则用默认 */
+    @TableField("avatar")
+    private String avatar;
+
+    /** 积分余额 */
+    @TableField("points")
+    private Integer points;
+
     /** SHA-256(salt + 明文) 的小写 hex */
     @TableField("password")
     private String password;
@@ -47,6 +55,22 @@ public class User implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+
+    public Integer getPoints() {
+        return points;
+    }
+
+    public void setPoints(Integer points) {
+        this.points = points;
     }
 
     public String getPassword() {

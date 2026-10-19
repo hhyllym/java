@@ -1,0 +1,20 @@
+﻿mysql.exe : mysql: [Warning] Using a password on the command line interface can
+ be insecure.
+所在位置 行:445 字符: 1
++ & "C:\Program Files\MySQL\MySQL Server 8.4\bin\mysql.exe" -uroot -p12 ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (mysql: [Warning...an be insecure. 
+   :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+椤?鍊?
+鍒嗙被鏁?17
+鏉＄洰鏁?22
+鍒嗙被鍏宠仈鏁?54
+鏍囩鏁?114
+鐑悳璇嶆暟	15
+娉ㄥ唽璐﹀彿鏁?2
+涓€绾у垎绫?灏忛┈鏁?
+绉嶆棌	22
+鍏冪礌	9
+鏍栨伅鍦?22

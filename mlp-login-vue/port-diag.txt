@@ -1,0 +1,3 @@
+http://localhost:8081/api/auth/captcha [GET] => ERROR: fetch failed
+http://localhost:8081/ [GET] => ERROR: fetch failed
+http://localhost:8081/api/auth/register [POST] => ERROR: fetch failed

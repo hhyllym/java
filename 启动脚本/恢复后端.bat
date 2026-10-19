@@ -66,16 +66,16 @@ if exist "%SRC%\sql" (
     echo       sql  -> OK
 )
 
-echo [3/3] 建数据库（mlp_login：账号表 + 首页图鉴表）...
+echo [3/3] 建数据库（mlp_login：账号表 + 首页图鉴表 + 消息中心表）...
 set "MYSQL_EXE="
 if exist "C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe" set "MYSQL_EXE=C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe"
 if not defined MYSQL_EXE for /d %%D in ("C:\Program Files\MySQL\*") do if not defined MYSQL_EXE if exist "%%~D\bin\mysql.exe" set "MYSQL_EXE=%%~D\bin\mysql.exe"
 if not defined MYSQL_EXE for /d %%D in ("D:\Program Files\MySQL\*") do if not defined MYSQL_EXE if exist "%%~D\bin\mysql.exe" set "MYSQL_EXE=%%~D\bin\mysql.exe"
 if not defined MYSQL_EXE (
     echo       [注意] 没找到 mysql.exe，跳过建库。
-    echo              请手工按顺序执行 %BACKEND_DIR%\sql\ 下的 mlp_login.sql、mlp_home.sql
+    echo              请手工按顺序执行 %BACKEND_DIR%\sql\ 下的 mlp_login.sql、mlp_home.sql、mlp_message.sql
 ) else (
-    for %%F in (mlp_login.sql mlp_home.sql) do (
+    for %%F in (mlp_login.sql mlp_home.sql mlp_message.sql) do (
         if exist "%BACKEND_DIR%\sql\%%F" (
             echo       - 执行 %%F ...
             "%MYSQL_EXE%" -uroot -p123456 --default-character-set=utf8mb4 < "%BACKEND_DIR%\sql\%%F"

@@ -1,2 +1,0 @@
-﻿5173 vite: UP
-8081 backend: UP

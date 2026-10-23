@@ -5,6 +5,8 @@
 -- 执行：mysql -uroot -p123456 mlp_login < mlp_friend.sql
 -- =====================================================
 
+USE mlp_login;
+
 CREATE TABLE IF NOT EXISTS `t_friend` (
   `id`          BIGINT       NOT NULL AUTO_INCREMENT,
   `user_id`     BIGINT       NOT NULL COMMENT '申请人 id',

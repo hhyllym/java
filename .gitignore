@@ -1,0 +1,12 @@
+# 后端编译产物 / 日志
+backend-src/target/
+backend-src/log/
+*.log
+
+# 临时备份与清理文件夹
+_清理备份/
+启动脚本/_旧机器备份/
+
+# 系统杂项
+.DS_Store
+Thumbs.db

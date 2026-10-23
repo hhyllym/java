@@ -75,10 +75,10 @@ if not defined MYSQL_EXE (
     echo       [注意] 没找到 mysql.exe，跳过建库。
     echo              请手工按顺序执行 %BACKEND_DIR%\sql\ 下的 mlp_login.sql、mlp_home.sql、mlp_message.sql
 ) else (
-    for %%F in (mlp_login.sql mlp_home.sql mlp_message.sql) do (
+    for %%F in (mlp_login.sql mlp_home.sql mlp_message.sql mlp_friend.sql mlp_extend.sql) do (
         if exist "%BACKEND_DIR%\sql\%%F" (
             echo       - 执行 %%F ...
-            "%MYSQL_EXE%" -uroot -p123456 --default-character-set=utf8mb4 < "%BACKEND_DIR%\sql\%%F"
+            "%MYSQL_EXE%" -uroot -p123456 --default-character-set=utf8mb4 --force < "%BACKEND_DIR%\sql\%%F"
             if errorlevel 1 (
                 echo         [注意] %%F 执行失败，检查 MySQL 有没有启动、root 密码是不是 123456。
             ) else (

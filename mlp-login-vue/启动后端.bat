@@ -36,8 +36,8 @@ if "%UP%"=="1" (
 rem ---------- 1) 定位后端项目 ----------
 if defined BACKEND_DIR goto :dir_ok
 for %%D in (
-    "%~dp0..\backend-src"
     "D:\workSpace\springBootTest"
+    "%~dp0..\backend-src"
     "C:\workSpace\springBootTest"
     "%~dp0..\springBootTest"
     "%~dp0..\..\springBootTest"
@@ -104,6 +104,8 @@ if not defined MVN_CMD for /d %%D in ("D:\Program Files\JetBrains\*" "C:\Program
 if not defined MVN_CMD for /d %%D in ("C:\*" "D:\*") do if not defined MVN_CMD if exist "%%~D\plugins\maven\lib\maven3\bin\mvn.cmd" set "MVN_CMD=%%~D\plugins\maven\lib\maven3\bin\mvn.cmd"
 if not defined MVN_CMD for /d %%D in ("D:\apache-maven*" "C:\apache-maven*" "D:\maven*" "C:\maven*") do if not defined MVN_CMD if exist "%%~D\bin\mvn.cmd" set "MVN_CMD=%%~D\bin\mvn.cmd"
 if not defined MVN_CMD if exist "%BACKEND_DIR%\mvnw.cmd" set "MVN_CMD=%BACKEND_DIR%\mvnw.cmd"
+rem 本机没装 Maven 也没装 IDEA 时，借用 springBootTest 里的 Maven Wrapper（首次运行会自动下载 Maven）
+if not defined MVN_CMD if exist "D:\workSpace\springBootTest\mvnw.cmd" set "MVN_CMD=D:\workSpace\springBootTest\mvnw.cmd"
 if not defined MVN_CMD (
     echo [X] 找不到 Maven。装一个 Maven 并加入 PATH，或者装 IntelliJ IDEA（自带 Maven）。
     goto :bye

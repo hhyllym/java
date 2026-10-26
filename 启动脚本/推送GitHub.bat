@@ -16,10 +16,10 @@ echo ==========================================================
 echo.
 
 rem ---------- 0) 环境检查 ----------
-if not exist ".git" (
-    echo [X] 当前目录不是 git 仓库: %CD%
+if not exist "%~dp0..\.git" (
+    echo [X] 当前目录不是 git 仓库: %~dp0..
     echo     也就是这里找不到 .git 目录。别在这个窗口里手动 git init，
-    echo     先确认 .git 是不是在 %CD% 下（本脚本要和它同级）。
+    echo     先确认 .git 是不是在 %~dp0.. 下（仓库根在 java 这一层）。
     goto :bye
 )
 where git >nul 2>nul
@@ -32,8 +32,8 @@ echo 仓库根 : %TOP%
 echo.
 
 rem 防呆：node_modules 要是没被忽略，推上去能有好几百兆
-if exist "mlp-login-vue\node_modules" (
-    git check-ignore -q "mlp-login-vue/node_modules"
+if exist "%~dp0..\mlp-login-vue\node_modules" (
+    git check-ignore -q "%~dp0..\mlp-login-vue/node_modules"
     if errorlevel 1 (
         echo [X] mlp-login-vue\node_modules 没有被 .gitignore 忽略，先别推！
         echo     不然会把几百兆依赖一起传上去。检查 mlp-login-vue\.gitignore 里有没有 node_modules

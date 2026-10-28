@@ -2,8 +2,11 @@ package com.fenglin.springboottest.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.fenglin.springboottest.entity.Pony;
+import org.apache.ibatis.annotations.Delete;
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
@@ -44,4 +47,20 @@ public interface PonyMapper extends BaseMapper<Pony> {
     /** 看详情时热度 +1 */
     @Update("UPDATE `t_pony` SET `view_count` = `view_count` + 1 WHERE `id` = #{id}")
     int increaseView(@Param("id") Long id);
+
+    // ---------- 后台管理系统用：小马是 INPUT 主键，新增时要自己算下一个 id ----------
+    @Select("SELECT COALESCE(MAX(id), 0) + 1 FROM `t_pony`")
+    Long nextPonyId();
+
+    /** 清掉某小马挂的全部分类关联（编辑时先清后写） */
+    @Delete("DELETE FROM `t_pony_category` WHERE `pony_id` = #{ponyId}")
+    int deletePonyCategories(@Param("ponyId") Long ponyId);
+
+    /** 给小马挂一个分类 */
+    @Insert("INSERT INTO `t_pony_category`(`pony_id`, `category_id`) VALUES(#{ponyId}, #{categoryId})")
+    int addPonyCategory(@Param("ponyId") Long ponyId, @Param("categoryId") Long categoryId);
+
+    /** 删除「某分类」下面的全部条目关联（删分类/删分类树时级联用） */
+    @Delete("DELETE FROM `t_pony_category` WHERE `category_id` = #{categoryId}")
+    int deletePonyCategoryRelations(@Param("categoryId") Long categoryId);
 }

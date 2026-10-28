@@ -24,6 +24,7 @@
         💬 消息<span v-if="unread > 0" class="nav-badge">{{ unread > 99 ? '99+' : unread }}</span>
       </router-link>
       <router-link to="/dashboard" class="nav-item">🌟 我的</router-link>
+      <router-link v-if="session.permission === 0 || session.permission === 2" to="/admin" class="nav-item admin-entry">🛠 后台管理</router-link>
     </nav>
 
     <!-- 统计条（全部来自后端 /api/home/overview） -->
@@ -466,3 +467,14 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.nav-item.admin-entry {
+  background: linear-gradient(135deg, #a06cd5, #c89bf0);
+  color: #fff !important;
+  box-shadow: 0 4px 12px rgba(160, 108, 213, .35);
+}
+.nav-item.admin-entry:hover {
+  filter: brightness(1.05);
+}
+</style>

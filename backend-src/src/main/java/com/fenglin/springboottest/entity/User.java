@@ -10,7 +10,8 @@ import java.time.LocalDateTime;
 
 /**
  * 用户表 t_user。
- * 注意：只有「小马名字 + 密码 + 盐」，没有邮箱、没有手机号，别再往这里加。
+ * 注意：只有「小马名字 + 密码」，没有邮箱、没有手机号，别再往这里加。
+ * 密码为明文存储（按需求不加密）；permission：1=默认普通用户，0=普通管理员，2=超级管理员。
  */
 @TableName("t_user")
 public class User implements Serializable {
@@ -30,13 +31,13 @@ public class User implements Serializable {
     @TableField("points")
     private Integer points;
 
-    /** SHA-256(salt + 明文) 的小写 hex */
+    /** 登录密码（明文，不加密） */
     @TableField("password")
     private String password;
 
-    /** 每个用户随机 16 位 hex */
-    @TableField("salt")
-    private String salt;
+    /** 权限：1=默认普通用户（看不到后台入口）；0=普通管理员；2=超级管理员（可管理其他管理员权限） */
+    @TableField("permission")
+    private Integer permission;
 
     @TableField("create_time")
     private LocalDateTime createTime;
@@ -81,12 +82,12 @@ public class User implements Serializable {
         this.password = password;
     }
 
-    public String getSalt() {
-        return salt;
+    public Integer getPermission() {
+        return permission;
     }
 
-    public void setSalt(String salt) {
-        this.salt = salt;
+    public void setPermission(Integer permission) {
+        this.permission = permission;
     }
 
     public LocalDateTime getCreateTime() {

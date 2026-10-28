@@ -10,7 +10,10 @@ import LearnView from '../views/LearnView.vue'
 import GameView from '../views/GameView.vue'
 import FriendsView from '../views/FriendsView.vue'
 import ChatView from '../views/ChatView.vue'
+import AdminLoginView from '../views/AdminLoginView.vue'
+import AdminView from '../views/AdminView.vue'
 import { getSession } from '../auth'
+import { getAdminSession } from '../adminAuth'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -26,15 +29,22 @@ const router = createRouter({
     { path: '/friends', name: 'friends', component: FriendsView, meta: { requiresAuth: true } },
     { path: '/chat/:id', name: 'chat', component: ChatView, meta: { requiresAuth: true } },
     { path: '/login', name: 'login', component: LoginView },
-    { path: '/register', name: 'register', component: RegisterView }
+    { path: '/register', name: 'register', component: RegisterView },
+    { path: '/admin/login', name: 'adminLogin', component: AdminLoginView },
+    { path: '/admin', name: 'admin', component: AdminView, meta: { requiresAdmin: true } }
   ]
 })
 
 router.beforeEach((to) => {
   const session = getSession()
+  const admin = getAdminSession()
   if (to.meta.requiresAuth && !session) return { name: 'login' }
   // 已登录的人访问登录/注册页，直接送去首页
   if ((to.name === 'login' || to.name === 'register') && session) return { name: 'home' }
+  // 后台管理页：必须持有管理员令牌
+  if (to.meta.requiresAdmin && !admin) return { name: 'adminLogin' }
+  // 已是管理员又跑去后台登录页，直接进后台
+  if (to.name === 'adminLogin' && admin) return { name: 'admin' }
   return true
 })
 

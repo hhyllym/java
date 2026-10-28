@@ -149,7 +149,13 @@ export default {
       const user = res.data
       // 记住账号名：下次「切换账号」回登录页时可直接预填
       rememberAccount(user.name)
-      setSession({ id: user.id, name: user.name, ts: Date.now() }, this.form.remember)
+      // 把权限一起存进会话：首页据此决定是否展示「后台管理」入口
+      setSession({
+        id: user.id,
+        name: user.name,
+        permission: (user.permission === 0 || user.permission === 2) ? user.permission : 1,
+        ts: Date.now()
+      }, this.form.remember)
       this.toast('登录成功，欢迎回家！🌟', 'ok')
       this.$router.push({ name: 'home' })
     },

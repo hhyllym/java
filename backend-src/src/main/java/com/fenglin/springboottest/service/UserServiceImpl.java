@@ -1,7 +1,6 @@
 package com.fenglin.springboottest.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.fenglin.springboottest.common.PasswordUtil;
 import com.fenglin.springboottest.common.Result;
 import com.fenglin.springboottest.entity.Message;
 import com.fenglin.springboottest.entity.User;
@@ -82,11 +81,10 @@ public class UserServiceImpl implements UserService {
             return Result.fail("这个小马名字已经被用过啦，换一个吧");
         }
 
-        String salt = PasswordUtil.randomSalt();
         User user = new User();
         user.setName(name);
-        user.setSalt(salt);
-        user.setPassword(PasswordUtil.hash(salt, password));
+        user.setPassword(password);   // 明文存储，按需求不加密
+        user.setPermission(1);       // 注册用户默认权限：1=普通用户
         user.setCreateTime(LocalDateTime.now());
         userMapper.insert(user);
 
@@ -120,13 +118,15 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             return Result.fail("这个小马名字还没注册过，先去注册一个吧");
         }
-        if (!PasswordUtil.matches(user.getSalt(), password, user.getPassword())) {
+        if (!password.equals(user.getPassword())) {
             return Result.fail("密码不正确，再想想～");
         }
 
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("id", user.getId());
         data.put("name", user.getName());
+        // 把权限带回前端，首页据此决定是否展示「后台管理」入口
+        data.put("permission", user.getPermission() == null ? 1 : user.getPermission());
         return Result.ok("登录成功", data);
     }
 

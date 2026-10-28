@@ -36,4 +36,8 @@ public interface CategoryMapper extends BaseMapper<Category> {
      */
     @Select("SELECT `pony_id` AS ponyId, `category_id` AS categoryId FROM `t_pony_category`")
     List<Map<String, Object>> selectAllRelations();
+
+    // ---------- 后台管理系统用：分类是 INPUT 主键，新增时要自己算下一个 id ----------
+    @Select("SELECT COALESCE(MAX(id), 0) + 1 FROM `t_category`")
+    Long nextCategoryId();
 }

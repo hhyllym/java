@@ -23,9 +23,9 @@ import java.util.Map;
 
 /**
  * 小马王国登录 / 注册接口，前端 src/auth.js 调的就是这三个：
- *   GET  /api/auth/captcha   拿验证码 PNG（答案存在 session 里）
- *   POST /api/auth/register  { name, password }
- *   POST /api/auth/login     { name, password, captcha }
+ *   GET  /api/auth/captcha   拿验证码 PNG（答案存在 session 里，一次性有效）
+ *   POST /api/auth/register  { name, password, captcha }  —— 注册需验证码，防机器批量注册
+ *   POST /api/auth/login     { name, password }
  */
 @RestController
 @RequestMapping("/api/auth")
@@ -52,24 +52,25 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public Result<?> register(@RequestBody Map<String, String> body) {
-        String name = body.get("name");
-        String password = body.get("password");
-        log.info("注册请求 name={}", name);
-        return userService.register(name, password);
-    }
-
-    @PostMapping("/login")
-    public Result<?> login(@RequestBody Map<String, String> body, HttpSession session) {
+    public Result<?> register(@RequestBody Map<String, String> body, HttpSession session) {
         String name = body.get("name");
         String password = body.get("password");
         String captcha = body.get("captcha");
 
         // 验证码先校验，而且用完即废（不管对错）
         if (!captchaService.verify(session, captcha)) {
-            log.info("登录失败：验证码错误 name={}", name);
+            log.info("注册失败：验证码错误 name={}", name);
             return Result.fail("验证码不正确，请重新输入");
         }
+
+        log.info("注册请求 name={}", name);
+        return userService.register(name, password);
+    }
+
+    @PostMapping("/login")
+    public Result<?> login(@RequestBody Map<String, String> body) {
+        String name = body.get("name");
+        String password = body.get("password");
 
         Result<?> result = userService.login(name, password);
         log.info("登录结果 name={} code={} msg={}", name, result.getCode(), result.getMsg());

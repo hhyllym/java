@@ -47,6 +47,10 @@ async function request(method, path, body) {
     try {
       return JSON.parse(text)
     } catch (e) {
+      // 500 且非 JSON，多半是 Vite 代理连不上 8081（后端没启动）返回的假 500
+      if (res.status === 500 || res.status === 502 || res.status === 504) {
+        return { code: -1, msg: '后端没有响应（多半是 Spring Boot 没启动），请先把后端跑起来再试', data: null }
+      }
       return { code: -1, msg: `后端返回了非 JSON（HTTP ${res.status}），去后端窗口看报错日志`, data: null }
     }
   } catch (e) {

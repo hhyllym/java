@@ -55,7 +55,11 @@ async function post(path, body) {
     try {
       return JSON.parse(text)
     } catch (e) {
-      // 后端抛异常时 Spring 返回的是 HTML 错误页，这里给个能定位问题的提示
+      // 500 且非 JSON，多半是 Vite 代理连不上 8081（后端没启动）返回的假 500；
+      // 后端真抛异常时通常也有监听、日志有堆栈
+      if (res.status === 500 || res.status === 502 || res.status === 504) {
+        return { code: -1, msg: '后端没有响应（多半是 Spring Boot 没启动），请先把后端跑起来再试', data: null }
+      }
       return {
         code: -1,
         msg: `后端返回了非 JSON 内容（HTTP ${res.status}），去后端窗口看报错日志`,
@@ -67,12 +71,12 @@ async function post(path, body) {
   }
 }
 
-/** 注册：{ name, password } —— 只用小马名字，不用邮箱/手机号 */
+/** 注册：{ name, password, captcha } —— captcha 是一次性的，失败后要换新的 */
 export function apiRegister(payload) {
   return post('/register', payload)
 }
 
-/** 登录：{ name, password, captcha }  —— 验证码是一次性的，失败后要换新的 */
+/** 登录：{ name, password } —— 验证码已移到注册页 */
 export function apiLogin(payload) {
   return post('/login', payload)
 }

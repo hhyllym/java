@@ -1,12 +1,22 @@
 <template>
   <!-- 小马 AI 助手：内嵌在登录/注册页，点击开聊，可更换助手形象 -->
   <div class="pa-root" ref="root">
-    <!-- 悬浮球 -->
-    <button ref="fab" class="pa-fab" :title="'和' + cur.name + '聊天'" @click="toggle">
-      <span class="pa-fab-face"><PonyFace :a="cur" /></span>
-      <span class="pa-fab-name">{{ cur.name }}</span>
-      <span v-if="!open" class="pa-fab-pulse"></span>
-    </button>
+    <!-- 小球整体：悬浮球 + 一键换助手按钮 绑在一起定位 -->
+    <div class="pa-ball">
+      <button ref="fab" class="pa-fab" :title="'和' + cur.name + '聊天'" @click="toggle">
+        <span class="pa-fab-face"><PonyFace :a="cur" /></span>
+        <span class="pa-fab-name">{{ cur.name }}</span>
+        <span v-if="!open" class="pa-fab-pulse"></span>
+        <span class="pa-fab-count">共 {{ ASSISTANTS().length }} 位</span>
+      </button>
+      <!-- 悬浮球上的快捷换助手：点一下切换下一位，不用先开面板 -->
+      <button ref="cycleBtn" class="pa-fab-cycle" title="换个助手" @click.stop="cycle" aria-label="换个助手">
+        <svg class="cycle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 12a9 9 0 1 1-2.64-6.36" />
+          <polyline points="21 3 21 9 15 9" />
+        </svg>
+      </button>
+    </div>
 
     <!-- 聊天面板：Teleport 到 body，避免被卡片 overflow 裁剪 -->
     <Teleport to="body">
@@ -79,23 +89,13 @@ import sound from '../sound'
 import { getSession } from '../auth'
 import PonyFace from './PonyFace.vue'
 
-/** 可更换的小马助手 */
+/** 可更换的小马助手（Mane 6 + 穗龙 + 月亮公主 + 宇宙公主，共 9 个） */
 const ASSISTANTS = [
   {
     id: 'spike', name: '穗龙', emoji: '🐲', title: '小马国首席助理',
     color: 'linear-gradient(135deg, #a5e0bf, #bda6f2)',
     greet: '嘿！我是穗龙，宝石保管专家兼头号跑腿，有求必应！',
     quick: ['怎么加好友？', '学院有什么好玩的？', '推荐个小游戏']
-  },
-  {
-    id: 'luna', name: '月亮公主', emoji: '🌙', title: '夜之守护者', color: '#9b8fd8',
-    greet: '夜安……我是露娜。今夜，你想了解些什么？',
-    quick: ['怎么换背景主题？', '今日运势', '打卡有什么用？']
-  },
-  {
-    id: 'celestia', name: '宇宙公主', emoji: '☀️', title: '小马国导师', color: '#f0d078',
-    greet: '欢迎，我的学生。有任何疑问，都可以尽情问我。',
-    quick: ['积分怎么赚？', '学院有什么好玩的？', '碧琪是谁？']
   },
   {
     id: 'twilight', name: '紫悦', emoji: '📚', title: '和谐之元 · 魔法', color: '#f2a8c8',
@@ -106,6 +106,36 @@ const ASSISTANTS = [
     id: 'rarity', name: '珍奇', emoji: '💎', title: '坎特洛特时装设计师', color: '#c9a0e8',
     greet: 'Bonjour～我是珍奇，旋转木马时装店的主理人。穿搭、配色、礼仪，尽管问我！',
     quick: ['学院有什么好玩的？', '积分怎么赚？', '怎么加好友？']
+  },
+  {
+    id: 'rainbow', name: '云宝黛西', emoji: '🌈', title: '彩虹音爆 · 飞行', color: '#7ec8f2',
+    greet: '我就是速度本身！彩虹音爆随时待命，有什么需要我飞着去办？',
+    quick: ['云宝是谁？', '推荐个小游戏', '怎么加好友？']
+  },
+  {
+    id: 'applejack', name: '苹果嘉儿', emoji: '🍎', title: '甜苹果园 · 勤劳', color: '#e0915a',
+    greet: '嘿咿哈！我是苹果嘉儿，诚实可靠，重活儿交给我准没错！',
+    quick: ['苹果嘉儿是谁？', '积分怎么赚？', '学院有什么好玩的？']
+  },
+  {
+    id: 'fluttershy', name: '柔柔', emoji: '🦋', title: '动物之友 · 温柔', color: '#f5c1d8',
+    greet: '你、你好呀……别紧张，慢慢说就好。需要我帮忙吗？',
+    quick: ['柔柔是谁？', '怎么换背景主题？', '推荐个小游戏']
+  },
+  {
+    id: 'pinkie', name: '碧琪', emoji: '🎈', title: '派对大师 · 欢乐', color: '#f29ab5',
+    greet: '派对时间到！🎉 我是碧琪，纸杯蛋糕和欢乐都管够，说吧想玩点啥？',
+    quick: ['碧琪是谁？', '推荐个小游戏', '怎么加好友？']
+  },
+  {
+    id: 'luna', name: '月亮公主', emoji: '🌙', title: '夜之守护者', color: '#9b8fd8',
+    greet: '夜安……我是露娜。今夜，你想了解些什么？',
+    quick: ['怎么换背景主题？', '今日运势', '打卡有什么用？']
+  },
+  {
+    id: 'celestia', name: '宇宙公主', emoji: '☀️', title: '小马国导师', color: '#f0d078',
+    greet: '欢迎，我的学生。有任何疑问，都可以尽情问我。',
+    quick: ['积分怎么赚？', '学院有什么好玩的？', '碧琪是谁？']
   }
 ]
 
@@ -168,7 +198,7 @@ function reply(text, cur) {
   if (has('谢谢', '感谢', '3q'))
     return { text: cur.id === 'luna' ? '不必言谢，这是我应该做的。' : '不客气！能帮上忙就好。' }
   if (has('你是谁', '名字', '介绍'))
-    return { text: `我是${cur.name}，${cur.title}。点我头顶的 🔄 可以换成月亮公主、宇宙公主或紫悦来陪你聊天。` }
+    return { text: `我是${cur.name}，${cur.title}。点悬浮球上的 🔄 就能换成其他小马助手，一共 ${ASSISTANTS.length} 位随你挑～` }
   if (has('吃', '饿'))
     return { text: '说到吃……碧琪的纸杯蛋糕学院里有教做法，顺便还能玩「甜品工坊」小游戏！' }
   return {
@@ -255,6 +285,13 @@ export default {
       try { localStorage.setItem(PICK_KEY, a.id) } catch (e) {}
       sound.magic()
     },
+    /** 悬浮球上的小 🔄：直接切换到下一位助手（不打开面板也能换） */
+    cycle() {
+      const list = ASSISTANTS
+      const idx = list.findIndex(a => a.id === this.cur.id)
+      const next = list[(idx + 1) % list.length]
+      this.choose(next)
+    },
     send(q) {
       const text = (q || this.input).trim()
       if (!text) return
@@ -307,6 +344,8 @@ export default {
 /* 内嵌模式：跟随文档流，由使用方决定放在哪（登录/注册页） */
 .pa-root { position: relative; z-index: 60; display: flex; justify-content: center; }
 .pa-root:empty { display: none; }
+/* 小球整体：悬浮球 + 一键换助手按钮 绑在一起定位 */
+.pa-ball { position: relative; display: inline-flex; }
 
 /* 悬浮球 */
 .pa-fab {
@@ -317,6 +356,25 @@ export default {
   transition: transform .18s cubic-bezier(.34, 1.56, .64, 1);
 }
 .pa-fab:hover { transform: translateY(-3px) scale(1.04); }
+.pa-fab-count {
+  font-size: 10px; font-weight: 600; color: var(--muted);
+  background: var(--panel); padding: 1px 8px; border-radius: 999px;
+  margin-left: 2px;
+}
+/* 悬浮球旁的快捷换助手按钮：与悬浮球完全一致的主题表面 */
+.pa-fab-cycle {
+  position: absolute; z-index: 61; top: -5px; right: -5px;
+  width: 18px; height: 18px; border-radius: 50%; cursor: pointer;
+  border: none;
+  background: var(--card);
+  color: var(--primary); font-size: 11px; line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 8px 24px rgba(120, 90, 160, .28);
+  transition: transform .18s cubic-bezier(.34, 1.56, .64, 1);
+}
+.pa-fab-cycle .cycle-icon { width: 11px; height: 11px; }
+.pa-fab-cycle:hover { transform: rotate(-40deg) scale(1.1); }
+.pa-fab-cycle:active { transform: rotate(180deg) scale(.92); }
 .pa-fab-face { font-size: 24px; line-height: 1; display: flex; align-items: center; justify-content: center; }
 .pa-fab-name { font-size: 13px; font-weight: 700; color: var(--text); }
 .pa-fab-pulse {

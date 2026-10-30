@@ -1,7 +1,7 @@
 /*
  Navicat Premium Dump SQL
 
- Source Server         : test
+ Source Server         : xmwg
  Source Server Type    : MySQL
  Source Server Version : 80039 (8.0.39)
  Source Host           : localhost:3306
@@ -11,7 +11,7 @@
  Target Server Version : 80039 (8.0.39)
  File Encoding         : 65001
 
- Date: 28/10/2026 09:49:17
+ Date: 30/10/2026 16:41:51
 */
 
 SET NAMES utf8mb4;
@@ -32,7 +32,7 @@ CREATE TABLE `t_category`  (
   `sort_no` int NOT NULL DEFAULT 0 COMMENT '排序（小的在前）',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_t_category_parent`(`parent_id` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '小马图鉴分类表（分级，自关联）' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '小马图鉴分类表（分级，自关联）' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_category
@@ -69,7 +69,7 @@ CREATE TABLE `t_chat_message`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_pair_time`(`from_id` ASC, `to_id` ASC, `id` ASC) USING BTREE,
   INDEX `idx_to_read`(`to_id` ASC, `read_flag` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '好友聊天消息表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '好友聊天消息表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_chat_message
@@ -91,7 +91,7 @@ CREATE TABLE `t_friend`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_pair`(`user_id` ASC, `friend_id` ASC) USING BTREE,
   INDEX `idx_friend_status`(`friend_id` ASC, `status` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '好友关系表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '好友关系表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_friend
@@ -115,7 +115,7 @@ CREATE TABLE `t_message`  (
   INDEX `idx_t_message_type`(`type` ASC) USING BTREE,
   INDEX `idx_t_message_to`(`to_id` ASC) USING BTREE,
   INDEX `idx_t_message_from`(`from_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '小马王国消息中心（留言板 / 私信 / 系统通知）' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '小马王国消息中心（留言板 / 私信 / 系统通知）' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_message
@@ -124,6 +124,8 @@ INSERT INTO `t_message` VALUES (1, 'NOTIFY', NULL, '小马王国', -1, NULL, '�
 INSERT INTO `t_message` VALUES (2, 'NOTIFY', NULL, '小马王国', -1, NULL, '每天来首页抽一只「今日幸运小马」吧 🎲，看看今天谁陪你冒险！', 0, '2026-10-28 08:28:53');
 INSERT INTO `t_message` VALUES (3, 'NOTIFY', NULL, '小马王国', 1, NULL, '欢迎来到小马王国，巴啦啦！记得去首页抽你的「今日幸运小马」🎲', 1, '2026-10-28 08:34:08');
 INSERT INTO `t_message` VALUES (4, 'BOARD', 1, '巴啦啦', NULL, NULL, '11', 0, '2026-10-28 08:34:54');
+INSERT INTO `t_message` VALUES (5, 'NOTIFY', NULL, '小马王国', 3, NULL, '欢迎来到小马王国，哇哇哇！记得去首页抽你的「今日幸运小马」🎲', 0, '2026-10-30 16:07:54');
+INSERT INTO `t_message` VALUES (6, 'NOTIFY', NULL, '小马王国', 4, NULL, '欢迎来到小马王国，啦啦啦！记得去首页抽你的「今日幸运小马」🎲', 0, '2026-10-30 16:26:34');
 
 -- ----------------------------
 -- Table structure for t_pet
@@ -142,7 +144,7 @@ CREATE TABLE `t_pet`  (
   `update_time` datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_user`(`user_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_pet
@@ -161,7 +163,7 @@ CREATE TABLE `t_point_log`  (
   `create_time` datetime NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_user`(`user_id` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_point_log
@@ -185,7 +187,7 @@ CREATE TABLE `t_pony`  (
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_t_pony_name`(`name` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '小马图鉴条目表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '小马图鉴条目表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_pony
@@ -224,7 +226,7 @@ CREATE TABLE `t_pony_category`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_pony_category`(`pony_id` ASC, `category_id` ASC) USING BTREE,
   INDEX `idx_pc_category`(`category_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 55 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '小马条目与分类的关联表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 55 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '小马条目与分类的关联表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_pony_category
@@ -295,7 +297,7 @@ CREATE TABLE `t_pony_tag`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_pony_tag`(`pony_id` ASC, `tag` ASC) USING BTREE,
   INDEX `idx_tag`(`tag` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 115 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '小马条目关键词标签' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 115 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '小马条目关键词标签' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_pony_tag
@@ -426,7 +428,7 @@ CREATE TABLE `t_search_word`  (
   `sort_no` int NOT NULL DEFAULT 0 COMMENT '人工置顶权重',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_word`(`word` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 11 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '首页热搜词' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 11 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '首页热搜词' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_search_word
@@ -455,12 +457,13 @@ CREATE TABLE `t_task_progress`  (
   `claimed` tinyint NULL DEFAULT 0,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_user_day_task`(`user_id` ASC, `day` ASC, `task_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_task_progress
 -- ----------------------------
 INSERT INTO `t_task_progress` VALUES (1, 1, '2026-10-28', 'daily_login', 1, 0);
+INSERT INTO `t_task_progress` VALUES (2, 4, '2026-10-30', 'daily_login', 1, 0);
 
 -- ----------------------------
 -- Table structure for t_user
@@ -476,13 +479,15 @@ CREATE TABLE `t_user`  (
   `permission` tinyint NOT NULL DEFAULT 1 COMMENT '1=鏅??鐢ㄦ埛 0=鏅??绠＄悊鍛?2=瓒呯骇绠＄悊鍛',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_t_user_name`(`name` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '小马王国用户表（没有邮箱、没有手机号）' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '小马王国用户表（没有邮箱、没有手机号）' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_user
 -- ----------------------------
 INSERT INTO `t_user` VALUES (1, '巴啦啦', '', 0, '6a8bddf97b11a3b4b914fc8e7ca2d2d5a58e03dcbbfd7a381801e37cd8c71cf9', '2026-10-28 08:34:08', 1);
 INSERT INTO `t_user` VALUES (2, 'admin', '', 0, 'Admin@1234', '2026-10-28 09:39:48', 2);
+INSERT INTO `t_user` VALUES (3, '哇哇哇', '', 0, 'Www123456', '2026-10-30 16:07:54', 1);
+INSERT INTO `t_user` VALUES (4, '啦啦啦', '', 0, 'Lll123456', '2026-10-30 16:26:34', 1);
 
 -- ----------------------------
 -- Table structure for t_user_item
@@ -496,7 +501,7 @@ CREATE TABLE `t_user_item`  (
   `update_time` datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_user_item`(`user_id` ASC, `item_id` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_user_item

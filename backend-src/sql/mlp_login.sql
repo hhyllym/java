@@ -1,7 +1,7 @@
 /*
  Navicat Premium Dump SQL
 
- Source Server         : xmwg
+ Source Server         : ll
  Source Server Type    : MySQL
  Source Server Version : 80039 (8.0.39)
  Source Host           : localhost:3306
@@ -11,7 +11,7 @@
  Target Server Version : 80039 (8.0.39)
  File Encoding         : 65001
 
- Date: 30/10/2026 16:41:51
+ Date: 02/11/2026 11:55:25
 */
 
 SET NAMES utf8mb4;
@@ -115,7 +115,7 @@ CREATE TABLE `t_message`  (
   INDEX `idx_t_message_type`(`type` ASC) USING BTREE,
   INDEX `idx_t_message_to`(`to_id` ASC) USING BTREE,
   INDEX `idx_t_message_from`(`from_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '小马王国消息中心（留言板 / 私信 / 系统通知）' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '小马王国消息中心（留言板 / 私信 / 系统通知）' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_message
@@ -126,6 +126,7 @@ INSERT INTO `t_message` VALUES (3, 'NOTIFY', NULL, '小马王国', 1, NULL, '欢
 INSERT INTO `t_message` VALUES (4, 'BOARD', 1, '巴啦啦', NULL, NULL, '11', 0, '2026-10-28 08:34:54');
 INSERT INTO `t_message` VALUES (5, 'NOTIFY', NULL, '小马王国', 3, NULL, '欢迎来到小马王国，哇哇哇！记得去首页抽你的「今日幸运小马」🎲', 0, '2026-10-30 16:07:54');
 INSERT INTO `t_message` VALUES (6, 'NOTIFY', NULL, '小马王国', 4, NULL, '欢迎来到小马王国，啦啦啦！记得去首页抽你的「今日幸运小马」🎲', 0, '2026-10-30 16:26:34');
+INSERT INTO `t_message` VALUES (7, 'NOTIFY', NULL, '小马王国', 5, NULL, '欢迎来到小马王国，钱钱钱！记得去首页抽你的「今日幸运小马」🎲', 0, '2026-11-02 10:43:26');
 
 -- ----------------------------
 -- Table structure for t_pet
@@ -144,11 +145,12 @@ CREATE TABLE `t_pet`  (
   `update_time` datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_user`(`user_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_pet
 -- ----------------------------
+INSERT INTO `t_pet` VALUES (1, 5, 'dragon', '小火龙', 1, 0, 60, 80, '2026-11-02 10:52:50', '2026-11-02 10:52:50');
 
 -- ----------------------------
 -- Table structure for t_point_log
@@ -163,11 +165,13 @@ CREATE TABLE `t_point_log`  (
   `create_time` datetime NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_user`(`user_id` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_point_log
 -- ----------------------------
+INSERT INTO `t_point_log` VALUES (1, 5, 5, 'task', '任务奖励：每日登录', '2026-11-02 10:46:59');
+INSERT INTO `t_point_log` VALUES (2, 5, 20, 'pet', '领养宠物奖励', '2026-11-02 10:52:50');
 
 -- ----------------------------
 -- Table structure for t_pony
@@ -192,7 +196,7 @@ CREATE TABLE `t_pony`  (
 -- ----------------------------
 -- Records of t_pony
 -- ----------------------------
-INSERT INTO `t_pony` VALUES (1, '紫悦', 'Twilight Sparkle', 'twilight', '📖', '#b79cf0', '传说', '坎特洛特的学霸小马，从独角兽一路成长为天角兽公主，掌管友谊魔法。', 0, 1, '2026-10-28 08:28:53');
+INSERT INTO `t_pony` VALUES (1, '紫悦', 'Twilight Sparkle', 'twilight', '📖', '#b79cf0', '传说', '坎特洛特的学霸小马，从独角兽一路成长为天角兽公主，掌管友谊魔法。', 1, 1, '2026-10-28 08:28:53');
 INSERT INTO `t_pony` VALUES (2, '碧琪', 'Pinkie Pie', 'pinkie', '🎈', '#f7a8c4', '稀有', '小马谷的派对担当，随时能从鬃毛里掏出派对道具，笑声能传遍整个镇子。', 0, 2, '2026-10-28 08:28:53');
 INSERT INTO `t_pony` VALUES (3, '云宝', 'Rainbow Dash', 'dash', '⚡', '#8fc7f0', '稀有', '云中城最耀眼的飞行家，彩虹音爆的创造者，梦想加入闪电飞马队。', 0, 3, '2026-10-28 08:28:53');
 INSERT INTO `t_pony` VALUES (4, '苹果嘉儿', 'Applejack', 'applejack', '🍎', '#f0a06a', '稀有', '甜苹果园的顶梁柱，戴着牛仔帽，说到做到、从不说谎。', 0, 4, '2026-10-28 08:28:53');
@@ -457,13 +461,14 @@ CREATE TABLE `t_task_progress`  (
   `claimed` tinyint NULL DEFAULT 0,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_user_day_task`(`user_id` ASC, `day` ASC, `task_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_task_progress
 -- ----------------------------
 INSERT INTO `t_task_progress` VALUES (1, 1, '2026-10-28', 'daily_login', 1, 0);
 INSERT INTO `t_task_progress` VALUES (2, 4, '2026-10-30', 'daily_login', 1, 0);
+INSERT INTO `t_task_progress` VALUES (3, 5, '2026-11-02', 'daily_login', 16, 1);
 
 -- ----------------------------
 -- Table structure for t_user
@@ -479,7 +484,7 @@ CREATE TABLE `t_user`  (
   `permission` tinyint NOT NULL DEFAULT 1 COMMENT '1=鏅??鐢ㄦ埛 0=鏅??绠＄悊鍛?2=瓒呯骇绠＄悊鍛',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_t_user_name`(`name` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '小马王国用户表（没有邮箱、没有手机号）' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '小马王国用户表（没有邮箱、没有手机号）' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_user
@@ -488,6 +493,7 @@ INSERT INTO `t_user` VALUES (1, '巴啦啦', '', 0, '6a8bddf97b11a3b4b914fc8e7ca
 INSERT INTO `t_user` VALUES (2, 'admin', '', 0, 'Admin@1234', '2026-10-28 09:39:48', 2);
 INSERT INTO `t_user` VALUES (3, '哇哇哇', '', 0, 'Www123456', '2026-10-30 16:07:54', 1);
 INSERT INTO `t_user` VALUES (4, '啦啦啦', '', 0, 'Lll123456', '2026-10-30 16:26:34', 1);
+INSERT INTO `t_user` VALUES (5, '钱钱钱', '', 25, 'Qqq123456', '2026-11-02 10:43:26', 1);
 
 -- ----------------------------
 -- Table structure for t_user_item
@@ -501,7 +507,7 @@ CREATE TABLE `t_user_item`  (
   `update_time` datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_user_item`(`user_id` ASC, `item_id` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_user_item

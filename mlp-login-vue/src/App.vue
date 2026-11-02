@@ -1,7 +1,7 @@
 <template>
   <PonyBackground />
 
-  <div class="card">
+  <div class="card" :class="{ 'card-wide': $route.meta.wide }">
     <div class="rainbow"></div>
     <div class="themes">
       <button

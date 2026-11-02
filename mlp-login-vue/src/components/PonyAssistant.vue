@@ -90,7 +90,7 @@ import { getSession } from '../auth'
 import PonyFace from './PonyFace.vue'
 
 /** 可更换的小马助手（Mane 6 + 穗龙 + 月亮公主 + 宇宙公主，共 9 个） */
-const ASSISTANTS = [
+export const ASSISTANTS = [
   {
     id: 'spike', name: '穗龙', emoji: '🐲', title: '小马国首席助理',
     color: 'linear-gradient(135deg, #a5e0bf, #bda6f2)',

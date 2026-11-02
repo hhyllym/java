@@ -2,7 +2,10 @@
   <div class="home">
     <!-- 顶部：logo + 问候 + 退出 -->
     <div class="home-top">
-      <div class="logo">🦄</div>
+      <router-link to="/dashboard" class="logo" title="进入我的主页">
+        <img v-if="isImage(greetAvatar)" :src="greetAvatar" class="logo-img" alt="头像" />
+        <span v-else>{{ greetAvatar || '🦄' }}</span>
+      </router-link>
       <div class="home-greet">
         <h2>你好，{{ session.name || '小马' }}！</h2>
         <p>小马王国图鉴 · 欢迎回来 ✨</p>
@@ -17,13 +20,13 @@
       <router-link to="/learn" class="nav-item">🎓 学院</router-link>
       <router-link to="/fortune" class="nav-item">🎲 幸运</router-link>
       <router-link to="/shop" class="nav-item">🧧 商店</router-link>
+      <router-link to="/pet" class="nav-item">🐾 宠物</router-link>
       <router-link to="/friends" class="nav-item">
         👥 好友<span v-if="chatUnread > 0" class="nav-badge">{{ chatUnread > 99 ? '99+' : chatUnread }}</span>
       </router-link>
       <router-link to="/message" class="nav-item">
         💬 消息<span v-if="unread > 0" class="nav-badge">{{ unread > 99 ? '99+' : unread }}</span>
       </router-link>
-      <router-link to="/dashboard" class="nav-item">🌟 我的</router-link>
       <router-link v-if="session.permission === 0 || session.permission === 2" to="/admin" class="nav-item admin-entry">🛠 后台管理</router-link>
     </nav>
 
@@ -185,6 +188,9 @@
         </div>
       </div>
     </Teleport>
+
+    <!-- AI 小马助手：仅主页显示，点它开聊 -->
+    <PonyAssistant />
   </div>
 </template>
 
@@ -195,6 +201,7 @@ import { apiUnread } from '../message'
 import { apiPresenceOffline } from '../presence'
 import { apiChatUnread } from '../chat'
 import CutieMark from '../components/CutieMark.vue'
+import PonyAssistant from '../components/PonyAssistant.vue'
 
 /** CutieMark.vue 里真正画了图案的几种可爱标志，其余用 emoji 兜底 */
 const MARKS = ['pinkie', 'twilight', 'dash', 'applejack', 'fluttershy', 'rarity']
@@ -203,11 +210,17 @@ const PAGE_SIZE = 12
 
 export default {
   name: 'HomeView',
-  components: { CutieMark },
+  components: { CutieMark, PonyAssistant },
   inject: ['toast'],
   data() {
+    // 欢迎语头像：优先本地自定义图片头像，其次会话里的 emoji
+    const session = getSession() || {}
+    let customAvatar = ''
+    try { customAvatar = localStorage.getItem('mlp_avatar_' + session.id) || '' } catch (e) {}
     return {
-      session: getSession() || {},
+      customAvatar,
+
+      session,
 
       // 列表与搜索状态
       keyword: '',
@@ -242,6 +255,10 @@ export default {
     }
   },
   computed: {
+    /** 欢迎语头像：本地自定义图片 > 会话 emoji > 默认 🦄 */
+    greetAvatar() {
+      return this.customAvatar || this.session.avatar || ''
+    },
     /** 当前一级分类下的二级分类 */
     subCategories() {
       const node = this.categoryTree.find(c => c.id === this.level1Id)
@@ -286,6 +303,10 @@ export default {
     if (this.chatTimer) clearInterval(this.chatTimer)
   },
   methods: {
+    /** 图片型头像（dataURL / 链接）用 <img> 渲染，emoji 走文本 */
+    isImage(v) {
+      return typeof v === 'string' && (v.startsWith('data:') || v.startsWith('http'))
+    },
     /** 支持从别的页面带参进来：/home?pony=2 直接开详情，/home?category=12 直接筛分类 */
     async applyQuery() {
       const q = this.$route.query || {}
@@ -469,6 +490,10 @@ export default {
 </script>
 
 <style scoped>
+/* 欢迎语头像：自定义图片时铺满圆形；点它进个人主页 */
+.logo { cursor: pointer; transition: transform .2s, box-shadow .2s; }
+.logo:hover { transform: scale(1.08) rotate(-4deg); box-shadow: 0 6px 18px rgba(0, 0, 0, .25); }
+.logo-img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
 .nav-item.admin-entry {
   background: linear-gradient(135deg, #a06cd5, #c89bf0);
   color: #fff !important;

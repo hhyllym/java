@@ -1,9 +1,13 @@
 <template>
   <div class="dash">
+    <!-- 返回主页 -->
+    <button class="dash-back" title="返回主页" @click="$router.push({ name: 'home' })">← 返回主页</button>
+
     <!-- 头部：头像 + 名字 + 积分 -->
     <div class="dash-head">
       <button class="dash-avatar" title="点我换头像" @click="avatarPicker = !avatarPicker">
-        {{ account.avatar || '🦄' }}
+        <img v-if="isImage(avatarDisplay)" :src="avatarDisplay" class="dash-avatar-img" alt="头像" />
+        <span v-else class="dash-avatar-emoji">{{ avatarDisplay }}</span>
         <span class="dash-avatar-edit">✏️</span>
       </button>
       <div class="dash-head-main">
@@ -19,6 +23,20 @@
     <!-- 头像选择器 -->
     <div v-if="avatarPicker" class="dash-avatars">
       <button v-for="e in AVATARS" :key="e" @click="pickAvatar(e)">{{ e }}</button>
+      <!-- 自定义：上传图片 -->
+      <label class="dash-avatar-custom" title="上传自定义图片头像">
+        📷<span>上传图片</span>
+        <input type="file" accept="image/*" class="hidden-file" @change="onAvatarFile" />
+      </label>
+      <!-- 自定义：任意 emoji -->
+      <input
+        v-model.trim="customEmoji"
+        maxlength="16"
+        class="dash-avatar-emoji-input"
+        placeholder="或输入自定义 emoji"
+        @keyup.enter="pickAvatar(customEmoji)"
+      />
+      <button v-if="customAvatar" class="dash-avatar-reset" @click="resetCustomAvatar">🦄 用默认</button>
     </div>
 
     <!-- 改名输入 -->
@@ -85,97 +103,6 @@
       </div>
     </div>
 
-    <!-- 宠物 -->
-    <div class="dash-sec">
-      <h4>🐾 我的宠物</h4>
-      <div v-if="petLoading" class="dash-tip">看看宠物窝里有没有小家伙…</div>
-      <div v-else-if="pet" class="pet-card">
-        <div class="pet-face" :class="{ hungry: pet.hunger < 30 }">
-          {{ pet.kindInfo.emoji }}
-          <span v-if="pet.cosmetic" class="pet-cosmetic" :title="pet.cosmetic.name">{{ pet.cosmetic.icon }}</span>
-        </div>
-        <div class="pet-main">
-          <p><b>{{ pet.name }}</b> <span class="pet-lv">Lv.{{ pet.level }}</span></p>
-          <div class="pet-stats">
-            <span>🍖 饱食 {{ pet.hunger }}</span>
-            <span>💖 心情 {{ pet.mood }}</span>
-            <span>⭐ 经验 {{ pet.exp }}/{{ pet.level * 50 }}</span>
-            <span v-if="pet.cosmetic">🎀 {{ pet.cosmetic.name }}</span>
-          </div>
-          <div class="pet-actions">
-            <button @click="feedPet">🍖 喂食</button>
-            <button @click="playPet">🎾 玩耍</button>
-            <button @click="renamePet">✏️ 改名</button>
-            <button @click="openWardrobe">🎀 衣橱</button>
-          </div>
-        </div>
-      </div>
-      <div v-else class="dash-tip">
-        还没有宠物 🥚<br />
-        <span>领养一只小家伙，或去商店兑换宠物蛋</span>
-        <div class="pet-adopt-actions">
-          <button class="dash-goto-adopt" @click="openAdopt">🥚 去领养</button>
-          <button class="dash-goto-shop" @click="$router.push({ name: 'shop' })">去商店看看</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- 领养中心：选种类 + 起名（手动领养入口） -->
-    <Teleport to="body">
-      <div v-if="adoptOpen" class="sheet-mask" @click.self="adoptOpen = false">
-        <div class="sheet adopt-sheet">
-          <h3>🥚 领养中心</h3>
-          <p class="sheet-tip">选一只喜欢的小家伙，给它起个名字吧</p>
-          <div class="adopt-kinds">
-            <button
-              v-for="k in PET_KINDS"
-              :key="k.kind"
-              :class="{ on: adoptKind === k.kind }"
-              @click="adoptKind = k.kind"
-            >
-              <span class="adopt-face">{{ k.emoji }}</span>
-              <b>{{ k.name }}</b>
-              <em>{{ k.desc }}</em>
-            </button>
-          </div>
-          <input v-model.trim="adoptName" maxlength="20" placeholder="起个名字（特殊符号也行）" @keyup.enter="confirmAdopt" />
-          <div class="sheet-btns">
-            <button class="primary" :disabled="adopting" @click="confirmAdopt">
-              {{ adopting ? '领养中…' : '领养！' }}
-            </button>
-            <button class="ghost" @click="adoptOpen = false">再想想</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- 衣橱：给宠物换装扮（积分兑换来的） -->
-      <div v-if="wardrobeOpen" class="sheet-mask" @click.self="wardrobeOpen = false">
-        <div class="sheet wardrobe-sheet">
-          <h3>🎀 宠物衣橱</h3>
-          <p class="sheet-tip">点一下就换上，再点一次卸下（只能戴一件）</p>
-          <div class="wardrobe-grid">
-            <button
-              v-for="c in cosmetics"
-              :key="c.id"
-              :class="{ on: c.equipped }"
-              @click="toggleCosmetic(c)"
-            >
-              <span class="wardrobe-face">{{ c.icon }}</span>
-              <b>{{ c.name }}</b>
-              <em v-if="c.equipped">装备中</em>
-              <em v-else-if="c.count > 1">x{{ c.count }}</em>
-            </button>
-            <div v-if="!cosmetics.length" class="sheet-tip">
-              衣橱还空着，去商店「宠物装扮」区兑换几件吧
-            </div>
-          </div>
-          <div class="sheet-btns">
-            <button class="ghost" @click="wardrobeOpen = false">搞定</button>
-          </div>
-        </div>
-      </div>
-    </Teleport>
-
     <!-- 同名小马：图鉴里有同名的就亮出来 -->
     <div class="dash-sec">
       <h4>你的同名小马</h4>
@@ -224,19 +151,12 @@ import { apiProfile } from '../user'
 import { apiAccountProfile, apiAccountUpdate } from '../account'
 import { apiPointBalance, apiPointLogs, apiPointRank } from '../point'
 import { apiTaskToday, apiTaskClaim, apiTaskBump } from '../task'
-import { apiPetMine, apiPetFeed, apiPetPlay, apiPetRename, apiPetAdopt, apiPetCosmetics, apiPetCosmeticEquip, apiPetCosmeticUnequip } from '../pet'
 import sound from '../sound'
 import CutieMark from '../components/CutieMark.vue'
 
 const MARKS = ['pinkie', 'twilight', 'dash', 'applejack', 'fluttershy', 'rarity']
 const RARITY_CLASS = { 常见: 'rr-common', 稀有: 'rr-rare', 传说: 'rr-legend' }
 const AVATARS = ['🦄', '🐲', '🌙', '☀️', '🎀', '💎', '⚡', '🍎', '🦋', '🎉', '📚', '⭐', '🐱', '🐦', '🧁', '👑']
-/** 领养中心的宠物种类（与后端 ShopDefs 一致） */
-const PET_KINDS = [
-  { kind: 'dragon', name: '小火龙', emoji: '🐲', desc: '喷小火苗的龙崽' },
-  { kind: 'cat', name: '奶糖猫', emoji: '🐱', desc: '又甜又软，爱打呼噜' },
-  { kind: 'bird', name: '云雀', emoji: '🐦', desc: '嗓门很小，唱歌跑调' }
-]
 
 export default {
   name: 'DashboardView',
@@ -249,32 +169,22 @@ export default {
       apiError: '',
       profile: { id: null, name: '', createTime: '', days: 0, pony: null },
 
-      // 账号 / 积分 / 任务 / 宠物
+      // 账号 / 积分 / 任务
       account: { name: '', avatar: '', points: 0 },
       tasks: [],
       rank: [],
       logs: [],
       logsOpen: false,
       showRank: false,
-      pet: null,
-      petLoading: true,
 
       // 头像与改名交互
       avatarPicker: false,
       renaming: false,
       newName: '',
+      // 自定义头像（本地图片，存 localStorage；emoji 走后端）
+      customEmoji: '',
+      customAvatar: '',
 
-      // 领养中心
-      adoptOpen: false,
-      adoptKind: 'dragon',
-      adoptName: '',
-      adopting: false,
-
-      // 衣橱
-      wardrobeOpen: false,
-      cosmetics: [],
-
-      PET_KINDS,
       AVATARS
     }
   },
@@ -282,14 +192,19 @@ export default {
     lastLoginText() {
       if (!this.session.ts) return ''
       return new Date(this.session.ts).toLocaleString('zh-CN')
+    },
+    avatarDisplay() {
+      return this.customAvatar || this.account.avatar || '🦄'
     }
   },
   created() {
     this.loadProfile()
     this.loadAccount()
     this.loadTasks()
-    this.loadPet()
     this.loadRank()
+    // 读回本地保存的自定义图片头像
+    const saved = localStorage.getItem('mlp_avatar_' + this.session.id)
+    if (saved) this.customAvatar = saved
     // 每日登录任务顺手达成
     apiTaskBump(this.session.id, 'login')
   },
@@ -325,12 +240,6 @@ export default {
       const r = await apiTaskToday(this.session.id)
       if (r.code === 200) this.tasks = r.data || []
     },
-    async loadPet() {
-      this.petLoading = true
-      const r = await apiPetMine(this.session.id)
-      this.petLoading = false
-      if (r.code === 200) this.pet = r.data
-    },
     async loadRank() {
       const r = await apiPointRank()
       if (r.code === 200) this.rank = r.data || []
@@ -343,7 +252,13 @@ export default {
       }
     },
     async pickAvatar(emoji) {
+      if (!emoji) return
       sound.pop()
+      // 选了 emoji：清掉本地自定义图片，统一用后端头像
+      if (this.customAvatar) {
+        localStorage.removeItem('mlp_avatar_' + this.session.id)
+        this.customAvatar = ''
+      }
       const r = await apiAccountUpdate(this.session.id, { avatar: emoji })
       if (r.code === 200) {
         this.account.avatar = emoji
@@ -352,6 +267,53 @@ export default {
       } else {
         this.toast(r.msg || '换头像失败', 'err')
       }
+    },
+    /** 是否图片型头像（data: 或 http(s): 走 <img>；其余当 emoji 文本） */
+    isImage(v) {
+      return typeof v === 'string' && (v.startsWith('data:') || v.startsWith('http'))
+    },
+    /** 上传本地图片当作头像：读图 → 居中裁成 160×160 → 压成 PNG dataURL → 存本地 */
+    async onAvatarFile(e) {
+      const file = e.target.files && e.target.files[0]
+      if (!file) return
+      const dataUrl = await this.compressImage(file, 160)
+      if (!dataUrl) {
+        this.toast('图片读取出错啦', 'err')
+        return
+      }
+      localStorage.setItem('mlp_avatar_' + this.session.id, dataUrl)
+      this.customAvatar = dataUrl
+      this.avatarPicker = false
+      this.toast('头像换好啦 🖼', 'ok')
+    },
+    compressImage(file, size) {
+      return new Promise((resolve) => {
+        const reader = new FileReader()
+        reader.onload = () => {
+          const img = new Image()
+          img.onload = () => {
+            const c = document.createElement('canvas')
+            c.width = size
+            c.height = size
+            const ctx = c.getContext('2d')
+            const min = Math.min(img.width, img.height)
+            const sx = (img.width - min) / 2
+            const sy = (img.height - min) / 2
+            ctx.drawImage(img, sx, sy, min, min, 0, 0, size, size)
+            resolve(c.toDataURL('image/png'))
+          }
+          img.onerror = () => resolve(null)
+          img.src = reader.result
+        }
+        reader.onerror = () => resolve(null)
+        reader.readAsDataURL(file)
+      })
+    },
+    /** 清除本地自定义图片，回到 emoji 默认 */
+    resetCustomAvatar() {
+      localStorage.removeItem('mlp_avatar_' + this.session.id)
+      this.customAvatar = ''
+      this.toast('已切换回默认头像 🦄', 'ok')
     },
     startRename() {
       this.newName = this.profile.name || this.account.name || ''
@@ -385,79 +347,6 @@ export default {
         this.toast(r.msg || '领奖失败', 'err')
       }
     },
-    async feedPet() {
-      const r = await apiPetFeed(this.session.id)
-      this.afterPetAction(r)
-    },
-    async playPet() {
-      const r = await apiPetPlay(this.session.id)
-      this.afterPetAction(r)
-    },
-    afterPetAction(r) {
-      if (r.code === 200) {
-        sound.pop()
-        this.toast(r.data, 'ok')
-        this.loadPet()
-        this.loadAccount()
-      } else {
-        this.toast(r.msg || '操作失败', 'err')
-      }
-    },
-    async renamePet() {
-      const name = prompt('给宠物起个新名字（特殊符号也行）：', this.pet ? this.pet.name : '')
-      if (!name || !name.trim()) return
-      const r = await apiPetRename(this.session.id, name.trim())
-      if (r.code === 200) {
-        this.toast(r.data, 'ok')
-        this.loadPet()
-      } else {
-        this.toast(r.msg || '改名失败', 'err')
-      }
-    },
-    /** 打开领养中心 */
-    openAdopt() {
-      this.adoptOpen = true
-      this.adoptKind = 'dragon'
-      this.adoptName = ''
-    },
-    /** 确认领养（手动领养入口） */
-    async confirmAdopt() {
-      if (this.adopting) return
-      this.adopting = true
-      const r = await apiPetAdopt(this.session.id, this.adoptKind, this.adoptName)
-      this.adopting = false
-      if (r.code === 200) {
-        this.adoptOpen = false
-        sound.magic()
-        this.toast(r.data, 'ok')
-        this.loadPet()
-        this.loadAccount()
-      } else {
-        sound.fail()
-        this.toast(r.msg || '领养失败', 'err')
-      }
-    },
-    /** 打开衣橱 */
-    async openWardrobe() {
-      this.wardrobeOpen = true
-      const r = await apiPetCosmetics(this.session.id)
-      if (r.code === 200) this.cosmetics = r.data || []
-    },
-    /** 点装扮：没装备就穿上，已装备就卸下 */
-    async toggleCosmetic(c) {
-      const r = c.equipped
-        ? await apiPetCosmeticUnequip(this.session.id)
-        : await apiPetCosmeticEquip(this.session.id, c.id)
-      if (r.code === 200) {
-        sound.pop()
-        this.toast(r.data, 'ok')
-        this.openWardrobe()
-        this.loadPet()
-      } else {
-        sound.fail()
-        this.toast(r.msg || '操作失败', 'err')
-      }
-    },
     openPony() {
       this.$router.push({ name: 'home', query: { pony: this.profile.pony.id } })
     },
@@ -485,6 +374,18 @@ export default {
 </script>
 
 <style scoped>
+/* 返回按钮悬浮在左上角，不占布局空间，头像位置保持原样 */
+.dash { position: relative; }
+.dash-back {
+  position: absolute; top: 8px; left: 14px;
+  border: none; cursor: pointer;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 12px; font-weight: 700;
+  color: var(--primary); background: var(--panel);
+  transition: background .2s, transform .2s;
+}
+.dash-back:hover { background: var(--track); transform: translateX(-2px); }
 .dash-head {
   display: flex; align-items: center; gap: 14px;
   padding: 16px 0 6px;
@@ -499,6 +400,11 @@ export default {
   transition: transform .15s;
 }
 .dash-avatar:hover { transform: scale(1.06) rotate(-3deg); }
+.dash-avatar-emoji { font-size: 34px; line-height: 1; }
+.dash-avatar-img {
+  width: 100%; height: 100%; object-fit: cover;
+  border-radius: 16px; display: block;
+}
 .dash-avatar-edit {
   position: absolute; right: -4px; bottom: -4px;
   width: 22px; height: 22px; border-radius: 50%;
@@ -531,6 +437,27 @@ export default {
   cursor: pointer; transition: all .15s;
 }
 .dash-avatars button:hover { border-color: var(--primary); transform: scale(1.15); }
+/* 自定义上传 / emoji 输入 / 恢复默认 */
+.dash-avatar-custom {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  border: 1px dashed var(--primary); border-radius: 10px;
+  background: var(--card); color: var(--primary);
+  font-size: 18px; padding: 6px 0 4px; cursor: pointer; transition: all .15s;
+}
+.dash-avatar-custom:hover { background: var(--panel); transform: scale(1.05); }
+.dash-avatar-custom span { font-size: 9px; color: var(--muted); }
+.hidden-file { display: none; }
+.dash-avatar-emoji-input {
+  grid-column: 1 / -1; border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 7px 10px; font-size: 13px;
+  background: var(--card); color: var(--text); outline: none;
+}
+.dash-avatar-emoji-input:focus { border-color: var(--primary); }
+.dash-avatar-reset {
+  grid-column: 1 / -1; border: none; cursor: pointer;
+  border-radius: 10px; padding: 7px 0; font-size: 12px; font-weight: 700;
+  color: #fff; background: linear-gradient(135deg, var(--pink), var(--purple));
+}
 
 /* 改名框 */
 .dash-rename-box {
@@ -579,9 +506,9 @@ export default {
 .dash-log-row .down { color: var(--danger); font-weight: 800; }
 .dash-log-row em { font-style: normal; color: var(--muted); }
 
-/* 每日任务：两个一排 */
+/* 每日任务：一列排布 */
 .task-grid {
-  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px;
+  display: grid; grid-template-columns: 1fr; gap: 8px;
 }
 .task-row {
   display: flex; align-items: center; gap: 8px;
@@ -597,135 +524,11 @@ export default {
 .task-bar i { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--pink), var(--purple)); transition: width .3s; }
 .task-claim {
   border: none; cursor: pointer; flex-shrink: 0;
+  width: auto;
   border-radius: 999px; padding: 6px 13px;
   font-size: 11.5px; font-weight: 800;
   color: #fff; background: linear-gradient(135deg, var(--pink), var(--purple));
 }
 .task-claim:disabled { background: var(--track); color: var(--muted); cursor: not-allowed; }
 
-/* 宠物 */
-.pet-card {
-  display: flex; gap: 12px; padding: 12px;
-  border-radius: 14px; background: var(--panel);
-}
-.pet-face {
-  width: 62px; height: 62px; flex-shrink: 0;
-  border-radius: 16px; background: var(--card);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 34px;
-  animation: petBounce 2.6s ease-in-out infinite;
-}
-.pet-face.hungry { filter: grayscale(.6); }
-@keyframes petBounce {
-  0%, 100% { transform: translateY(0) rotate(-2deg); }
-  50% { transform: translateY(-6px) rotate(2deg); }
-}
-.pet-main { flex: 1; min-width: 0; }
-.pet-main p { margin: 0 0 5px; font-size: 14.5px; }
-.pet-lv {
-  font-size: 10.5px; color: #fff; margin-left: 6px;
-  background: var(--primary); border-radius: 999px; padding: 1px 8px;
-}
-.pet-stats { display: flex; flex-wrap: wrap; gap: 8px; font-size: 11.5px; color: var(--muted); margin-bottom: 8px; }
-.pet-actions { display: flex; gap: 6px; flex-wrap: wrap; }
-.pet-actions button {
-  border: 1.5px solid var(--border); cursor: pointer;
-  background: var(--card); color: var(--text);
-  border-radius: 999px; padding: 5px 12px; font-size: 11.5px; font-weight: 700;
-  transition: all .15s;
-}
-.pet-actions button:hover { border-color: var(--primary); color: var(--primary); }
-.dash-goto-shop {
-  display: block; margin: 10px auto 0;
-  border: none; cursor: pointer; border-radius: 999px;
-  padding: 8px 18px; font-size: 12.5px; font-weight: 700;
-  color: #fff; background: linear-gradient(135deg, var(--pink), var(--purple));
-}
-.pet-adopt-actions { display: flex; gap: 8px; justify-content: center; margin-top: 10px; }
-.dash-goto-adopt {
-  display: block; border: none; cursor: pointer; border-radius: 999px;
-  padding: 8px 18px; font-size: 12.5px; font-weight: 700;
-  color: #fff; background: linear-gradient(135deg, var(--pink), var(--purple));
-}
-.pet-adopt-actions .dash-goto-shop { margin-top: 0; }
-
-/* 宠物头顶装扮角标 */
-.pet-cosmetic {
-  position: absolute; top: -10px; right: -8px;
-  font-size: 20px;
-  filter: drop-shadow(0 2px 3px rgba(160, 108, 213, .4));
-  animation: petBounce 2s ease-in-out infinite;
-}
-.pet-face { position: relative; }
-
-/* 领养中心 */
-.adopt-kinds { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
-.adopt-kinds button {
-  display: flex; flex-direction: column; align-items: center; gap: 3px;
-  border: 1.5px solid var(--border); border-radius: 14px;
-  background: var(--panel); color: var(--text);
-  padding: 12px 6px; cursor: pointer; transition: all .15s;
-}
-.adopt-kinds button:hover { border-color: var(--primary); }
-.adopt-kinds button.on {
-  border-color: var(--primary);
-  background: linear-gradient(135deg, var(--pink), var(--purple));
-  color: #fff;
-}
-.adopt-face { font-size: 32px; }
-.adopt-kinds b { font-size: 12.5px; }
-.adopt-kinds em {
-  font-style: normal; font-size: 10px; color: var(--muted);
-  text-align: center; line-height: 1.4;
-}
-.adopt-kinds button.on em { color: rgba(255, 255, 255, .85); }
-
-/* 衣橱 */
-.wardrobe-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-.wardrobe-grid button {
-  display: flex; flex-direction: column; align-items: center; gap: 3px;
-  border: 1.5px solid var(--border); border-radius: 14px;
-  background: var(--panel); color: var(--text);
-  padding: 10px 4px; cursor: pointer; transition: all .15s;
-}
-.wardrobe-grid button:hover { border-color: var(--primary); transform: translateY(-2px); }
-.wardrobe-grid button.on {
-  border-color: var(--primary);
-  outline: 2px solid var(--primary);
-  outline-offset: -1px;
-}
-.wardrobe-face { font-size: 26px; }
-.wardrobe-grid b { font-size: 11px; }
-.wardrobe-grid em { font-style: normal; font-size: 10px; color: var(--primary); font-weight: 700; }
-.wardrobe-grid button.on b { color: var(--primary); }
-
-/* 通用弹层（领养/衣橱复用） */
-.sheet-mask {
-  position: fixed; inset: 0; z-index: 100;
-  background: rgba(60, 30, 90, .35);
-  display: flex; align-items: center; justify-content: center;
-  padding: 20px;
-}
-.sheet {
-  width: 100%; max-width: var(--app-w); max-height: var(--app-h); overflow-y: auto;
-  background: var(--card); border-radius: 20px;
-  padding: 20px; border: 1.5px solid var(--border);
-}
-.sheet h3 { margin: 0 0 4px; font-size: 17px; }
-.sheet-tip { margin: 0 0 12px; font-size: 12px; color: var(--muted); }
-.sheet input {
-  width: 100%; box-sizing: border-box;
-  border: 1.5px solid var(--border); border-radius: 10px;
-  padding: 9px 12px; font-size: 13px;
-  background: var(--panel); color: var(--text); outline: none;
-}
-.sheet input:focus { border-color: var(--primary); }
-.sheet-btns { display: flex; gap: 8px; margin-top: 14px; }
-.sheet-btns button {
-  flex: 1; border: none; cursor: pointer; border-radius: 10px;
-  padding: 9px 0; font-size: 13px; font-weight: 800;
-  color: #fff; background: linear-gradient(135deg, var(--pink), var(--purple));
-}
-.sheet-btns button.ghost { background: var(--panel); color: var(--muted); }
-.sheet-btns button:disabled { background: var(--track); color: var(--muted); cursor: not-allowed; }
 </style>

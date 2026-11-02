@@ -4,6 +4,7 @@ import LoginView from '../views/LoginView.vue'
 import RegisterView from '../views/RegisterView.vue'
 import DashboardView from '../views/DashboardView.vue'
 import ShopView from '../views/ShopView.vue'
+import PetView from '../views/PetView.vue'
 import MessageCenterView from '../views/MessageCenterView.vue'
 import FortuneView from '../views/FortuneView.vue'
 import LearnView from '../views/LearnView.vue'
@@ -21,7 +22,8 @@ const router = createRouter({
     { path: '/', redirect: { name: 'home' } },
     { path: '/home', name: 'home', component: HomeView, meta: { requiresAuth: true } },
     { path: '/dashboard', name: 'dashboard', component: DashboardView, meta: { requiresAuth: true } },
-    { path: '/shop', name: 'shop', component: ShopView, meta: { requiresAuth: true } },
+    { path: '/shop', name: 'shop', component: ShopView, meta: { requiresAuth: true, wide: true } },
+    { path: '/pet', name: 'pet', component: PetView, meta: { requiresAuth: true } },
     { path: '/message', name: 'message', component: MessageCenterView, meta: { requiresAuth: true } },
     { path: '/fortune', name: 'fortune', component: FortuneView, meta: { requiresAuth: true } },
     { path: '/learn', name: 'learn', component: LearnView, meta: { requiresAuth: true } },

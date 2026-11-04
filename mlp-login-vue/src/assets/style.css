@@ -290,6 +290,17 @@ button.submit:active { transform: translateY(1px); }
 }
 .nav-item.disabled { opacity: .55; }
 
+/* 导航折叠按钮 + 收起态 */
+.nav-fold {
+  flex: 0 0 auto; min-width: 84px;
+  border: 1.5px dashed var(--border); background: none; cursor: pointer;
+  border-radius: 9px; padding: 9px 12px;
+  font-size: 13px; color: var(--muted); transition: all .18s ease;
+}
+.nav-fold:hover { color: var(--primary); border-color: var(--primary); }
+.navbar.folded .nav-item { display: none; }
+.navbar.folded { justify-content: center; }
+
 /* 搜索栏 */
 .search { display: flex; gap: 8px; padding: 0; }   /* padding:0 是为了盖掉全局 form 的内边距，让搜索框和下面的筛选按钮左右对齐 */
 .search input {

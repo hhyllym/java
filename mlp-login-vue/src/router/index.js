@@ -13,6 +13,8 @@ import FriendsView from '../views/FriendsView.vue'
 import ChatView from '../views/ChatView.vue'
 import AdminLoginView from '../views/AdminLoginView.vue'
 import AdminView from '../views/AdminView.vue'
+import AdventureView from '../views/AdventureView.vue'
+import DiaryView from '../views/DiaryView.vue'
 import { getSession } from '../auth'
 import { getAdminSession } from '../adminAuth'
 
@@ -27,6 +29,8 @@ const router = createRouter({
     { path: '/message', name: 'message', component: MessageCenterView, meta: { requiresAuth: true } },
     { path: '/fortune', name: 'fortune', component: FortuneView, meta: { requiresAuth: true } },
     { path: '/learn', name: 'learn', component: LearnView, meta: { requiresAuth: true } },
+    { path: '/adventure', name: 'adventure', component: AdventureView, meta: { requiresAuth: true } },
+    { path: '/diary', name: 'diary', component: DiaryView, meta: { requiresAuth: true } },
     { path: '/game/:id', name: 'game', component: GameView, meta: { requiresAuth: true } },
     { path: '/friends', name: 'friends', component: FriendsView, meta: { requiresAuth: true } },
     { path: '/chat/:id', name: 'chat', component: ChatView, meta: { requiresAuth: true } },

@@ -343,29 +343,30 @@ export default {
   margin-bottom: 8px;
 }
 .shop-grid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
 }
 .shop-item {
-  display: flex; flex-direction: column; gap: 4px;
-  padding: 14px 12px 10px; border-radius: 16px;
+  display: flex; flex-direction: column; gap: 3px;
+  padding: 10px 8px 8px; border-radius: 14px;
   background: var(--card); border: 1.5px solid var(--border);
   transition: all .15s;
+  min-width: 0;
 }
 .shop-item:hover { border-color: var(--primary); transform: translateY(-2px); }
-.shop-item-face { font-size: 36px; text-align: center; }
-.shop-item b { font-size: 13.5px; }
+.shop-item-face { font-size: 28px; text-align: center; }
+.shop-item b { font-size: 12px; text-align: center; }
 .shop-item p {
-  flex: 1; margin: 0; font-size: 11px; color: var(--muted);
-  line-height: 1.5;
+  flex: 1; margin: 0; font-size: 10px; color: var(--muted);
+  line-height: 1.4; text-align: center;
 }
 .shop-item-foot {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-top: 6px;
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  margin-top: 4px;
 }
-.price { font-size: 12.5px; font-weight: 800; color: var(--primary); }
+.price { font-size: 12px; font-weight: 800; color: var(--primary); }
 .shop-item-foot button {
   border: none; cursor: pointer; border-radius: 999px;
-  padding: 5px 14px; font-size: 11.5px; font-weight: 800;
+  padding: 4px 12px; font-size: 11px; font-weight: 800;
   color: #fff; background: linear-gradient(135deg, var(--pink), var(--purple));
 }
 .shop-item-foot button:disabled {

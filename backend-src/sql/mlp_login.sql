@@ -1,7 +1,7 @@
 /*
  Navicat Premium Dump SQL
 
- Source Server         : ll
+ Source Server         : dd
  Source Server Type    : MySQL
  Source Server Version : 80039 (8.0.39)
  Source Host           : localhost:3306
@@ -11,7 +11,7 @@
  Target Server Version : 80039 (8.0.39)
  File Encoding         : 65001
 
- Date: 02/11/2026 11:55:25
+ Date: 04/11/2026 09:43:17
 */
 
 SET NAMES utf8mb4;
@@ -91,10 +91,30 @@ CREATE TABLE `t_friend`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_pair`(`user_id` ASC, `friend_id` ASC) USING BTREE,
   INDEX `idx_friend_status`(`friend_id` ASC, `status` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '好友关系表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '好友关系表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_friend
+-- ----------------------------
+INSERT INTO `t_friend` VALUES (1, 1, 3, 0, '', '很高兴认识你！', '2026-11-04 08:56:09', '2026-11-04 08:56:09');
+INSERT INTO `t_friend` VALUES (2, 1, 5, 1, '', '很高兴认识你！', '2026-11-04 08:56:16', '2026-11-04 09:05:25');
+
+-- ----------------------------
+-- Table structure for t_friend_remark
+-- ----------------------------
+DROP TABLE IF EXISTS `t_friend_remark`;
+CREATE TABLE `t_friend_remark`  (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `me_id` bigint NOT NULL COMMENT '谁起的备注（t_user.id）',
+  `friend_id` bigint NOT NULL COMMENT '备注的是哪个好友（t_user.id）',
+  `remark` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '备注名，最长和用户名一致',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_me_friend`(`me_id` ASC, `friend_id` ASC) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '好友备注表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of t_friend_remark
 -- ----------------------------
 
 -- ----------------------------
@@ -145,12 +165,13 @@ CREATE TABLE `t_pet`  (
   `update_time` datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_user`(`user_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_pet
 -- ----------------------------
 INSERT INTO `t_pet` VALUES (1, 5, 'dragon', '小火龙', 1, 0, 60, 80, '2026-11-02 10:52:50', '2026-11-02 10:52:50');
+INSERT INTO `t_pet` VALUES (2, 1, 'dragon', '小火龙', 1, 0, 60, 80, '2026-11-04 08:57:52', '2026-11-04 08:57:52');
 
 -- ----------------------------
 -- Table structure for t_point_log
@@ -165,13 +186,15 @@ CREATE TABLE `t_point_log`  (
   `create_time` datetime NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_user`(`user_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_point_log
 -- ----------------------------
 INSERT INTO `t_point_log` VALUES (1, 5, 5, 'task', '任务奖励：每日登录', '2026-11-02 10:46:59');
 INSERT INTO `t_point_log` VALUES (2, 5, 20, 'pet', '领养宠物奖励', '2026-11-02 10:52:50');
+INSERT INTO `t_point_log` VALUES (3, 1, 5, 'task', '任务奖励：每日登录', '2026-11-04 08:56:38');
+INSERT INTO `t_point_log` VALUES (4, 1, 20, 'pet', '领养宠物奖励', '2026-11-04 08:57:52');
 
 -- ----------------------------
 -- Table structure for t_pony
@@ -461,7 +484,7 @@ CREATE TABLE `t_task_progress`  (
   `claimed` tinyint NULL DEFAULT 0,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_user_day_task`(`user_id` ASC, `day` ASC, `task_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_task_progress
@@ -469,6 +492,7 @@ CREATE TABLE `t_task_progress`  (
 INSERT INTO `t_task_progress` VALUES (1, 1, '2026-10-28', 'daily_login', 1, 0);
 INSERT INTO `t_task_progress` VALUES (2, 4, '2026-10-30', 'daily_login', 1, 0);
 INSERT INTO `t_task_progress` VALUES (3, 5, '2026-11-02', 'daily_login', 16, 1);
+INSERT INTO `t_task_progress` VALUES (4, 1, '2026-11-04', 'daily_login', 14, 1);
 
 -- ----------------------------
 -- Table structure for t_user
@@ -489,7 +513,7 @@ CREATE TABLE `t_user`  (
 -- ----------------------------
 -- Records of t_user
 -- ----------------------------
-INSERT INTO `t_user` VALUES (1, '巴啦啦', '', 0, '6a8bddf97b11a3b4b914fc8e7ca2d2d5a58e03dcbbfd7a381801e37cd8c71cf9', '2026-10-28 08:34:08', 1);
+INSERT INTO `t_user` VALUES (1, '巴啦啦', '', 25, '6a8bddf97b11a3b4b914fc8e7ca2d2d5a58e03dcbbfd7a381801e37cd8c71cf9', '2026-10-28 08:34:08', 1);
 INSERT INTO `t_user` VALUES (2, 'admin', '', 0, 'Admin@1234', '2026-10-28 09:39:48', 2);
 INSERT INTO `t_user` VALUES (3, '哇哇哇', '', 0, 'Www123456', '2026-10-30 16:07:54', 1);
 INSERT INTO `t_user` VALUES (4, '啦啦啦', '', 0, 'Lll123456', '2026-10-30 16:26:34', 1);

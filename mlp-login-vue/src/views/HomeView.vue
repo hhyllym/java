@@ -13,11 +13,13 @@
       <button class="logout" title="退出登录" @click="handleLogout">退出</button>
     </div>
 
-    <!-- 导航栏 -->
-    <nav class="navbar">
+    <!-- 导航栏（可折叠：点右侧按钮收起/展开） -->
+    <nav class="navbar" :class="{ folded: navFolded }">
       <router-link to="/home" class="nav-item active">🏠 首页</router-link>
       <router-link to="/home" class="nav-item" @click.native="scrollTop">📚 图鉴</router-link>
       <router-link to="/learn" class="nav-item">🎓 学院</router-link>
+      <router-link to="/adventure" class="nav-item">🗺️ 探险</router-link>
+      <router-link to="/diary" class="nav-item">📔 日记本</router-link>
       <router-link to="/fortune" class="nav-item">🎲 幸运</router-link>
       <router-link to="/shop" class="nav-item">🧧 商店</router-link>
       <router-link to="/pet" class="nav-item">🐾 宠物</router-link>
@@ -27,7 +29,11 @@
       <router-link to="/message" class="nav-item">
         💬 消息<span v-if="unread > 0" class="nav-badge">{{ unread > 99 ? '99+' : unread }}</span>
       </router-link>
+      <router-link to="/dashboard" class="nav-item">👤 我的</router-link>
       <router-link v-if="session.permission === 0 || session.permission === 2" to="/admin" class="nav-item admin-entry">🛠 后台管理</router-link>
+      <button class="nav-fold" :title="navFolded ? '展开导航' : '收起导航'" @click="toggleNav">
+        {{ navFolded ? '☰ 菜单' : '✕ 收起' }}
+      </button>
     </nav>
 
     <!-- 统计条（全部来自后端 /api/home/overview） -->
@@ -222,6 +228,9 @@ export default {
 
       session,
 
+      // 导航折叠状态（记住用户的选择）
+      navFolded: (() => { try { return localStorage.getItem('mlp_nav_fold') === '1' } catch (e) { return false } })(),
+
       // 列表与搜索状态
       keyword: '',
       list: [],
@@ -303,6 +312,11 @@ export default {
     if (this.chatTimer) clearInterval(this.chatTimer)
   },
   methods: {
+    /** 折叠/展开导航栏，选择存本地下次进来不变 */
+    toggleNav() {
+      this.navFolded = !this.navFolded
+      try { localStorage.setItem('mlp_nav_fold', this.navFolded ? '1' : '0') } catch (e) {}
+    },
     /** 图片型头像（dataURL / 链接）用 <img> 渲染，emoji 走文本 */
     isImage(v) {
       return typeof v === 'string' && (v.startsWith('data:') || v.startsWith('http'))

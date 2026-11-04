@@ -12,7 +12,7 @@
       </button>
       <div class="dash-head-main">
         <h2>
-          {{ profile.name || session.name || '小马' }}
+          <span class="dash-name">{{ profile.name || session.name || '小马' }}</span>
           <button class="dash-rename" title="改名字（支持特殊符号）" @click="startRename">✏️</button>
         </h2>
         <div class="meta">{{ lastLoginText ? '上次登录：' + lastLoginText : '欢迎回来～' }}</div>
@@ -416,8 +416,14 @@ export default {
   margin: 0; font-size: 19px;
   display: flex; align-items: center; gap: 8px;
 }
+.dash-name {
+  flex: 1 1 auto; min-width: 0;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
 .dash-rename {
   border: none; background: none; cursor: pointer;
+  /* 全局 .dash button 有 width:100%，会把小铅笔拉满整行挤掉名字，这里必须豁免 */
+  width: auto; flex-shrink: 0;
   font-size: 12px; padding: 2px 6px; border-radius: 6px;
   opacity: .6; transition: opacity .15s;
 }

@@ -1,9 +1,9 @@
 @echo off
 chcp 936 >nul
 setlocal
-rem 参数1 = 端口，默认 5173
+rem 参数1 = 端口，默认 5180
 set "PORT=%~1"
-if "%PORT%"=="" set "PORT=5173"
+if "%PORT%"=="" set "PORT=5180"
 set /a _N=0
 :wait
 set /a _N+=1

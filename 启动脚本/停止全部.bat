@@ -4,20 +4,20 @@ setlocal
 title 小马王国 - 停止前后端
 
 echo ==========================================================
-echo   停止前端 5173 和 后端 8081
+echo   停止前端 5180 和 后端 8081
 echo ==========================================================
 echo.
 
-call :kill_port 5173 前端
+call :kill_port 5180 前端
 call :kill_port 8081 后端
 
-if "%F_5173%%F_8081%"=="00" (
+if "%F_5180%%F_8081%"=="00" (
     echo 没有发现正在运行的前端 / 后端服务。
 ) else (
     echo.
     echo 等进程退出 ...
     timeout /t 2 /nobreak >nul
-    call :port_up 5173
+    call :port_up 5180
     call :port_up 8081
 )
 echo.

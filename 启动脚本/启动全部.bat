@@ -4,7 +4,7 @@ setlocal
 title 小马王国 - 一键启动
 cd /d "%~dp0"
 
-set "FRONT_PORT=5173"
+set "FRONT_PORT=5180"
 set "BACK_PORT=8081"
 set "FRONT_ALREADY=0"
 
@@ -96,8 +96,8 @@ exit /b
 rem ================= 内部子过程 =================
 :port_up
 rem 参数1=端口  结果放进 UP (1=有人在监听 0=没有)
-rem 注意：这里故意不写 netstat -p TCP。Vite 只监听 IPv6 的 [::1]:5173，
-rem 而 -p TCP 只列 IPv4 表，会导致 5173 永远检测不到（浏览器不弹、杀不掉）。
+rem 注意：这里故意不写 netstat -p TCP。Vite 只监听 IPv6 的 [::1]:5180，
+rem 而 -p TCP 只列 IPv4 表，会导致 5180 永远检测不到（浏览器不弹、杀不掉）。
 rem 不带 -p 同时列 IPv4/IPv6，tokens=5 都是 PID。
 set "UP=0"
 for /f "tokens=5" %%A in ('netstat -ano ^| findstr /I "LISTENING" ^| findstr ":%~1 "') do set "UP=1"

@@ -45,8 +45,8 @@ echo.
 echo --- 5. 端口 / 服务 ---
 echo   MySQL 3306:
 netstat -ano | findstr /I "LISTENING" | findstr ":3306 " || echo     [注意] 3306 没在监听，MySQL 可能没启动
-echo   Vite 5173:
-netstat -ano | findstr /I "LISTENING" | findstr ":5173 " || echo     未启动
+echo   Vite 5180:
+netstat -ano | findstr /I "LISTENING" | findstr ":5180 " || echo     未启动
 echo   Spring Boot 8081:
 netstat -ano | findstr /I "LISTENING" | findstr ":8081 " || echo     未启动
 echo.

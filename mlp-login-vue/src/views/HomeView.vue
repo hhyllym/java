@@ -13,26 +13,26 @@
       <button class="logout" title="退出登录" @click="handleLogout">退出</button>
     </div>
 
-    <!-- 导航栏（可折叠：点右侧按钮收起/展开） -->
-    <nav class="navbar" :class="{ folded: navFolded }">
+    <!-- 导航栏：默认只露前两排（前 6 项），其余点「展开」才显示 -->
+    <nav class="navbar" :class="{ expanded: navExpanded }">
       <router-link to="/home" class="nav-item active">🏠 首页</router-link>
       <router-link to="/home" class="nav-item" @click.native="scrollTop">📚 图鉴</router-link>
       <router-link to="/learn" class="nav-item">🎓 学院</router-link>
       <router-link to="/adventure" class="nav-item">🗺️ 探险</router-link>
       <router-link to="/diary" class="nav-item">📔 日记本</router-link>
       <router-link to="/fortune" class="nav-item">🎲 幸运</router-link>
-      <router-link to="/shop" class="nav-item">🧧 商店</router-link>
-      <router-link to="/pet" class="nav-item">🐾 宠物</router-link>
-      <router-link to="/friends" class="nav-item">
+      <router-link to="/shop" class="nav-item nav-extra">🧧 商店</router-link>
+      <router-link to="/pet" class="nav-item nav-extra">🐾 宠物</router-link>
+      <router-link to="/friends" class="nav-item nav-extra">
         👥 好友<span v-if="chatUnread > 0" class="nav-badge">{{ chatUnread > 99 ? '99+' : chatUnread }}</span>
       </router-link>
-      <router-link to="/message" class="nav-item">
+      <router-link to="/message" class="nav-item nav-extra">
         💬 消息<span v-if="unread > 0" class="nav-badge">{{ unread > 99 ? '99+' : unread }}</span>
       </router-link>
-      <router-link to="/dashboard" class="nav-item">👤 我的</router-link>
-      <router-link v-if="session.permission === 0 || session.permission === 2" to="/admin" class="nav-item admin-entry">🛠 后台管理</router-link>
-      <button class="nav-fold" :title="navFolded ? '展开导航' : '收起导航'" @click="toggleNav">
-        {{ navFolded ? '☰ 菜单' : '✕ 收起' }}
+      <router-link to="/dashboard" class="nav-item nav-extra">👤 我的</router-link>
+      <router-link v-if="session.permission === 0 || session.permission === 2" to="/admin" class="nav-item nav-extra admin-entry">🛠 后台管理</router-link>
+      <button class="nav-fold" :title="navExpanded ? '收起，只看前两排' : '展开，看全部导航'" @click="toggleNav">
+        {{ navExpanded ? '⌃ 收起' : '⌄ 展开更多' }}
       </button>
     </nav>
 
@@ -228,8 +228,8 @@ export default {
 
       session,
 
-      // 导航折叠状态（记住用户的选择）
-      navFolded: (() => { try { return localStorage.getItem('mlp_nav_fold') === '1' } catch (e) { return false } })(),
+      // 导航展开状态：默认 false = 只露出前两排（前 6 项），其余收起
+      navExpanded: (() => { try { return localStorage.getItem('mlp_nav_expand') === '1' } catch (e) { return false } })(),
 
       // 列表与搜索状态
       keyword: '',
@@ -312,10 +312,10 @@ export default {
     if (this.chatTimer) clearInterval(this.chatTimer)
   },
   methods: {
-    /** 折叠/展开导航栏，选择存本地下次进来不变 */
+    /** 展开/收起导航：默认只露前两排，其余的展开后才出现；选择存本地下次进来不变 */
     toggleNav() {
-      this.navFolded = !this.navFolded
-      try { localStorage.setItem('mlp_nav_fold', this.navFolded ? '1' : '0') } catch (e) {}
+      this.navExpanded = !this.navExpanded
+      try { localStorage.setItem('mlp_nav_expand', this.navExpanded ? '1' : '0') } catch (e) {}
     },
     /** 图片型头像（dataURL / 链接）用 <img> 渲染，emoji 走文本 */
     isImage(v) {

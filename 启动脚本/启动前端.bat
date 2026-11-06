@@ -1,13 +1,13 @@
 @echo off
 chcp 936 >nul
 setlocal
-title 小马王国 - 前端 (Vite 5173)
+title 小马王国 - 前端 (Vite 5180)
 cd /d "%~dp0..\mlp-login-vue"
 
 rem ================= 可调参数 =================
 set "NPM_REGISTRY=https://registry.npmmirror.com"
 rem 镜像源装不上会自动换回官方源，一般不用改
-set "DEV_PORT=5173"
+set "DEV_PORT=5180"
 rem ===========================================
 
 echo ==========================================================
@@ -125,8 +125,8 @@ exit /b
 rem ================= 内部子过程 =================
 :port_up
 rem 参数1=端口  结果放进 UP (1=有人在监听 0=没有)
-rem 注意：这里故意不写 netstat -p TCP。Vite 只监听 IPv6 的 [::1]:5173，
-rem 而 -p TCP 只列 IPv4 表，会导致 5173 永远检测不到（浏览器不弹、杀不掉）。
+rem 注意：这里故意不写 netstat -p TCP。Vite 只监听 IPv6 的 [::1]:5180，
+rem 而 -p TCP 只列 IPv4 表，会导致 5180 永远检测不到（浏览器不弹、杀不掉）。
 rem 不带 -p 同时列 IPv4/IPv6，tokens=5 都是 PID。
 set "UP=0"
 for /f "tokens=5" %%A in ('netstat -ano ^| findstr /I "LISTENING" ^| findstr ":%~1 "') do set "UP=1"

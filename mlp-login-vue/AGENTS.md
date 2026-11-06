@@ -13,7 +13,7 @@
 
 | 角色 | 路径 | 技术 | 端口 |
 |---|---|---|---|
-| 前端 | `C:\Users\Administrator\Desktop\java-main\mlp-login-vue` | Vue3 + Vite + vue-router | **5173** |
+| 前端 | `C:\Users\Administrator\Desktop\java-main\mlp-login-vue` | Vue3 + Vite + vue-router | **5180** |
 | 后端 | `D:\workSpace\springBootTest` | Spring Boot 3.4.5 + MyBatis-Plus 3.5.9 + MySQL | **8081** |
 
 - 前端登录/注册调用的接口：`POST /api/auth/login`、`POST /api/auth/register`（见 `src/auth.js` 的 `API_BASE = '/api/auth'`）
@@ -70,7 +70,7 @@
 | Maven | ⚠️ **PATH 里没有 `mvn`**。用 IDEA 自带的：`D:\IntelliJ IDEA 2024.3.2.2\plugins\maven\lib\maven3\bin\mvn.cmd`（Maven **3.9.9**，可用） |
 | Maven 本地库 | `C:\Users\Administrator\.m2\repository`（约 **763 MB**，依赖已齐，`mvn -o compile` **1.9 秒**通过） |
 | MySQL | 3306 正在监听，账号 `root` / 密码 `123456` |
-| 前端地址 | `http://localhost:5173`（`vite.config.js` 是 `open: false` + `strictPort: true`，浏览器由 `启动前端.bat` → `打开网页.bat` 在端口就绪后打开） |
+| 前端地址 | `http://localhost:5180`（`vite.config.js` 是 `open: false` + `strictPort: true`，浏览器由 `启动前端.bat` → `打开网页.bat` 在端口就绪后打开） |
 | 后端地址 | `http://localhost:8081`（`application-dev.properties` 里 `server.port=8081`） |
 
 **结论：环境是好的，能跑。只是 mvn 不在 PATH 里。**
@@ -105,9 +105,9 @@
 - ❌ 别从 bash 里调 `cmd.exe`（安全策略会拦，白费力气）。**PowerShell 里可以正常跑 mvn / 杀进程。**
 - ❌ 别把 GBK 的 `.bat` 用 UTF-8 重新保存，中文会变乱码（脚本已 `chcp 936`）。
   生成脚本用的工具在 `C:\Users\Administrator\WorkBuddy\<会话>\.workbuddy\tmp\gen-bats.py`，改脚本优先用它重新生成。
-- ❌ 别用 `netstat -ano -p TCP` 判断端口。**Vite 只监听 IPv6 的 `[::1]:5173`**，
-  而 `-p TCP` 只列 IPv4 表 → 5173 永远查不到，症状是「前端明明起来了，脚本却说没起来、浏览器不弹、`停止全部.bat` 杀不掉」。
-  2026-10-14 实测：`netstat -ano -p TCP | findstr ":5173 "` 空，`netstat -ano | findstr ":5173 "` 才拿得到 PID。
+- ❌ 别用 `netstat -ano -p TCP` 判断端口。**Vite 只监听 IPv6 的 `[::1]:5180`**，
+  而 `-p TCP` 只列 IPv4 表 → 5180 永远查不到，症状是「前端明明起来了，脚本却说没起来、浏览器不弹、`停止全部.bat` 杀不掉」。
+  2026-10-14 实测：`netstat -ano -p TCP | findstr ":5180 "` 空，`netstat -ano | findstr ":5180 "` 才拿得到 PID。
   现在所有脚本统一用 `netstat -ano`（不带 `-p`），`tokens=5` 在 IPv4/IPv6 两种行里都是 PID。
 - ✅ **git 仓库根已修正（2026-10-14）**：`.git` 原来被错放在 `mlp-login-vue\` 下，而索引里存的是「上一级目录」的路径，
   导致 `git status` 满屏 `D`、`推送GitHub.bat` 报「当前目录不是 git 仓库」（它的 `if not exist .git` 检查一直不过）。
@@ -139,7 +139,7 @@
   ⚠️ 现在的实现**没有**「明文老数据自动升级成哈希」的逻辑，别照着老笔记以为有；库里一律存哈希。
 - 验证码走 **session**（`CaptchaService.SESSION_KEY`），一次性：校验完立刻作废，
   所以前端登录失败后必须换一张新的（`LoginView` 已经这么做了）。
-  JSESSIONID 能穿过 Vite 代理，实测经 `http://localhost:5173/api/auth/*` 登录注册都正常。
+  JSESSIONID 能穿过 Vite 代理，实测经 `http://localhost:5180/api/auth/*` 登录注册都正常。
 - 前端提示文案要和后端 msg 对得上：`LoginView` 按 msg 里有没有「验证码 / 还没注册 / 名字」来把错误挂到对应输入框，
   `RegisterView` 按有没有「密码」来分。改后端文案时注意别把这两个匹配规则弄失效。
 
@@ -277,12 +277,12 @@ mlp-login-vue/                                     ← 前端项目就在这里
 ├── 启动全部.bat                  一键起前后端（会自动等端口、打印结果）  ← GBK
 ├── 启动前端.bat                  装依赖(如缺) + vite，浏览器由 打开网页.bat 开
 ├── 启动后端.bat                  Spring Boot 8081
-├── 停止全部.bat                  按端口 5173/8081 杀进程
+├── 停止全部.bat                  按端口 5180/8081 杀进程
 ├── 环境检测.bat                  Node/JDK/Maven/目录/端口 一次性自检
 ├── 打开网页.bat                  内部用：轮询端口起来后再开默认浏览器
 ├── tools/static-server.cjs       零依赖兜底：起 dist/ + 代理 /api → 8081
 ├── index.html                    入口，挂 #app，title=小马王国 · 账号中心
-├── vite.config.js                5173，open:false，strictPort，proxy /api → 8081
+├── vite.config.js                5180，open:false，strictPort，proxy /api → 8081
 ├── package.json                  dev / build / preview 三个脚本
 ├── .gitignore                    node_modules, dist
 ├── src/
@@ -335,7 +335,7 @@ D:\workSpace\springBootTest\
 │   ├── controller/HomeController.java      /api/home/overview|search
 │   ├── controller/CategoryController.java  /api/category/tree
 │   ├── controller/PonyController.java      /api/pony/{id}
-│   ├── config/CorsConfig.java              localhost:5173 / 4173 跨域（要带 cookie，所以不能写 *）
+│   ├── config/CorsConfig.java              localhost:5180 / 4173 跨域（要带 cookie，所以不能写 *）
 │   └── UserController.java                 thymeleaf 老 demo，与登录无关
 └── log/xx.log                     运行日志
 ```

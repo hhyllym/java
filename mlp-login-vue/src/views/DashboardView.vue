@@ -58,6 +58,12 @@
       </div>
     </div>
 
+    <!-- 我的宠物：领养后会出现（主页 / 个人主页 / 聊天界面 三处都有） -->
+    <div class="dash-sec">
+      <h4>🐾 我的宠物</h4>
+      <PetBadge />
+    </div>
+
     <!-- 积分中心 -->
     <div class="dash-sec">
       <h4>💎 积分中心</h4>
@@ -153,6 +159,7 @@ import { apiPointBalance, apiPointLogs, apiPointRank } from '../point'
 import { apiTaskToday, apiTaskClaim, apiTaskBump } from '../task'
 import sound from '../sound'
 import CutieMark from '../components/CutieMark.vue'
+import PetBadge from '../components/PetBadge.vue'
 
 const MARKS = ['pinkie', 'twilight', 'dash', 'applejack', 'fluttershy', 'rarity']
 const RARITY_CLASS = { 常见: 'rr-common', 稀有: 'rr-rare', 传说: 'rr-legend' }
@@ -160,7 +167,7 @@ const AVATARS = ['🦄', '🐲', '🌙', '☀️', '🎀', '💎', '⚡', '🍎'
 
 export default {
   name: 'DashboardView',
-  components: { CutieMark },
+  components: { CutieMark, PetBadge },
   inject: ['toast'],
   data() {
     return {

@@ -14,6 +14,9 @@
       <button class="chat-call-btn" title="语音通话" @click="startVoiceCall">📞</button>
     </div>
 
+    <!-- 我的宠物：领养后会出现（聊天界面用紧凑样式） -->
+    <PetBadge compact />
+
     <!-- 消息区 -->
     <div ref="msgBox" class="msg-box" @click="closeMenu">
       <div v-if="loading" class="empty">正在加载聊天记录…</div>
@@ -134,6 +137,7 @@ import { getSession } from '../auth'
 import { apiHistory, apiSend, apiSendImage, apiRecall, apiCallLog, apiMarkRead } from '../chat'
 import { apiPresenceStatus } from '../presence'
 import sound from '../sound'
+import PetBadge from '../components/PetBadge.vue'
 
 /** 表情面板：小马王国常用萌系表情 */
 const EMOJIS = ['😊', '😂', '🥰', '😍', '🤩', '😘', '😜', '🤗', '😴', '😎',
@@ -143,6 +147,7 @@ const EMOJIS = ['😊', '😂', '🥰', '😍', '🤩', '😘', '😜', '🤗', 
 
 export default {
   name: 'ChatView',
+  components: { PetBadge },
   inject: ['toast'],
   data() {
     return {

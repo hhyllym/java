@@ -44,6 +44,9 @@
       <div class="stat"><b>{{ stats.memberTotal || 0 }}</b><span>注册小马</span></div>
     </div>
 
+    <!-- 我的宠物：领养后会出现（主页 / 个人主页 / 聊天界面 三处都有） -->
+    <PetBadge />
+
     <!-- 搜索栏 -->
     <form class="search" @submit.prevent="doSearch">
       <input
@@ -208,6 +211,7 @@ import { apiPresenceOffline } from '../presence'
 import { apiChatUnread } from '../chat'
 import CutieMark from '../components/CutieMark.vue'
 import PonyAssistant from '../components/PonyAssistant.vue'
+import PetBadge from '../components/PetBadge.vue'
 
 /** CutieMark.vue 里真正画了图案的几种可爱标志，其余用 emoji 兜底 */
 const MARKS = ['pinkie', 'twilight', 'dash', 'applejack', 'fluttershy', 'rarity']
@@ -216,7 +220,7 @@ const PAGE_SIZE = 12
 
 export default {
   name: 'HomeView',
-  components: { CutieMark, PonyAssistant },
+  components: { CutieMark, PonyAssistant, PetBadge },
   inject: ['toast'],
   data() {
     // 欢迎语头像：优先本地自定义图片头像，其次会话里的 emoji

@@ -1,7 +1,7 @@
 /*
  Navicat Premium Dump SQL
 
- Source Server         : dd
+ Source Server         : yy
  Source Server Type    : MySQL
  Source Server Version : 80039 (8.0.39)
  Source Host           : localhost:3306
@@ -11,7 +11,7 @@
  Target Server Version : 80039 (8.0.39)
  File Encoding         : 65001
 
- Date: 04/11/2026 09:54:01
+ Date: 06/11/2026 16:45:12
 */
 
 SET NAMES utf8mb4;
@@ -111,7 +111,7 @@ CREATE TABLE `t_friend_remark`  (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_me_friend`(`me_id` ASC, `friend_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '好友备注表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '好友备注表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_friend_remark
@@ -186,7 +186,7 @@ CREATE TABLE `t_point_log`  (
   `create_time` datetime NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_user`(`user_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_point_log
@@ -197,6 +197,7 @@ INSERT INTO `t_point_log` VALUES (3, 1, 5, 'task', '任务奖励：每日登录'
 INSERT INTO `t_point_log` VALUES (4, 1, 20, 'pet', '领养宠物奖励', '2026-11-04 08:57:52');
 INSERT INTO `t_point_log` VALUES (5, 5, 50, 'bind', '绑定「搭档」关系奖励', '2026-11-04 09:52:06');
 INSERT INTO `t_point_log` VALUES (6, 1, 50, 'bind', '绑定「搭档」关系奖励', '2026-11-04 09:52:06');
+INSERT INTO `t_point_log` VALUES (7, 5, 5, 'task', '任务奖励：每日登录', '2026-11-06 16:43:11');
 
 -- ----------------------------
 -- Table structure for t_pony
@@ -486,7 +487,7 @@ CREATE TABLE `t_task_progress`  (
   `claimed` tinyint NULL DEFAULT 0,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_user_day_task`(`user_id` ASC, `day` ASC, `task_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_task_progress
@@ -496,6 +497,7 @@ INSERT INTO `t_task_progress` VALUES (2, 4, '2026-10-30', 'daily_login', 1, 0);
 INSERT INTO `t_task_progress` VALUES (3, 5, '2026-11-02', 'daily_login', 16, 1);
 INSERT INTO `t_task_progress` VALUES (4, 1, '2026-11-04', 'daily_login', 14, 1);
 INSERT INTO `t_task_progress` VALUES (5, 5, '2026-11-04', 'daily_login', 2, 0);
+INSERT INTO `t_task_progress` VALUES (6, 5, '2026-11-06', 'daily_login', 1, 1);
 
 -- ----------------------------
 -- Table structure for t_user
@@ -520,7 +522,7 @@ INSERT INTO `t_user` VALUES (1, '巴啦啦', '', 75, '6a8bddf97b11a3b4b914fc8e7c
 INSERT INTO `t_user` VALUES (2, 'admin', '', 0, 'Admin@1234', '2026-10-28 09:39:48', 2);
 INSERT INTO `t_user` VALUES (3, '哇哇哇', '', 0, 'Www123456', '2026-10-30 16:07:54', 1);
 INSERT INTO `t_user` VALUES (4, '啦啦啦', '', 0, 'Lll123456', '2026-10-30 16:26:34', 1);
-INSERT INTO `t_user` VALUES (5, '钱钱钱', '', 75, 'Qqq123456', '2026-11-02 10:43:26', 1);
+INSERT INTO `t_user` VALUES (5, '钱钱钱', '', 80, 'Qqq123456', '2026-11-02 10:43:26', 1);
 
 -- ----------------------------
 -- Table structure for t_user_item

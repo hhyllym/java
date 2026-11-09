@@ -1,5 +1,5 @@
 -- =====================================================
--- 小马王国 · 好友 + 聊天（mlp_login 库）
+-- 星糖谷 · 好友 + 聊天（mlp_login 库）
 --   t_friend       好友关系（user_id=申请人, friend_id=接收人, status 0申请中 1已通过）
 --   t_chat_message 一对一聊天消息
 --   t_friend_remark 好友备注（me_id 给 friend_id 起的备注名，清空即删行）
@@ -25,7 +25,10 @@ CREATE TABLE IF NOT EXISTS `t_chat_message` (
   `id`          BIGINT       NOT NULL AUTO_INCREMENT,
   `from_id`     BIGINT       NOT NULL COMMENT '发送者 id',
   `to_id`       BIGINT       NOT NULL COMMENT '接收者 id',
-  `content`     VARCHAR(500) NOT NULL COMMENT '消息内容',
+  `content`     MEDIUMTEXT   NOT NULL COMMENT '消息内容（文本或图片 base64）',
+  `msg_type`    VARCHAR(16)  NOT NULL DEFAULT 'text' COMMENT 'text/image/audio/call',
+  `recalled`    TINYINT      NOT NULL DEFAULT 0 COMMENT '0=正常 1=已撤回',
+  `extra`       VARCHAR(255) NULL DEFAULT '' COMMENT '扩展：通话时长秒数',
   `read_flag`   TINYINT      NOT NULL DEFAULT 0 COMMENT '0=未读 1=已读',
   `create_time` DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),

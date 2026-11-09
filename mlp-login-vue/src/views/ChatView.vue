@@ -34,22 +34,40 @@
               <!-- 撤回态 -->
               <span v-if="m.recalled" class="bubble-text recalled">{{ m.mine ? '你撤回了一条消息' : '对方撤回了一条消息' }}</span>
               <!-- 通话卡片 -->
-              <div v-else-if="m.type === 'call'" class="call-card">
-                <span class="call-icon">{{ callAnswered(m) ? '📞' : '📕' }}</span>
+              <div v-else-if="m.type === 'call'" class="call-card" :class="{ missed: !callAnswered(m) }">
+                <span class="call-icon">
+                  <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" style="display:block">
+                    <path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.2.2 2.4.6 3.6.1.3 0 .7-.2 1l-2.3 2.2z"/>
+                  </svg>
+                </span>
                 <div class="call-info">
                   <b>{{ callAnswered(m) ? '语音通话' : '未接来电' }}</b>
                   <em>{{ callAnswered(m) ? '通话时长 ' + fmtDur(callSeconds(m)) : '无人接听' }}</em>
                 </div>
-                <button class="call-again" @click.stop="startVoiceCall">再打一次</button>
+                <button class="call-again" @click.stop="startVoiceCall">
+                  <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor" style="display:block">
+                    <path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.2.2 2.4.6 3.6.1.3 0 .7-.2 1l-2.3 2.2z"/>
+                  </svg>
+                  再打一次
+                </button>
               </div>
               <!-- 图片消息 -->
               <div v-else-if="m.type === 'image'" class="bubble-img-wrap" @click.stop="previewImage(m)">
                 <img class="bubble-img" :src="m.content" alt="聊天图片" />
               </div>
-              <!-- 语音消息 -->
-              <div v-else-if="m.type === 'audio'" class="bubble-audio">
-                <span class="audio-ico">🎵</span>
-                <audio controls preload="none" :src="m.content"></audio>
+              <!-- 语音消息（微信风格语音条：点击播放/暂停） -->
+              <div
+                v-else-if="m.type === 'audio'"
+                class="voice-bar"
+                :class="{ mine: m.mine, playing: voicePlaying === m.id }"
+                :style="{ minWidth: voiceWidth(m) }"
+                title="点击播放"
+                @click.stop="toggleVoice(m)"
+              >
+                <span v-if="!m.mine" class="voice-tri"></span>
+                <span class="voice-wave"><i></i><i></i><i></i><i></i></span>
+                <span class="voice-dur">{{ voiceDur(m) }}</span>
+                <span v-if="m.mine" class="voice-tri"></span>
               </div>
               <!-- 文本 -->
               <span v-else class="bubble-text">{{ m.content }}</span>
@@ -136,10 +154,11 @@
 import { getSession } from '../auth'
 import { apiHistory, apiSend, apiSendImage, apiRecall, apiCallLog, apiMarkRead } from '../chat'
 import { apiPresenceStatus } from '../presence'
+import { bump } from '../quest'
 import sound from '../sound'
 import PetBadge from '../components/PetBadge.vue'
 
-/** 表情面板：小马王国常用萌系表情 */
+/** 表情面板：小马乐园常用萌系表情 */
 const EMOJIS = ['😊', '😂', '🥰', '😍', '🤩', '😘', '😜', '🤗', '😴', '😎',
   '🦄', '🐴', '🐲', '🐱', '🐶', '🐰', '🐦', '🦋', '🐝', '🌟',
   '⭐', '🌈', '💖', '💎', '🎀', '🧁', '🍎', '🍰', '🎉', '🎁',
@@ -182,7 +201,11 @@ export default {
       mediaRecorder: null,
       recStream: null,
       recTimer: null,
-      recDiscard: false
+      recDiscard: false,
+      // 语音条播放状态（微信风格）
+      voicePlaying: null,
+      voiceAudio: null,
+      _durCtx: null
     }
   },
   computed: {
@@ -213,6 +236,12 @@ export default {
       return 'unknown'
     }
   },
+  watch: {
+    // 有新语音消息时自动解码时长（微信语音条要显示 x″）
+    messages(list) {
+      list.forEach((m) => { if (m.type === 'audio') this.ensureDur(m) })
+    }
+  },
   created() {
     this.loadHistory(true)
     // 每 3 秒轮询一次新消息（简单可靠，课程项目够用）
@@ -225,6 +254,8 @@ export default {
     if (this.recTimer) clearInterval(this.recTimer)
     // 离开聊天页时若仍在录音，停掉麦克风
     this.forceStopRecorder()
+    // 停掉正在播放的语音
+    this.stopVoice()
   },
   methods: {
     goBack() {
@@ -277,6 +308,7 @@ export default {
       const res = await apiSend(this.session.id, this.id, text)
       this.sending = false
       if (res.code === 200) {
+        bump('msg')
         this.draft = ''
         this.messages.push(res.data)
         this.$nextTick(this.scrollBottom)
@@ -289,6 +321,7 @@ export default {
       this.emojiOpen = false
       const res = await apiSend(this.session.id, this.id, e)
       if (res.code === 200) {
+        bump('msg')
         this.messages.push(res.data)
         this.$nextTick(this.scrollBottom)
       } else {
@@ -330,6 +363,7 @@ export default {
       const res = await apiSendImage(this.session.id, this.id, dataUrl)
       this.sending = false
       if (res.code === 200) {
+        bump('msg')
         this.messages.push(res.data)
         this.$nextTick(this.scrollBottom)
         this.toast('图片已发送 📷', 'ok')
@@ -528,9 +562,54 @@ export default {
       this.mediaRecorder = null
       this.recording = false
     },
+    /** ========== 微信风格语音条 ========== */
+    voiceDur(m) {
+      if (m.dur === undefined || m.dur === null) return '--″'
+      return Math.max(1, Math.round(m.dur)) + '″'
+    },
+    /** 时长越长语音条越宽（微信同款逻辑，封顶 24″） */
+    voiceWidth(m) {
+      if (!m.dur) return '104px'
+      return Math.min(250, Math.round(104 + Math.min(m.dur, 24) * 6)) + 'px'
+    },
+    /** 解码音频拿真实时长（MediaRecorder 的 webm 没有元数据，只能解码） */
+    async ensureDur(m) {
+      if (m.dur !== undefined || m.durLoading) return
+      m.durLoading = true
+      try {
+        const buf = await (await fetch(m.content)).arrayBuffer()
+        const AC = window.AudioContext || window.webkitAudioContext
+        if (!this._durCtx) this._durCtx = new AC()
+        const audio = await this._durCtx.decodeAudioData(buf)
+        m.dur = audio.duration || 1
+      } catch (e) {
+        m.dur = 0
+      }
+      m.durLoading = false
+    },
+    toggleVoice(m) {
+      if (this.voicePlaying === m.id) { this.stopVoice(); return }
+      this.stopVoice()
+      this.ensureDur(m)
+      const a = new Audio(m.content)
+      this.voiceAudio = a
+      this.voicePlaying = m.id
+      const done = () => {
+        if (this.voiceAudio === a) { this.voiceAudio = null; this.voicePlaying = null }
+      }
+      a.onended = done
+      a.onerror = done
+      a.play().catch(() => { this.toast('语音播放失败', 'err'); done() })
+    },
+    stopVoice() {
+      if (this.voiceAudio) { try { this.voiceAudio.pause() } catch (e) {} }
+      this.voiceAudio = null
+      this.voicePlaying = null
+    },
     async sendAudio(dataUrl) {
       const res = await apiSend(this.session.id, this.id, dataUrl, 'audio')
       if (res.code === 200) {
+        bump('msg')
         this.messages.push(res.data)
         this.$nextTick(this.scrollBottom)
         sound.click()
@@ -600,8 +679,8 @@ export default {
   color: #fff; font-size: 14px; font-weight: 700;
 }
 .bubble {
-  position: relative; max-width: 85%; padding: 9px 13px 7px;
-  border-radius: 16px 16px 16px 4px;
+  position: relative; max-width: 72%; padding: 7px 11px 6px;
+  border-radius: 14px 14px 14px 4px;
   background: var(--card);
   box-shadow: 0 2px 6px rgba(160,108,213,.08);
   animation: bubbleIn .2s ease;
@@ -637,19 +716,33 @@ export default {
 .bubble-img-wrap { cursor: zoom-in; border-radius: 10px; overflow: hidden; margin: -2px 0; }
 .bubble-img { display: block; max-width: 220px; max-height: 260px; object-fit: cover; }
 
-/* 通话卡片消息 */
-.bubble.call { padding: 11px 14px; min-width: 200px; }
+/* 通话卡片消息（通话记录都是自己发的，恒在紫色渐变气泡里，配色按白字适配） */
+.bubble.call { padding: 10px 12px; min-width: 208px; }
 .call-card { display: flex; align-items: center; gap: 10px; }
-.call-icon { font-size: 22px; }
+.call-icon {
+  width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--purple); background: rgba(255,255,255,.92);
+  box-shadow: 0 3px 8px rgba(90,50,140,.25);
+}
+.call-card.missed .call-icon {
+  color: #fff; background: linear-gradient(135deg, #ff9d8a, #f2635a);
+  box-shadow: 0 3px 8px rgba(120,30,30,.35);
+}
 .call-info { flex: 1; min-width: 0; }
-.call-info b { display: block; font-size: 13.5px; }
-.call-info em { font-style: normal; font-size: 11px; opacity: .7; }
+.call-info b { display: block; font-size: 13.5px; font-weight: 700; letter-spacing: .3px; }
+.call-info em { font-style: normal; font-size: 11px; opacity: .78; margin-top: 1px; display: block; }
+.call-card.missed .call-info b { color: #ffe3de; }
 .call-again {
   border: none; cursor: pointer; border-radius: 999px;
-  padding: 5px 11px; font-size: 11px; font-weight: 700;
-  color: var(--primary); background: var(--panel);
+  padding: 7px 13px; font-size: 11.5px; font-weight: 700;
+  display: flex; align-items: center; gap: 5px;
+  color: var(--purple); background: #fff;
+  box-shadow: 0 3px 9px rgba(90,50,140,.28);
+  transition: transform .15s, box-shadow .15s;
 }
-.call-again:hover { filter: brightness(.96); }
+.call-again:hover { transform: translateY(-1px); box-shadow: 0 5px 13px rgba(90,50,140,.4); }
+.call-again:active { transform: translateY(0) scale(.96); }
 
 /* 正在输入提示 */
 .typing-hint { display: flex; gap: 4px; padding: 4px 6px; }
@@ -677,9 +770,9 @@ export default {
 }
 .chat-tool:hover, .chat-tool.on { background: var(--card); transform: scale(1.08); box-shadow: 0 2px 8px rgba(160,108,213,.15); }
 .chat-input-bar input[type="text"] {
-  flex: 1; min-width: 0; padding: 11px 14px;
+  flex: 1; min-width: 0; padding: 14px 18px;
   border: 1.5px solid var(--border); border-radius: 999px;
-  font-size: 14px; color: var(--text); background: var(--card);
+  font-size: 15px; color: var(--text); background: var(--card);
   transition: border-color .15s, box-shadow .15s;
 }
 .chat-input-bar input[type="text"]:focus {
@@ -687,9 +780,9 @@ export default {
   box-shadow: 0 0 0 3px rgba(160,108,213,.15);
 }
 .chat-send {
-  flex-shrink: 0; padding: 0 20px; height: 38px;
+  flex-shrink: 0; padding: 0 24px; height: 44px;
   border: none; border-radius: 999px; cursor: pointer;
-  color: #fff; font-size: 14px; font-weight: 700;
+  color: #fff; font-size: 15px; font-weight: 700;
   background: linear-gradient(135deg, var(--pink), var(--purple));
   box-shadow: 0 4px 12px rgba(160,108,213,.3);
   transition: filter .15s;
@@ -731,16 +824,50 @@ export default {
 .rec-send { color: #fff; background: linear-gradient(135deg, var(--pink), var(--purple)); }
 .rec-send:hover { filter: brightness(1.06); }
 
-/* 语音消息气泡 */
-.bubble-audio {
-  display: flex; align-items: center; gap: 8px;
-  padding: 4px 2px; min-width: 180px;
+/* 微信风格语音条 */
+.voice-bar {
+  display: inline-flex; align-items: center; gap: 9px;
+  padding: 2px 4px; max-width: 260px;
+  cursor: pointer; user-select: none; color: var(--text);
 }
-.audio-ico { font-size: 18px; flex-shrink: 0; }
-.bubble-audio audio {
-  height: 34px; max-width: 220px; flex: 1; min-width: 0;
+.voice-bar.mine { color: #fff; }
+.voice-bar:active { opacity: .72; }
+.voice-tri {
+  width: 0; height: 0; flex-shrink: 0;
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+  border-left: 10px solid currentColor;
 }
-.bubble.mine .bubble-audio audio { filter: invert(.92) hue-rotate(180deg); }
+.voice-bar.mine .voice-tri {
+  border-left: none;
+  border-right: 10px solid currentColor;
+}
+.voice-wave {
+  display: inline-flex; align-items: center; gap: 3px;
+  height: 20px; flex-shrink: 0;
+}
+.voice-wave i {
+  width: 3px; border-radius: 2px; background: currentColor;
+  opacity: .9; height: 45%;
+}
+.voice-wave i:nth-child(2) { height: 90%; }
+.voice-wave i:nth-child(3) { height: 60%; }
+.voice-wave i:nth-child(4) { height: 80%; }
+.voice-bar.playing .voice-wave i {
+  animation: voiceEq .8s ease-in-out infinite;
+  transform-origin: center;
+}
+.voice-bar.playing .voice-wave i:nth-child(2) { animation-delay: .15s; }
+.voice-bar.playing .voice-wave i:nth-child(3) { animation-delay: .3s; }
+.voice-bar.playing .voice-wave i:nth-child(4) { animation-delay: .45s; }
+@keyframes voiceEq {
+  0%, 100% { transform: scaleY(.35); }
+  50% { transform: scaleY(1); }
+}
+.voice-dur {
+  font-size: 13px; font-weight: 700; opacity: .92;
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
 
 /* 表情面板 */
 .emoji-panel {

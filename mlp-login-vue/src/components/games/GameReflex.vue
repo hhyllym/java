@@ -24,7 +24,7 @@
       <div class="stage-text">
         <template v-if="state === 'idle'">
           <p class="dash-title">⚡ 闪电反应</p>
-          <p class="dash-sub">天空变<b class="go">绿</b>的瞬间，帮云宝第一个冲线！</p>
+          <p class="dash-sub">天空变<b class="go">绿</b>的瞬间，帮云驰第一个冲线！</p>
           <p class="dash-sub small">提前点击算抢跑，本轮回炉重来</p>
           <button class="dash-btn" @pointerdown.stop="begin">开始第一轮</button>
         </template>
@@ -48,7 +48,7 @@
 
         <template v-else-if="state === 'foul'">
           <p class="dash-title foul-t">抢跑啦！</p>
-          <p class="dash-sub">云宝被吹回起跑线，这一轮不算</p>
+          <p class="dash-sub">云驰被吹回起跑线，这一轮不算</p>
           <button class="dash-btn" @pointerdown.stop="retry">重试本轮</button>
         </template>
       </div>
@@ -63,7 +63,7 @@
           <div class="flag">🏁</div>
           <!-- 彩虹尾迹（冲刺时出现） -->
           <div class="trail"></div>
-          <!-- 云宝 -->
+          <!-- 云驰 -->
           <div class="pony" :class="state">
             <svg class="pony-svg" viewBox="0 0 150 110" aria-hidden="true">
               <!-- 尾巴：彩虹飘带 -->
@@ -97,10 +97,11 @@
               <circle cx="116.6" cy="36.8" r="0.9" fill="#fff"/>
               <!-- 嘴 -->
               <path d="M119 46 q3 2.2 5.5 0" stroke="#3a6b8a" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-              <!-- 可爱标记：云朵 + 彩虹闪电 -->
+              <!-- 心印：彗星穿过流云 -->
               <g transform="translate(64,52)">
                 <ellipse cx="0" cy="4" rx="7.5" ry="3.6" fill="#fff"/>
-                <path d="M-1.5 -3 L3.5 -3 L1.5 1 L5 1 L-2.5 9 L-0.5 2.5 L-3.5 2.5 Z" fill="#ff5b7f"/>
+                <path d="M-7 -4 Q-2 -1 3 -1" stroke="#9fd4ef" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+                <circle cx="4" cy="-1.5" r="2.6" fill="#ffe9a8"/>
               </g>
             </svg>
           </div>
@@ -121,7 +122,7 @@
 const TOTAL = 5
 
 export default {
-  name: 'GameDash',
+  name: 'GameReflex',
   emits: ['score', 'over'],
   data() {
     return {
@@ -143,7 +144,7 @@ export default {
     rating() {
       const a = this.avg
       if (a === 0) return '再试一次！'
-      if (a < 250) return '音速彩虹！🦄'
+      if (a < 250) return '风一样快！🦄'
       if (a < 350) return '极速飞行！⚡'
       if (a < 500) return '相当快！💨'
       return '继续加油！🐴'
@@ -151,7 +152,7 @@ export default {
     tip() {
       const a = this.avg
       if (a === 0) return ''
-      if (a < 250) return '这反应速度，云宝本宝！'
+      if (a < 250) return '这反应速度，云驰本人！'
       if (a < 350) return '职业选手的水平了！'
       if (a < 500) return '比大多数人快，多练几轮还能提升'
       return '试试盯住屏幕中央，别分心～'
@@ -308,7 +309,7 @@ export default {
 }
 .dash-stage.go .trail { opacity: .85; width: 55%; transition: width .8s cubic-bezier(.2,.7,.3,1), opacity .2s; }
 
-/* ---------- 云宝 ---------- */
+/* ---------- 云驰 ---------- */
 .pony {
   position: absolute; left: 12%; bottom: 30px;
   width: 96px; height: 70px;

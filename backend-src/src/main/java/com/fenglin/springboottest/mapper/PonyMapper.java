@@ -39,7 +39,7 @@ public interface PonyMapper extends BaseMapper<Pony> {
     List<Map<String, Object>> selectTagsByPonyIds(@Param("ponyIds") List<Long> ponyIds);
 
     /**
-     * 批量取条目所属分类（含父分类名，前端拿来拼「🦄 种族 · 飞马」）。
+     * 批量取条目所属分类（含父分类名，前端拿来拼「🦄 种族 · 云翼驹」）。
      * 返回 [{ponyId, id, name, icon, color, level, parentId, parentName, parentIcon}, ...]
      */
     List<Map<String, Object>> selectCategoriesByPonyIds(@Param("ponyIds") List<Long> ponyIds);

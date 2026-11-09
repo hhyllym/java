@@ -3,8 +3,8 @@
     <div class="particle-layer" ref="particleLayer"></div>
     <div class="head">
       <div class="logo">🦄</div>
-      <h1>小马王国</h1>
-      <p>友谊的魔法，从登录开始 ✨</p>
+      <h1>小马乐园</h1>
+      <p>欢迎回来，星糖谷的小马们在等你 ✨</p>
     </div>
 
     <div class="tabs">
@@ -49,7 +49,7 @@
         <a href="#" @click.prevent="handleForgot">忘记魔法密码？</a>
       </div>
       <div class="submit-wrap">
-        <button type="submit" class="submit" ref="loginBtn" :class="{ popping: rainbow }">进入小马王国 🌈</button>
+        <button type="submit" class="submit" ref="loginBtn" :class="{ popping: rainbow }">进入小马乐园 🌈</button>
       </div>
     </form>
 
@@ -134,7 +134,11 @@ export default {
         ts: Date.now()
       }, this.form.remember)
       this.toast('登录成功，欢迎回家！🌟', 'ok')
-      this.$router.push({ name: 'home' })
+      // 从邀请链接进来时，登录后直接回房间（只接受站内路径，防止外部跳转）
+      const redirect = String(this.$route.query.redirect || '')
+      this.$router.push(
+        redirect.startsWith('/') && !redirect.startsWith('//') ? redirect : { name: 'home' }
+      )
     },
     handleForgot() {
       const name = prompt('请输入你的小马名字，我们会发送重置链接（演示）：')

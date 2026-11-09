@@ -22,7 +22,7 @@ import java.io.OutputStream;
 import java.util.Map;
 
 /**
- * 小马王国登录 / 注册接口，前端 src/auth.js 调的就是这三个：
+ * 小马乐园登录 / 注册接口，前端 src/auth.js 调的就是这三个：
  *   GET  /api/auth/captcha   拿验证码 PNG（答案存在 session 里，一次性有效）
  *   POST /api/auth/register  { name, password, captcha }  —— 注册需验证码，防机器批量注册
  *   POST /api/auth/login     { name, password }

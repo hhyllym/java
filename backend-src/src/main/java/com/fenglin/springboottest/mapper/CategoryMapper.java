@@ -19,7 +19,7 @@ public interface CategoryMapper extends BaseMapper<Category> {
      * 取「某个分类 + 它下面所有子孙分类」的 id（MySQL 8 递归 CTE）。
      * <p>
      * 这是分级分类搜索的核心：用户点一级分类「种族」时，
-     * 要把「陆马 / 飞马 / 独角兽 / 天角兽」下挂的小马一起捞出来，
+     * 要把「原野驹 / 云翼驹 / 星角驹 / 星翼驹」下挂的小马一起捞出来，
      * 而不是只查 category_id = 1（那样一只都查不到）。
      */
     @Select("WITH RECURSIVE `sub` AS ("
@@ -32,7 +32,7 @@ public interface CategoryMapper extends BaseMapper<Category> {
     /**
      * 全部「分类 ↔ 条目」关系（现在才 40 行，一次性捞进内存算数量最省事）。
      * 服务层据此自底向上求并集，得到每个分类（含子孙）下的小马数量——
-     * 注意不能简单把子分类数量相加，因为紫悦同时属于「独角兽」和「天角兽」。
+     * 注意不能简单把子分类数量相加，因为星澜同时属于「星角驹」和「星翼驹」。
      */
     @Select("SELECT `pony_id` AS ponyId, `category_id` AS categoryId FROM `t_pony_category`")
     List<Map<String, Object>> selectAllRelations();

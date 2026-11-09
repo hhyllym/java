@@ -2,7 +2,7 @@
   <div class="admin">
     <!-- 顶栏 -->
     <header class="topbar">
-      <div class="brand">🛠 小马王国 · 后台管理系统</div>
+      <div class="brand">🛠 小马乐园 · 后台管理系统</div>
       <div class="right">
         <span class="who">{{ admin.permission === 2 ? '超级管理员' : '管理员' }}：{{ admin.name || 'admin' }}</span>
         <button class="logout" @click="handleLogout">退出</button>
@@ -25,16 +25,69 @@
         <!-- ============ 概览 ============ -->
         <section v-if="menu === 'overview'">
           <h2 class="title">数据概览</h2>
-          <p class="desc">首页展示的数据都来自这里，下面是实时统计。</p>
+          <p class="desc">首页展示的数据都来自这里，下面是实时统计。点卡片可以直接跳去管理。</p>
           <div class="stat-grid">
-            <div class="stat"><b>{{ ov.ponyTotal || 0 }}</b><span>图鉴条目</span></div>
-            <div class="stat"><b>{{ ov.categoryTotal || 0 }}</b><span>分类</span></div>
-            <div class="stat"><b>{{ ov.tagTotal || 0 }}</b><span>标签</span></div>
-            <div class="stat"><b>{{ ov.memberTotal || 0 }}</b><span>注册小马</span></div>
+            <button class="stat clickable" @click="switchMenu('pony')"><b>{{ ov.ponyTotal || 0 }}</b><span>图鉴条目</span></button>
+            <button class="stat clickable" @click="switchMenu('category')"><b>{{ ov.categoryTotal || 0 }}</b><span>分类</span></button>
+            <button class="stat clickable" @click="switchMenu('tag')"><b>{{ ov.tagTotal || 0 }}</b><span>标签</span></button>
+            <button class="stat clickable" @click="switchMenu('user')"><b>{{ ov.memberTotal || 0 }}</b><span>注册小马</span></button>
           </div>
+
+          <div class="panel-grid">
+            <!-- 热搜词 -->
+            <div class="panel">
+              <div class="panel-head">🔥 热搜词 TOP {{ hotWords.length }}</div>
+              <div v-if="hotWords.length" class="chips">
+                <span v-for="(w, i) in hotWords" :key="w.word" class="chip" :class="{ top: i < 3 }">
+                  {{ w.word }}<em>{{ w.hitCount }}</em>
+                </span>
+              </div>
+              <div v-else class="panel-empty">还没有人搜过</div>
+            </div>
+            <!-- 热门小马 -->
+            <div class="panel">
+              <div class="panel-head">⭐ 热门小马</div>
+              <div v-if="hotPonies.length" class="rank">
+                <div v-for="(p, i) in hotPonies" :key="p.id" class="rank-item">
+                  <span class="rank-no" :class="'no-' + (i + 1)">{{ i + 1 }}</span>
+                  <span class="dot" :style="{ background: p.color || '#b79cf0' }"></span>
+                  <span class="rank-name">{{ p.name }}</span>
+                  <span class="muted">{{ p.viewCount || 0 }} 次浏览</span>
+                </div>
+              </div>
+              <div v-else class="panel-empty">暂无浏览数据</div>
+            </div>
+            <!-- 最近注册 -->
+            <div class="panel">
+              <div class="panel-head">🆕 最近注册的小马</div>
+              <div v-if="recentUsers.length" class="rank">
+                <div v-for="u in recentUsers" :key="u.id" class="rank-item">
+                  <span class="rank-emoji">{{ u.avatar || '🐴' }}</span>
+                  <span class="rank-name">{{ u.name }}</span>
+                  <span class="rank-perm" :class="permClass(u.permission)">{{ permText(u.permission) }}</span>
+                  <span class="muted">{{ fmt(u.createTime) }}</span>
+                </div>
+              </div>
+              <div v-else class="panel-empty">还没有人注册</div>
+            </div>
+            <!-- 最新消息 -->
+            <div class="panel">
+              <div class="panel-head">💬 最新动态</div>
+              <div v-if="recentMessages.length" class="rank">
+                <div v-for="m in recentMessages" :key="m.id" class="rank-item">
+                  <span class="pill">{{ typeText(m.type) }}</span>
+                  <span class="rank-msg">{{ m.content }}</span>
+                </div>
+              </div>
+              <div v-else class="panel-empty">还没有消息</div>
+              <button class="panel-more" @click="switchMenu('message')">去消息管理 →</button>
+            </div>
+          </div>
+
           <div class="quick">
             <button class="q" @click="switchMenu('pony')">去管理小马图鉴 →</button>
             <button class="q" @click="switchMenu('category')">去管理分类 →</button>
+            <button class="q" @click="switchMenu('message')">发一条系统通知 →</button>
           </div>
         </section>
 
@@ -137,7 +190,14 @@
         <section v-if="menu === 'user'">
           <div class="bar">
             <h2 class="title">用户管理</h2>
+            <span v-if="userTotal" class="muted">共 {{ userTotal }} 位</span>
             <div class="spacer"></div>
+            <select v-model.number="userPermFilter" class="search" @change="loadUser(1)">
+              <option :value="-1">全部权限</option>
+              <option :value="1">普通用户</option>
+              <option :value="0">普通管理员</option>
+              <option :value="2">超级管理员</option>
+            </select>
             <input v-model.trim="userKeyword" class="search" placeholder="搜名字" @keyup.enter="loadUser(1)" />
             <button class="btn" @click="loadUser(1)">查询</button>
           </div>
@@ -156,6 +216,7 @@
                 <td class="muted">{{ fmt(u.createTime) }}</td>
                 <td>
                   <button class="link" @click="openPoints(u)">改积分</button>
+                  <button class="link" @click="openPwd(u)">重置密码</button>
                   <template v-if="admin.permission === 2 && u.permission !== 2">
                     <button class="link" @click="setRole(u, 2)">升为超管</button>
                     <button class="link" @click="setRole(u, u.permission === 0 ? 1 : 0)">
@@ -179,7 +240,9 @@
         <section v-if="menu === 'message'">
           <div class="bar">
             <h2 class="title">消息管理</h2>
+            <span v-if="msgTotal" class="muted">共 {{ msgTotal }} 条</span>
             <div class="spacer"></div>
+            <button class="btn primary" @click="openSend">📣 发系统通知</button>
             <select v-model="msgType" class="search" @change="loadMessage(1)">
               <option value="">全部类型</option>
               <option value="BOARD">留言板</option>
@@ -219,9 +282,9 @@
       <div class="modal">
         <h3>{{ ponyForm.data.id ? '编辑小马' : '新增小马' }}</h3>
         <div class="grid2">
-          <label>名字*<input v-model="ponyForm.data.name" placeholder="如 紫悦" /></label>
-          <label>英文名<input v-model="ponyForm.data.alias" placeholder="如 Twilight" /></label>
-          <label>可爱标志
+          <label>名字*<input v-model="ponyForm.data.name" placeholder="如 星澜" /></label>
+          <label>英文名<input v-model="ponyForm.data.alias" placeholder="如 Lumina Gleam" /></label>
+          <label>心印徽记
             <select v-model="ponyForm.data.mark">
               <option v-for="m in markOptions" :key="m" :value="m">{{ m }}</option>
             </select>
@@ -260,7 +323,7 @@
       <div class="modal">
         <h3>{{ categoryForm.data.id ? '编辑分类' : '新增分类' }}</h3>
         <div class="grid2">
-          <label>名称*<input v-model="categoryForm.data.name" placeholder="如 飞马" /></label>
+          <label>名称*<input v-model="categoryForm.data.name" placeholder="如 云翼驹" /></label>
           <label>图标<input v-model="categoryForm.data.icon" placeholder="🐦" /></label>
           <label>主题色<input v-model="categoryForm.data.color" placeholder="#8fc7f0" /></label>
           <label>排序<input v-model.number="categoryForm.data.sortNo" type="number" /></label>
@@ -305,6 +368,38 @@
         </div>
       </div>
     </div>
+
+    <!-- ============ 重置密码弹窗 ============ -->
+    <div class="mask" v-if="pwdForm.show" @click.self="pwdForm.show = false">
+      <div class="modal">
+        <h3>重置密码 · {{ pwdForm.name }}</h3>
+        <label class="full">新密码（6~32 位）
+          <input v-model="pwdForm.password" type="text" placeholder="给「{{ pwdForm.name }}」设一个新密码" @keyup.enter="savePwd" />
+        </label>
+        <p class="tip">重置后该小马下次登录就用新密码，旧密码立刻作废。</p>
+        <div class="modal-bar">
+          <button class="btn" @click="pwdForm.show = false">取消</button>
+          <button class="btn primary" :disabled="pwdForm.saving" @click="savePwd">{{ pwdForm.saving ? '保存中…' : '确认重置' }}</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 发系统通知弹窗 ============ -->
+    <div class="mask" v-if="sendForm.show" @click.self="sendForm.show = false">
+      <div class="modal">
+        <h3>发系统通知</h3>
+        <label class="full">收件小马（留空 = 全员广播）
+          <input v-model="sendForm.toName" placeholder="如 泡芙；留空发给所有小马" />
+        </label>
+        <label class="full">通知内容
+          <textarea v-model="sendForm.content" rows="4" placeholder="要通知大家什么事情，写在这里（最多 500 字）"></textarea>
+        </label>
+        <div class="modal-bar">
+          <button class="btn" @click="sendForm.show = false">取消</button>
+          <button class="btn primary" :disabled="sendForm.sending" @click="sendNotify">{{ sendForm.sending ? '发送中…' : '发送' }}</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -314,8 +409,8 @@ import {
   apiAdminMe, apiAdminPonyList, apiAdminPonyCreate, apiAdminPonyUpdate, apiAdminPonyDelete,
   apiAdminCategoryList, apiAdminCategoryCreate, apiAdminCategoryUpdate, apiAdminCategoryDelete,
   apiAdminTagList, apiAdminTagAdd, apiAdminTagRename, apiAdminTagDelete,
-  apiAdminUserList, apiAdminUserDelete, apiAdminUserPoints, apiAdminUserPermission,
-  apiAdminMessageList, apiAdminMessageDelete
+  apiAdminUserList, apiAdminUserDelete, apiAdminUserPoints, apiAdminUserPassword, apiAdminUserPermission,
+  apiAdminMessageList, apiAdminMessageDelete, apiAdminMessageSend
 } from '../adminAuth'
 
 const MARK_OPTIONS = ['star', 'pinkie', 'twilight', 'dash', 'applejack', 'fluttershy', 'rarity']
@@ -333,6 +428,8 @@ export default {
       rarityOptions: RARITY_OPTIONS,
 
       ov: {},
+      // 概览的四块小面板（数据来自 /api/home/overview + 管理端接口）
+      hotWords: [], hotPonies: [], recentUsers: [], recentMessages: [],
 
       // 小马
       ponyList: [], ponyPage: 1, ponyPages: 1, ponyKeyword: '', ponyLoading: false,
@@ -348,10 +445,14 @@ export default {
 
       // 用户
       userList: [], userPage: 1, userPages: 1, userKeyword: '', userLoading: false,
+      userTotal: 0, userPermFilter: -1,
       pointsForm: { show: false, id: null, name: '', points: 0 },
+      pwdForm: { show: false, saving: false, id: null, name: '', password: '' },
 
       // 消息
-      messageList: [], msgPage: 1, msgPages: 1, msgType: '', msgKeyword: '', msgLoading: false
+      messageList: [], msgPage: 1, msgPages: 1, msgType: '', msgKeyword: '', msgLoading: false,
+      msgTotal: 0,
+      sendForm: { show: false, sending: false, toName: '', content: '' }
     }
   },
   computed: {
@@ -415,14 +516,26 @@ export default {
 
     // ---------- 概览 ----------
     async loadOverview() {
+      // 第一块：统计 + 热搜词 + 热门小马，一次拿齐
       try {
         const res = await fetch('/api/home/overview')
         const text = await res.text()
         const d = JSON.parse(text)
-        this.ov = (d && d.data && d.data.stats) || {}
+        const data = (d && d.data) || {}
+        this.ov = data.stats || {}
+        this.hotWords = (data.hotWords || []).slice(0, 10)
+        this.hotPonies = (data.recommends || []).slice(0, 5)
       } catch (e) {
         this.ov = {}
+        this.hotWords = []
+        this.hotPonies = []
       }
+      // 第二块：最近注册（管理端接口，复用用户列表按注册时间倒序的第一页）
+      const users = await apiAdminUserList('', 1, 6)
+      this.recentUsers = users.code === 200 ? (users.data && users.data.list) || [] : []
+      // 第三块：最新动态（消息列表第一页）
+      const msgs = await apiAdminMessageList('', '', 1, 5)
+      this.recentMessages = msgs.code === 200 ? (msgs.data && msgs.data.list) || [] : []
     },
 
     // ---------- 小马 ----------
@@ -562,12 +675,13 @@ export default {
     async loadUser(page) {
       this.userLoading = true
       this.userPage = page || 1
-      const res = await apiAdminUserList(this.userKeyword, this.userPage, 12)
+      const res = await apiAdminUserList(this.userKeyword, this.userPage, 12, this.userPermFilter)
       this.userLoading = false
       if (res.code !== 200) { this.toast(res.msg || '加载失败', 'err'); return }
       const d = res.data || {}
       this.userList = d.list || []
       this.userPages = d.pages || 1
+      this.userTotal = d.total || 0
     },
     openPoints(u) {
       this.pointsForm = { show: true, id: u.id, name: u.name, points: u.points || 0 }
@@ -586,6 +700,19 @@ export default {
       this.toast(res.msg || '已删除', 'ok')
       this.loadUser(this.userPage)
       this.loadOverview()
+    },
+    openPwd(u) {
+      this.pwdForm = { show: true, saving: false, id: u.id, name: u.name, password: '' }
+    },
+    async savePwd() {
+      const pw = (this.pwdForm.password || '').trim()
+      if (pw.length < 6 || pw.length > 32) { this.toast('新密码要 6~32 位', 'err'); return }
+      this.pwdForm.saving = true
+      const res = await apiAdminUserPassword(this.pwdForm.id, pw)
+      this.pwdForm.saving = false
+      if (res.code !== 200) { this.toast(res.msg || '重置失败', 'err'); return }
+      this.toast(res.msg || '密码已重置', 'ok')
+      this.pwdForm.show = false
     },
     permText(p) {
       if (p === 2) return '超级管理员'
@@ -614,6 +741,7 @@ export default {
       const d = res.data || {}
       this.messageList = d.list || []
       this.msgPages = d.pages || 1
+      this.msgTotal = d.total || 0
     },
     async delMessage(m) {
       if (!confirm('确定删除这条消息？')) return
@@ -621,6 +749,21 @@ export default {
       if (res.code !== 200) { this.toast(res.msg || '删除失败', 'err'); return }
       this.toast(res.msg || '已删除', 'ok')
       this.loadMessage(this.msgPage)
+    },
+    openSend() {
+      this.sendForm = { show: true, sending: false, toName: '', content: '' }
+    },
+    async sendNotify() {
+      const content = (this.sendForm.content || '').trim()
+      if (!content) { this.toast('通知内容不能为空', 'err'); return }
+      this.sendForm.sending = true
+      const res = await apiAdminMessageSend((this.sendForm.toName || '').trim(), content)
+      this.sendForm.sending = false
+      if (res.code !== 200) { this.toast(res.msg || '发送失败', 'err'); return }
+      this.toast(res.msg || '已发送', 'ok')
+      this.sendForm.show = false
+      this.msgType = 'NOTIFY'
+      this.loadMessage(1)
     }
   }
 }
@@ -661,8 +804,34 @@ export default {
 .stat { background: #fff; border-radius: 14px; padding: 18px 22px; min-width: 120px; box-shadow: 0 6px 18px rgba(160,108,213,.08); }
 .stat b { display: block; font-size: 26px; color: #7c5cbf; }
 .stat span { font-size: 12.5px; color: #9088a0; }
+.stat.clickable { border: none; cursor: pointer; text-align: left; font-family: inherit; transition: .15s; }
+.stat.clickable:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(160,108,213,.16); }
 .quick { margin-top: 18px; display: flex; gap: 10px; }
 .q { border: 1.5px solid #e0d4f5; background: #fff; color: #7c5cbf; font-weight: 700; padding: 9px 14px; border-radius: 10px; cursor: pointer; }
+
+/* 概览四块小面板 */
+.panel-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin-top: 16px; }
+.panel { background: #fff; border-radius: 14px; padding: 16px 18px; box-shadow: 0 6px 18px rgba(160,108,213,.06); }
+.panel-head { font-size: 14px; font-weight: 800; color: #5a4b78; margin-bottom: 10px; }
+.panel-empty { color: #b3aac6; font-size: 13px; padding: 6px 0; }
+.panel-more { border: none; background: transparent; color: #7c5cbf; font-weight: 700; font-size: 12.5px; cursor: pointer; padding: 8px 0 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; background: #f6f1fb; color: #6b6380; border-radius: 999px; padding: 5px 12px; font-size: 12.5px; font-weight: 700; }
+.chip em { font-style: normal; font-size: 11px; color: #a59cba; }
+.chip.top { background: linear-gradient(135deg, #ffe9f3, #fdf3d6); color: #d6589b; }
+.chip.top em { color: #e0953f; }
+.rank { display: flex; flex-direction: column; gap: 8px; }
+.rank-item { display: flex; align-items: center; gap: 8px; font-size: 13px; min-width: 0; }
+.rank-no { width: 20px; height: 20px; border-radius: 50%; background: #efe9fb; color: #7c5cbf; font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex: none; }
+.rank-no.no-1 { background: #ffd9e8; color: #d6589b; }
+.rank-no.no-2 { background: #fde9c8; color: #c08a00; }
+.rank-no.no-3 { background: #e3ecfb; color: #3f8fd6; }
+.rank-emoji { flex: none; }
+.rank-name { font-weight: 700; color: #5a4b78; }
+.rank-perm { font-size: 11px; font-weight: 800; padding: 1px 8px; border-radius: 999px; flex: none; }
+.rank-item .muted { margin-left: auto; font-size: 12px; flex: none; }
+.rank-msg { color: #6b6380; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.tip { margin: -4px 0 0; font-size: 12px; color: #a59cba; }
 
 .bar { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
 .spacer { flex: 1; }

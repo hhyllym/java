@@ -50,7 +50,7 @@
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
 		</dependency>
 
-		<!-- 小马王国登录/注册用：MyBatis-Plus + MySQL -->
+		<!-- 星糖谷登录/注册用：MyBatis-Plus + MySQL -->
 		<dependency>
 			<groupId>com.baomidou</groupId>
 			<artifactId>mybatis-plus-spring-boot3-starter</artifactId>

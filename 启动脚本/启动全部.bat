@@ -1,7 +1,7 @@
 @echo off
 chcp 936 >nul
 setlocal
-title 小马王国 - 一键启动
+title 小马乐园 - 一键启动
 cd /d "%~dp0"
 
 set "FRONT_PORT=5180"
@@ -9,7 +9,7 @@ set "BACK_PORT=8081"
 set "FRONT_ALREADY=0"
 
 echo ==========================================================
-echo   小马王国 - 一键启动
+echo   小马乐园 - 一键启动
 echo   前端 http://localhost:%FRONT_PORT%      后端 http://localhost:%BACK_PORT%
 echo ==========================================================
 echo.
@@ -32,7 +32,7 @@ call :port_up %BACK_PORT%
 if "%UP%"=="1" goto :back_ready
 
 echo [1/3] 打开【后端】窗口 (Spring Boot)，它先编译再启动。
-start "小马王国-后端" cmd /k "%~dp0启动后端.bat"
+start "小马乐园-后端" cmd /k "%~dp0启动后端.bat"
 echo       等待后端监听 %BACK_PORT% 端口，最多等 150 秒 ...
 call :wait_port %BACK_PORT% 150
 if "%UP%"=="1" goto :back_ready
@@ -44,7 +44,7 @@ echo.
 goto :front
 
 :back_ready
-echo [1/3] 后端 OK  ->  http://localhost:%BACK_PORT%   (接口前缀 /api)
+echo [1/3] 后端 OK  -^>  http://localhost:%BACK_PORT%   (接口前缀 /api)
 echo.
 
 rem -------------------- 第二步：前端 --------------------
@@ -53,7 +53,7 @@ call :port_up %FRONT_PORT%
 if "%UP%"=="1" goto :front_ready
 
 echo [2/3] 打开【前端】窗口 (Vite)，前端就绪后会自动帮你开浏览器。
-start "小马王国-前端" cmd /k "%~dp0启动前端.bat"
+start "小马乐园-前端" cmd /k "%~dp0启动前端.bat"
 echo       第一次跑要装依赖，1~3 分钟，前端窗口在滚字就说明没死。
 echo       等待前端监听 %FRONT_PORT% 端口，最多等 300 秒 ...
 call :wait_port %FRONT_PORT% 300
@@ -64,7 +64,7 @@ echo.
 goto :summary
 
 :front_ready
-echo [2/3] 前端 OK  ->  http://localhost:%FRONT_PORT%
+echo [2/3] 前端 OK  -^>  http://localhost:%FRONT_PORT%
 echo.
 
 rem -------------------- 第三步：汇总 --------------------
@@ -80,7 +80,7 @@ if "%FRONT_ALREADY%"=="1" (
     call "%~dp0打开网页.bat" %FRONT_PORT%
 )
 echo ----------------------------------------------------------
-echo   在浏览器打开 http://localhost:%FRONT_PORT% 就是小马王国页面
+echo   在浏览器打开 http://localhost:%FRONT_PORT% 就是小马乐园页面
 echo   登录 / 注册接口走 http://localhost:%BACK_PORT%/api/auth/*
 echo   停止服务：双击 停止全部.bat
 echo   起不来  ：双击 环境检测.bat

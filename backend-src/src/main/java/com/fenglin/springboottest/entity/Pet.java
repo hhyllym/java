@@ -18,7 +18,7 @@ public class Pet implements Serializable {
     @TableField("user_id")
     private Long userId;
 
-    /** dragon / cat / bird */
+    /** cat / dog / bird（旧数据 dragon 自动按 dog 处理） */
     @TableField("kind")
     private String kind;
 

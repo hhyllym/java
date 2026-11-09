@@ -126,7 +126,7 @@ export default {
     buildRound() {
       const occ = OCCASIONS[this.idx % OCCASIONS.length]
       this.occasion = occ
-      // 评委轮换（从时尚伙伴里挑，含珍奇本人）
+      // 评委轮换（从时尚伙伴里挑，含绮罗本人）
       this.judge = FASHION_PONIES[Math.floor(Math.random() * FASHION_PONIES.length)]
       this.judgeSays = '按场合搭配，选够 3 件就过关～'
 

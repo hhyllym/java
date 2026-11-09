@@ -1,5 +1,5 @@
 -- ============================================================
---  小马王国（mlp-login-vue）消息中心表
+--  星糖谷（mlp-login-vue）消息中心表
 --  这个脚本可以重复执行，不会把已有消息删掉
 --  执行方式（cmd 里）：
 --    "C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe" -uroot -p123456 < sql\mlp_message.sql
@@ -22,15 +22,15 @@ CREATE TABLE IF NOT EXISTS `t_message` (
     KEY `idx_t_message_to`   (`to_id`),
     KEY `idx_t_message_from` (`from_id`)
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT '小马王国消息中心（留言板 / 私信 / 系统通知）';
+  DEFAULT CHARSET = utf8mb4 COMMENT '星糖谷消息中心（留言板 / 私信 / 系统通知）';
 
 -- 幂等种子：全员广播的系统公告（to_id = -1），重复执行不会重复插入
 INSERT INTO `t_message` (`type`, `from_name`, `to_id`, `content`, `read_flag`, `create_time`)
-SELECT 'NOTIFY', '小马王国', -1, '欢迎来到小马王国！点开左上角 💬 消息中心，里面有留言板、私信和系统通知～', 0, NOW()
-WHERE NOT EXISTS (SELECT 1 FROM `t_message` WHERE `type` = 'NOTIFY' AND `content` LIKE '欢迎来到小马王国%');
+SELECT 'NOTIFY', '星糖谷', -1, '欢迎来到星糖谷！点开左上角 💬 消息中心，里面有留言板、私信和系统通知～', 0, NOW()
+WHERE NOT EXISTS (SELECT 1 FROM `t_message` WHERE `type` = 'NOTIFY' AND `content` LIKE '欢迎来到星糖谷%');
 
 INSERT INTO `t_message` (`type`, `from_name`, `to_id`, `content`, `read_flag`, `create_time`)
-SELECT 'NOTIFY', '小马王国', -1, '每天来首页抽一只「今日幸运小马」吧 🎲，看看今天谁陪你冒险！', 0, NOW()
+SELECT 'NOTIFY', '星糖谷', -1, '每天来首页抽一只「今日幸运小马」吧 🎲，看看今天谁陪你冒险！', 0, NOW()
 WHERE NOT EXISTS (SELECT 1 FROM `t_message` WHERE `type` = 'NOTIFY' AND `content` LIKE '每天来首页抽%');
 
 -- 自检

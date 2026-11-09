@@ -8,6 +8,7 @@ import com.fenglin.springboottest.entity.User;
 import com.fenglin.springboottest.mapper.FriendMapper;
 import com.fenglin.springboottest.mapper.PointLogMapper;
 import com.fenglin.springboottest.mapper.UserMapper;
+import com.fenglin.springboottest.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -36,6 +37,33 @@ public class PointController {
 
     @Autowired
     private UserController userController;
+
+    @Autowired
+    private UserService userService;
+
+    /** 新人大礼包：每人限领一次（一次性 10000 积分） */
+    @PostMapping("/claim-bonus")
+    public Result<?> claimBonus(@RequestBody Map<String, Object> body) {
+        Long userId = toLong(body.get("userId"));
+        if (userId == null) {
+            return Result.fail("先登录再来领取吧");
+        }
+        return userService.claimNewbieBonus(userId);
+    }
+
+    /** 新人大礼包状态：领过的账号前端直接隐藏入口，不再显示横幅 */
+    @GetMapping("/bonus-status")
+    public Result<?> bonusStatus(@RequestParam Long userId) {
+        if (userId == null) {
+            return Result.fail("先登录再来查看吧");
+        }
+        Long cnt = pointLogMapper.selectCount(new LambdaQueryWrapper<PointLog>()
+                .eq(PointLog::getUserId, userId)
+                .eq(PointLog::getBiz, "newbie-10000"));
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("claimed", cnt != null && cnt > 0);
+        return Result.ok(data);
+    }
 
     /** 积分余额 */
     @GetMapping("/balance")

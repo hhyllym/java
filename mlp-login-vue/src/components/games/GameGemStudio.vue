@@ -59,17 +59,17 @@ const THEMES = [
     palette: ['#f0a06a', '#f7e08a', '#f5c08a', '#f2a950']
   },
   {
-    name: '森林漫步', desc: '绿色系，像柔柔家后的小树林',
+    name: '森林漫步', desc: '绿色系，像茸茸家后的小树林',
     palette: ['#7fd4a8', '#a7e3c9', '#58b98a', '#b8ecd2']
   },
   {
-    name: '星空之夜', desc: '紫色系，像紫悦的魔法夜空',
+    name: '星空之夜', desc: '紫色系，像星澜的魔法夜空',
     palette: ['#8f7ae8', '#b79cf0', '#c9a0e8', '#a06cd5']
   }
 ]
 
 export default {
-  name: 'GameRarity',
+  name: 'GameGemStudio',
   emits: ['score', 'over'],
   data() {
     return {

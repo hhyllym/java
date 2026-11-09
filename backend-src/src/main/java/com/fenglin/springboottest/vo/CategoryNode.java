@@ -6,7 +6,7 @@ import java.util.List;
 
 /**
  * 分类树节点。count = 该分类及其所有子孙分类下的小马总数，
- * 所以一级分类「种族」的 count 是 16，二级分类「飞马」的 count 是 3。
+ * 所以一级分类「种族」的 count 是 16，二级分类「云翼驹」的 count 是 3。
  */
 public class CategoryNode implements Serializable {
 

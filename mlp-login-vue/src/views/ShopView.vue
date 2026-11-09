@@ -5,7 +5,7 @@
       <button class="shop-back" title="返回我的" @click="$router.push({ name: 'dashboard' })">«</button>
       <div class="shop-title">
         <h3>🧧 积分商店</h3>
-        <span>做任务攒积分，好东西换回家</span>
+        <span>做任务攒积分，<router-link to="/earn" style="color:var(--primary);font-weight:700;text-decoration:underline">去赚积分 →</router-link></span>
       </div>
       <div class="shop-balance">💎 <b>{{ points }}</b></div>
     </div>
@@ -24,7 +24,10 @@
         <div class="shop-group-title">{{ g.icon }} {{ g.label }}</div>
         <div class="shop-grid">
           <div v-for="it in g.items" :key="it.id" class="shop-item">
-            <div class="shop-item-face">{{ it.icon }}</div>
+            <div class="shop-item-face">
+              <PetSprite v-if="it.petKind" :kind="it.petKind" :size="58" state="happy" />
+              <template v-else>{{ it.icon }}</template>
+            </div>
             <b>{{ it.name }}</b>
             <p>{{ it.desc }}</p>
             <div class="shop-item-foot">
@@ -42,7 +45,10 @@
     <!-- 背包列表 -->
     <div v-else class="bag-list">
       <div v-for="it in bag" :key="it.id" class="bag-row">
-        <span class="bag-face">{{ it.icon }}</span>
+        <span class="bag-face">
+          <PetSprite v-if="it.petKind" :kind="it.petKind" :size="40" :still="true" />
+          <template v-else>{{ it.icon }}</template>
+        </span>
         <div class="bag-main">
           <b>{{ it.name }} <em v-if="it.count > 1">x{{ it.count }}</em></b>
           <span>{{ it.desc }}</span>
@@ -111,13 +117,16 @@
 
 <script>
 import { getSession } from '../auth'
+import { bump } from '../quest'
 import { apiShopItems, apiShopBuy, apiShopBag, apiShopUse } from '../shop'
 import { apiAccountProfile, apiAccountUpdate } from '../account'
 import { apiFriendList } from '../friend'
+import PetSprite from '../components/PetSprite.vue'
 import sound from '../sound'
 
 export default {
   name: 'ShopView',
+  components: { PetSprite },
   inject: ['toast'],
   data() {
     return {
@@ -194,6 +203,7 @@ export default {
       const r = await apiShopBuy(this.session.id, it.id)
       this.buying = ''
       if (r.code === 200) {
+        bump('shop')
         sound.success()
         this.toast(r.data, 'ok')
         this.loadPoints()
@@ -353,7 +363,10 @@ export default {
   min-width: 0;
 }
 .shop-item:hover { border-color: var(--primary); transform: translateY(-2px); }
-.shop-item-face { font-size: 28px; text-align: center; }
+.shop-item-face {
+  font-size: 28px; text-align: center;
+  min-height: 60px; display: flex; align-items: center; justify-content: center;
+}
 .shop-item b { font-size: 12px; text-align: center; }
 .shop-item p {
   flex: 1; margin: 0; font-size: 10px; color: var(--muted);

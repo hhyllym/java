@@ -6,12 +6,20 @@
 
 const ADMIN_SESSION_KEY = 'mlp_admin_session'
 const API_BASE = '/api/admin'
+/** 管理员会话最长保留 7 天，过期自动作废（后端 /me 还会再校验一次令牌） */
+const SESSION_TTL = 7 * 24 * 60 * 60 * 1000
 
 export function getAdminSession() {
   const s = localStorage.getItem(ADMIN_SESSION_KEY)
   if (!s) return null
   try {
-    return JSON.parse(s)
+    const session = JSON.parse(s)
+    // 会话太老就当不存在，逼着重新登录
+    if (!session || !session.token || (session.ts && Date.now() - session.ts > SESSION_TTL)) {
+      localStorage.removeItem(ADMIN_SESSION_KEY)
+      return null
+    }
+    return session
   } catch (e) {
     return null
   }
@@ -83,13 +91,15 @@ export const apiAdminTagRename = (oldTag, newTag) => request('PUT', '/tag/rename
 export const apiAdminTagDelete = (tag) => request('DELETE', `/tag/${encodeURIComponent(tag)}`)
 
 // ---------- 用户 ----------
-export const apiAdminUserList = (keyword = '', page = 1, size = 12) =>
-  request('GET', `/user/list?keyword=${encodeURIComponent(keyword)}&page=${page}&size=${size}`)
+export const apiAdminUserList = (keyword = '', page = 1, size = 12, permission = -1) =>
+  request('GET', `/user/list?keyword=${encodeURIComponent(keyword)}&permission=${permission}&page=${page}&size=${size}`)
 export const apiAdminUserDelete = (id) => request('DELETE', `/user/${id}`)
 export const apiAdminUserPoints = (id, points) => request('PUT', `/user/${id}/points`, { points })
+export const apiAdminUserPassword = (id, password) => request('PUT', `/user/${id}/password`, { password })
 export const apiAdminUserPermission = (id, permission) => request('PUT', `/user/${id}/permission`, { permission })
 
 // ---------- 消息 ----------
 export const apiAdminMessageList = (type = '', keyword = '', page = 1, size = 12) =>
   request('GET', `/message/list?type=${encodeURIComponent(type)}&keyword=${encodeURIComponent(keyword)}&page=${page}&size=${size}`)
 export const apiAdminMessageDelete = (id) => request('DELETE', `/message/${id}`)
+export const apiAdminMessageSend = (toName, content) => request('POST', '/message/send', { toName, content })

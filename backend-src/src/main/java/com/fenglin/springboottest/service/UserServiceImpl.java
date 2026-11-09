@@ -1,10 +1,13 @@
 package com.fenglin.springboottest.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.fenglin.springboottest.common.Result;
 import com.fenglin.springboottest.entity.Message;
+import com.fenglin.springboottest.entity.PointLog;
 import com.fenglin.springboottest.entity.User;
 import com.fenglin.springboottest.mapper.MessageMapper;
+import com.fenglin.springboottest.mapper.PointLogMapper;
 import com.fenglin.springboottest.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,6 +34,12 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private PonyService ponyService;
+
+    @Autowired
+    private PointLogMapper pointLogMapper;
+
+    /** 登录礼包金额：每天首次登录送 10000 积分 */
+    private static final int NEWBIE_BONUS = 10000;
 
     @Override
     public Result<?> profile(Long id) {
@@ -91,9 +100,9 @@ public class UserServiceImpl implements UserService {
         // 注册成功，写入一条「个人」系统欢迎通知（to_id = 新用户；区别于 to_id=-1 的全员广播）
         Message welcome = new Message();
         welcome.setType("NOTIFY");
-        welcome.setFromName("小马王国");
+        welcome.setFromName("小马乐园");
         welcome.setToId(user.getId());
-        welcome.setContent("欢迎来到小马王国，" + name + "！记得去首页抽你的「今日幸运小马」🎲");
+        welcome.setContent("欢迎来到小马乐园，" + name + "！记得去首页抽你的「今日幸运小马」🎲");
         welcome.setReadFlag(0);
         welcome.setCreateTime(LocalDateTime.now());
         messageMapper.insert(welcome);
@@ -128,6 +137,28 @@ public class UserServiceImpl implements UserService {
         // 把权限带回前端，首页据此决定是否展示「后台管理」入口
         data.put("permission", user.getPermission() == null ? 1 : user.getPermission());
         return Result.ok("登录成功", data);
+    }
+
+    /** 新人大礼包：每人限领一次（流水表 biz=newbie-10000 判重，防反复领取刷分） */
+    @Transactional(rollbackFor = Exception.class)
+    public Result<?> claimNewbieBonus(Long userId) {
+        Long cnt = pointLogMapper.selectCount(new LambdaQueryWrapper<PointLog>()
+                .eq(PointLog::getUserId, userId)
+                .eq(PointLog::getBiz, "newbie-10000"));
+        if (cnt != null && cnt > 0) {
+            return Result.ok("already", null);
+        }
+        userMapper.update(null, new LambdaUpdateWrapper<User>()
+                .eq(User::getId, userId)
+                .setSql("points = IFNULL(points, 0) + " + NEWBIE_BONUS));
+        PointLog log = new PointLog();
+        log.setUserId(userId);
+        log.setAmount(NEWBIE_BONUS);
+        log.setBiz("newbie-10000");
+        log.setRemark("新人大礼包");
+        log.setCreateTime(LocalDateTime.now());
+        pointLogMapper.insert(log);
+        return Result.ok("ok", NEWBIE_BONUS);
     }
 
     private User findByName(String name) {

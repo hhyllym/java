@@ -1,6 +1,7 @@
 package com.fenglin.springboottest.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.fenglin.springboottest.common.Result;
 import com.fenglin.springboottest.entity.GameScore;
 import com.fenglin.springboottest.entity.User;
@@ -29,23 +30,44 @@ public class GameScoreController {
     @Autowired
     private UserMapper userMapper;
 
-    /** 提交一局成绩 */
+    @Autowired
+    private UserController userController;
+
+    /** 提交一局成绩：记录最高分，并把「超出历史最佳的部分」作为真实积分奖励发放到账号余额 */
     @PostMapping("/score")
     @Transactional(rollbackFor = Exception.class)
     public Result<?> score(@RequestBody Map<String, Object> body) {
         String gameId = body.get("gameId") == null ? "" : String.valueOf(body.get("gameId")).trim();
         Long userId = toLong(body.get("userId"));
         Integer score = body.get("score") == null ? null : ((Number) body.get("score")).intValue();
+        String name = body.get("name") == null ? gameId : String.valueOf(body.get("name")).trim();
         if (userId == null || gameId.isEmpty() || score == null) {
             return Result.fail("参数不完整");
         }
+        // 提交前先取历史最佳（不含本次这一局）
+        GameScore bestRow = gameScoreMapper.selectOne(new LambdaQueryWrapper<GameScore>()
+                .eq(GameScore::getGameId, gameId)
+                .eq(GameScore::getUserId, userId)
+                .orderByDesc(GameScore::getScore)
+                .last("limit 1"));
+        int bestBefore = bestRow == null ? 0 : bestRow.getScore();
+
         GameScore g = new GameScore();
         g.setGameId(gameId);
         g.setUserId(userId);
         g.setScore(score);
         g.setCreateTime(LocalDateTime.now());
         gameScoreMapper.insert(g);
-        return Result.ok("成绩已记录");
+
+        // 仅「打破自己历史最佳」的增量计入真实积分，杜绝反复刷分
+        int reward = Math.max(0, score - bestBefore);
+        if (reward > 0) {
+            userController.addPoints(userId, reward, "game-reward", "游戏「" + name + "」破纪录奖励 +" + reward);
+        }
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("best", Math.max(bestBefore, score));
+        data.put("reward", reward);
+        return Result.ok("成绩已记录", data);
     }
 
     /** 某游戏排行榜 top 20 */

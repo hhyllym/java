@@ -28,7 +28,7 @@
       >{{ f.emoji }}<em>{{ f.name }}</em></button>
     </div>
 
-    <div class="forest-tip">💡 柔柔说：点对了小动物会很开心，点错了它会难过的</div>
+    <div class="forest-tip">💡 茸茸说：点对了小动物会很开心，点错了它会难过的</div>
   </div>
 </template>
 
@@ -54,7 +54,7 @@ const FOODS = [
 ]
 
 export default {
-  name: 'GameFluttershy',
+  name: 'GameForestFeed',
   emits: ['score', 'over'],
   data() {
     return {

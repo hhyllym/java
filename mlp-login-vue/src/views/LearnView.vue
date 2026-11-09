@@ -4,8 +4,8 @@
     <div class="home-top">
       <div class="logo">🎓</div>
       <div class="home-greet">
-        <h2>小马学院</h2>
-        <p>跟六位主角学本领 · 玩转友谊魔法</p>
+        <h2>星辉学院</h2>
+        <p>跟六位主角学本领 · 玩转六色心印</p>
       </div>
       <button class="logout" @click="goHome">返回</button>
     </div>
@@ -29,7 +29,10 @@
     </div>
 
     <!-- 小游戏入口 -->
-    <div class="filter-label">🎮 小马游乐场 · 六位主角各有一款拿手游戏</div>
+    <div class="filter-label learn-game-head">
+      <span>🎮 星糖游乐场 · {{ GAMES.length }} 款小游戏，挑一款开玩</span>
+      <router-link to="/games" class="learn-more">全部游戏 →</router-link>
+    </div>
     <div class="game-grid">
       <button v-for="g in GAMES" :key="g.id" class="game-card" :style="{ '--pc': PONIES[g.pony].color }" @click="openGame(g)">
         <span class="game-face">
@@ -79,7 +82,7 @@
             <span class="sheet-face" :style="{ '--pc': PONIES[course.pony].color }">{{ course.icon }}</span>
             <div class="sheet-title">
               <h3>{{ course.name }}</h3>
-              <p>{{ PONIES[course.pony].name }} · {{ PONIES[course.pony].element }}元素</p>
+              <p>{{ PONIES[course.pony].name }} · {{ PONIES[course.pony].element }}心印</p>
             </div>
             <button class="sheet-close" @click="course = null">✕</button>
           </div>
@@ -146,6 +149,7 @@
 
 <script>
 import { getSession } from '../auth'
+import { bump } from '../quest'
 import CutieMark from '../components/CutieMark.vue'
 import { COURSES, BADGES, GAMES, PONIES } from '../courses'
 import {
@@ -179,7 +183,7 @@ export default {
     const today = new Date()
     const t = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
     this.checkedToday = this.state.checkin.last === t
-    // 从背景可爱标志跳进来：/learn?pony=xxx 自动打开对应小马的课程
+    // 从背景心印徽记跳进来：/learn?pony=xxx 自动打开对应小马的课程
     const pony = this.$route.query.pony
     if (pony) {
       const c = COURSES.find(c => c.pony === pony)
@@ -232,6 +236,7 @@ export default {
     markLesson(l) {
       if (!this.course) return
       completeLesson(this.course.id, l.id)
+      bump('lesson')
       this.state = loadLearn()
       this.toast('学完「' + l.title + '」，+10 积分！', 'ok')
       // 整门课完成 → 发徽章
@@ -261,6 +266,7 @@ export default {
         sound.success()
         if (this.course) {
           quizRight(this.course.id, l.id)
+          bump('quiz')
           this.state = loadLearn()
         }
       } else {
@@ -272,6 +278,7 @@ export default {
       this.state = loadLearn()
       this.checkedToday = true
       if (r.gained) {
+        bump('checkin')
         sound.success()
         this.toast(`打卡成功，+${r.gained} 积分，连击 ${r.streak} 天 🔥`, 'ok')
       }
@@ -281,7 +288,7 @@ export default {
 </script>
 
 <style scoped>
-/* ========== 小马学院 ========== */
+/* ========== 星辉学院 ========== */
 .checkin-row {
   display: flex; align-items: center; gap: 12px;
   margin: 14px 0 4px; padding: 12px 14px;
@@ -300,6 +307,11 @@ export default {
 .checkin-btn.done { background: var(--mint); color: #2b6b4e; cursor: default; box-shadow: none; }
 
 /* 游戏入口 */
+.learn-game-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.learn-more {
+  color: var(--primary); font-weight: 700; text-decoration: none; white-space: nowrap;
+}
+.learn-more:hover { text-decoration: underline; }
 .game-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
 .game-card {
   border: none; cursor: pointer; text-align: center;

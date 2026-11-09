@@ -2,7 +2,7 @@
   <div class="home game-page">
     <!-- 游戏不存在 -->
     <div v-if="!game" class="empty">
-      没有这个游戏 🥺 <router-link to="/learn" class="back-link">回学院看看</router-link>
+      没有这个游戏 🥺 <router-link :to="fromHub ? '/games' : '/learn'" class="back-link">回{{ fromHub ? '游戏中心' : '学院' }}看看</router-link>
     </div>
 
     <template v-else>
@@ -22,8 +22,9 @@
         </div>
       </div>
 
-      <!-- 历史最佳 -->
-      <div class="game-best-bar" v-if="best > 0">🏆 历史最佳 {{ best }} 分</div>
+      <!-- 历史最佳 + 积分说明 -->
+      <div class="game-best-bar" v-if="best > 0">🏆 历史最佳 {{ best }} 分 · 破纪录超出的分数会变成积分存入账户 💎</div>
+      <div class="game-best-bar" v-else>💎 破纪录超出的分数会直接变成积分，存入你的账户</div>
 
       <!-- 游戏本体 -->
       <component :is="gameComp" :key="round" @score="onScore" @over="onOver" />
@@ -32,19 +33,19 @@
       <Teleport to="body">
         <div v-if="result" class="sheet-mask" @click.self="result = null">
           <div class="sheet result-sheet">
-            <div class="result-emoji">{{ result.gain > 0 ? '🎉' : '💪' }}</div>
+            <div class="result-emoji">{{ result.accountReward > 0 ? '🎉' : '💪' }}</div>
             <h3 class="result-title">{{ resultTitle }}</h3>
             <div class="result-score">{{ result.score }} 分</div>
             <p class="result-detail">
-              <template v-if="result.newBest">🏆 新纪录！</template>
-                <template v-if="result.gain > 0">积分 +{{ result.gain }}</template>
-                <template v-else>这次没超过历史最佳，不加积分</template>
-              </p>
+              <template v-if="result.accountReward > 0">🏆 新纪录！积分 <b>+{{ result.accountReward }}</b> 已存入账户 💎</template>
+              <template v-else>这次没破纪录，去冲个更高的分数就能领积分啦～</template>
+            </p>
+            <p class="result-best">历史最佳：{{ result.best }} 分</p>
             <div class="result-btns">
               <button class="result-btn main" @click="replay">🔁 再玩一次</button>
               <button class="result-btn ghost" @click="openRank">🏆 排行榜</button>
               <button class="result-btn ghost" @click="openVs">⚔️ 好友对战</button>
-              <button class="result-btn ghost" @click="goBack">🎓 返回学院</button>
+              <button class="result-btn ghost" @click="goBack">{{ fromHub ? '🎮 返回游戏中心' : '🎓 返回学院' }}</button>
             </div>
           </div>
         </div>
@@ -125,30 +126,47 @@ import { gameBest, settleGame } from '../learn'
 import { apiGameScore, apiGameRank, apiGameVs } from '../gameScore'
 import { apiFriendList } from '../friend'
 import { getSession } from '../auth'
-import GameTwilight from '../components/games/GameTwilight.vue'
-import GameApplejack from '../components/games/GameApplejack.vue'
-import GameDash from '../components/games/GameDash.vue'
-import GamePinkie from '../components/games/GamePinkie.vue'
-import GameFluttershy from '../components/games/GameFluttershy.vue'
-import GameRarity from '../components/games/GameRarity.vue'
+import { bump } from '../quest'
+import GameStarQuiz from '../components/games/GameStarQuiz.vue'
+import GameOrchard from '../components/games/GameOrchard.vue'
+import GameReflex from '../components/games/GameReflex.vue'
+import GameFlipCard from '../components/games/GameFlipCard.vue'
+import GameForestFeed from '../components/games/GameForestFeed.vue'
+import GameGemStudio from '../components/games/GameGemStudio.vue'
 import GameDessert from '../components/games/GameDessert.vue'
 import GameParty from '../components/games/GameParty.vue'
 import GameStyle from '../components/games/GameStyle.vue'
-import GameSports from '../components/games/GameSports.vue'
+import GameMatch3 from '../components/games/GameMatch3.vue'
+import GameMemory from '../components/games/GameMemory.vue'
+import GameRainbow from '../components/games/GameRainbow.vue'
+import GameWhack from '../components/games/GameWhack.vue'
+import GameGem from '../components/games/GameGem.vue'
+import GameSnake from '../components/games/GameSnake.vue'
+import GameMonopoly from '../components/games/GameMonopoly.vue'
+import GamePetBattle from '../components/games/GamePetBattle.vue'
+import GameRps from '../components/games/GameRps.vue'
 import sound from '../sound'
 
 /** 游戏 id → 组件 */
 const GAME_COMPS = {
-  twilight: GameTwilight,
-  applejack: GameApplejack,
-  dash: GameDash,
-  pinkie: GamePinkie,
-  fluttershy: GameFluttershy,
-  rarity: GameRarity,
+  twilight: GameStarQuiz,
+  applejack: GameOrchard,
+  dash: GameReflex,
+  pinkie: GameFlipCard,
+  fluttershy: GameForestFeed,
+  rarity: GameGemStudio,
   dessert: GameDessert,
   party: GameParty,
   style: GameStyle,
-  sports: GameSports
+  sports: GameMatch3,
+  petbattle: GamePetBattle,
+  rps: GameRps,
+  memory: GameMemory,
+  rainbow: GameRainbow,
+  whack: GameWhack,
+  gem: GameGem,
+  snake: GameSnake,
+  monopoly: GameMonopoly
 }
 
 export default {
@@ -171,6 +189,10 @@ export default {
     }
   },
   computed: {
+    /** 从游戏中心进来的人，返回时回中心；从学院进来的回学院 */
+    fromHub() {
+      return this.$route.query.from === 'games'
+    },
     game() {
       return GAMES.find(g => g.id === this.$route.params.id) || null
     },
@@ -191,27 +213,44 @@ export default {
   },
   methods: {
     goBack() {
-      this.$router.push({ name: 'learn' })
+      this.$router.push({ name: this.fromHub ? 'games' : 'learn' })
     },
     onScore(n) {
       this.score = n
     },
-    onOver(score) {
+    async onOver(score) {
+      // 本地学习积分（首页学习中心装饰用，保留）
       const r = settleGame(this.game.id, score)
+      // 提交到后端并领取「真实到账积分」（破纪录增量）
+      let accountReward = 0
+      let serverBest = r.best
+      try {
+        const res = await apiGameScore(this.game.id, this.session.id, score, this.game.name)
+        if (res && res.code === 200 && res.data) {
+          accountReward = res.data.reward || 0
+          if (typeof res.data.best === 'number') serverBest = res.data.best
+        }
+      } catch (e) { /* 网络异常不影响本地结算 */ }
+      this.best = serverBest
       this.result = {
         score,
         gain: r.gain,
-        best: r.best,
-        newBest: r.gain > 0 && score >= r.best
+        accountReward,
+        best: serverBest,
+        newBest: accountReward > 0
       }
-      this.best = r.best
-      if (r.gain > 0) this.toast(`本局得分 ${score}，积分 +${r.gain} 💎`, 'ok')
-      // 结算音效：破纪录魔法音，得分成功音，零分鼓励音
-      if (this.result.newBest) sound.magic()
-      else if (score > 0) sound.success()
-      else sound.fail()
-      // 成绩同步到服务器（失败不影响本地结算）
-      apiGameScore(this.game.id, this.session.id, score)
+      // 结算音效 + 提示：明确告知「已存入账户」
+      if (accountReward > 0) {
+        this.toast(`🎉 破纪录！积分 +${accountReward} 已存入账户 💎`, 'ok')
+        sound.magic()
+      } else if (score > 0) {
+        this.toast(`本局得分 ${score}，未破纪录，下次冲更高就能领积分！`, 'ok')
+        sound.success()
+      } else {
+        this.toast('再试一次吧～', 'err')
+        sound.fail()
+      }
+      bump('game')
     },
     replay() {
       this.result = null
@@ -294,7 +333,9 @@ export default {
   font-size: 34px; font-weight: 800; color: var(--primary);
   margin: 6px 0;
 }
-.result-detail { font-size: 12.5px; color: var(--muted); margin: 0 0 16px; line-height: 1.7; }
+.result-detail { font-size: 12.5px; color: var(--muted); margin: 0 0 6px; line-height: 1.7; }
+.result-detail b { color: var(--primary); font-size: 14px; }
+.result-best { font-size: 11.5px; color: var(--muted); opacity: .75; margin: 0 0 16px; }
 .result-btns { display: flex; flex-direction: column; gap: 8px; }
 .result-btn {
   width: 100%; padding: 11px; border: none; border-radius: 11px;

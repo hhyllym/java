@@ -184,8 +184,9 @@ public class ShopController {
                 }
                 Pet p = new Pet();
                 p.setUserId(userId);
-                p.setKind(String.valueOf(item.get("petKind")));
-                p.setName(petName.isEmpty() ? String.valueOf(ShopDefs.petKind(String.valueOf(item.get("petKind"))).get("name")) : petName);
+                String petKind = ShopDefs.normalizePetKind(String.valueOf(item.get("petKind")));
+                p.setKind(petKind);
+                p.setName(petName.isEmpty() ? String.valueOf(ShopDefs.petKind(petKind).get("name")) : petName);
                 p.setLevel(1);
                 p.setExp(0);
                 p.setHunger(60);
@@ -296,8 +297,10 @@ public class ShopController {
     }
 
     private Map<String, Object> findItem(String itemId) {
+        // 旧版「龙崽蛋」库存继续可用，孵化出来就是萨摩耶
+        String lookup = "pet-egg-dragon".equals(itemId) ? "pet-egg-dog" : itemId;
         for (Map<String, Object> item : ShopDefs.shopItems()) {
-            if (itemId.equals(item.get("id"))) {
+            if (lookup.equals(item.get("id"))) {
                 return item;
             }
         }

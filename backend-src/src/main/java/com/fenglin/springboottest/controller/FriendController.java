@@ -28,6 +28,10 @@ import java.util.Map;
  *   POST /api/friend/list    { meId }            好友列表
  *   POST /api/friend/delete  { meId, friendId }  删除好友（软删，再加回保留数据）
  *   POST /api/friend/remark  { meId, friendId, remark }  设置备注（空串=清除）
+ *   POST /api/friend/sent    { meId }            我发出的申请（待处理 / 未通过）
+ *   POST /api/friend/cancel  { applyId, meId }   撤回自己发出的申请
+ *   POST /api/friend/profile { meId, friendId }  好友资料卡（天数/徽章/共同好友/战绩）
+ *   POST /api/friend/suggest { meId }            可能认识的人
  */
 @RestController
 @RequestMapping("/api/friend")
@@ -101,6 +105,30 @@ public class FriendController {
     public Result<?> remark(@RequestBody Map<String, Object> body) {
         return friendService.setRemark(toLong(body.get("meId")), toLong(body.get("friendId")),
                 (String) body.get("remark"));
+    }
+
+    /** 我发出的申请：状态 waiting / rejected，可撤回、可重发 */
+    @PostMapping("/sent")
+    public Result<?> sent(@RequestBody Map<String, Object> body) {
+        return friendService.sent(toLong(body.get("meId")));
+    }
+
+    /** 撤回尚未处理的申请 */
+    @PostMapping("/cancel")
+    public Result<?> cancel(@RequestBody Map<String, Object> body) {
+        return friendService.cancel(toLong(body.get("applyId")), toLong(body.get("meId")));
+    }
+
+    /** 好友资料卡 */
+    @PostMapping("/profile")
+    public Result<?> profile(@RequestBody Map<String, Object> body) {
+        return friendService.profile(toLong(body.get("meId")), toLong(body.get("friendId")));
+    }
+
+    /** 可能认识的人 */
+    @PostMapping("/suggest")
+    public Result<?> suggest(@RequestBody Map<String, Object> body) {
+        return friendService.suggest(toLong(body.get("meId")));
     }
 
     private Long toLong(Object o) {

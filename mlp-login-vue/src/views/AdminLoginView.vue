@@ -6,6 +6,8 @@
       <h1>管理员登录</h1>
       <p class="sub">仅限管理员进入 · 普通用户请回首页</p>
 
+      <div v-if="netError" class="net-err">{{ netError }}</div>
+
       <form novalidate @submit.prevent="handleLogin">
         <div class="field">
           <label for="adminName">管理员账号</label>
@@ -42,7 +44,6 @@
       </form>
 
       <router-link to="/home" class="back">« 返回首页</router-link>
-      <div class="hint">默认超级管理员 admin · 密码 Admin@1234（明文，在 sql\mlp_login.sql 中预置，可在库里改）</div>
     </div>
   </div>
 </template>
@@ -58,6 +59,7 @@ export default {
       form: { username: '', password: '' },
       show: false,
       errors: {},
+      netError: '',
       submitting: false
     }
   },
@@ -65,6 +67,7 @@ export default {
     async handleLogin() {
       if (this.submitting) return
       this.errors = {}
+      this.netError = ''
       const username = this.form.username.trim()
       const password = this.form.password
       if (!username) { this.errors.username = '请输入管理员账号'; return }
@@ -75,7 +78,12 @@ export default {
       this.submitting = false
 
       if (res.code !== 200) {
-        this.errors.password = res.msg || '登录失败'
+        // 连不上后端（code=-1）：单独用提示条展示，不挤进密码框下面的小红字
+        if (res.code === -1) {
+          this.netError = '📡 连不上后端（端口 8081）——请先把 Spring Boot 启动起来，再回来登录'
+        } else {
+          this.errors.password = res.msg || '登录失败'
+        }
         return
       }
       const d = res.data || {}
@@ -139,6 +147,19 @@ export default {
   font-size: 12px; cursor: pointer; font-weight: 700;
 }
 .err { color: var(--danger, #e06666); font-size: 12px; min-height: 16px; margin-top: 4px; }
+.net-err {
+  margin: 0 0 14px;
+  padding: 10px 13px;
+  border-radius: 12px;
+  background: #fdeaea;
+  border: 1px solid #f5c2c2;
+  color: #b23b3b;
+  font-size: 12.5px;
+  line-height: 1.55;
+  text-align: left;
+  animation: netErrIn .25s ease;
+}
+@keyframes netErrIn { from { opacity: 0; transform: translateY(-5px); } }
 .submit {
   width: 100%;
   margin-top: 4px;
@@ -155,5 +176,4 @@ export default {
 .submit:hover { filter: brightness(1.05); }
 .submit:disabled { opacity: .7; cursor: default; }
 .back { display: inline-block; margin-top: 14px; font-size: 13px; color: var(--primary, #a06cd5); text-decoration: none; font-weight: 700; }
-.hint { margin-top: 10px; font-size: 11px; color: var(--muted, #9088a0); }
 </style>

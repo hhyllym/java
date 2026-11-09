@@ -1,15 +1,15 @@
 @echo off
 chcp 936 >nul
 setlocal
-title 小马王国 - 推送到 GitHub (hhyllym/java)
+title 小马乐园 - 推送到 GitHub (hhyllym/java)
 cd /d "%~dp0"
 
 set "REPO_URL=https://github.com/hhyllym/java.git"
 set "BRANCH=main"
-set "MSG=更新小马王国项目"
+set "MSG=更新小马乐园项目"
 
 echo ==========================================================
-echo   小马王国 - 推送代码到 GitHub
+echo   小马乐园 - 推送代码到 GitHub
 echo   仓库: https://github.com/hhyllym/java   分支: main
 echo   目录: %CD%
 echo ==========================================================
@@ -58,8 +58,8 @@ set "AUTH_URL=https://hhyllym:%TOKEN%@github.com/hhyllym/java.git"
 echo.
 
 rem ---------- 2) 提交本地改动 ----------
-set /p MSG=提交说明(直接回车用默认「更新小马王国项目」): 
-if "%MSG%"=="" set "MSG=更新小马王国项目"
+set /p MSG=提交说明(直接回车用默认「更新小马乐园项目」): 
+if "%MSG%"=="" set "MSG=更新小马乐园项目"
 git add -A
 echo [1/4] 本次要提交的改动:
 echo        ^(中文文件名显示成 \345\220... 这种八进制转义是正常的，不影响提交^)

@@ -20,7 +20,7 @@
       </div>
       <div class="rank-bar"><i :style="{ width: rankPct + '%' }"></i></div>
       <p class="rank-next" v-if="rankNext">再远征 {{ rankNext.min - state.trips.length }} 次升为「{{ rankNext.name }}」</p>
-      <p class="rank-next" v-else>已经是最高等级，整条小马谷都认识你了。</p>
+      <p class="rank-next" v-else>已经是最高等级，整条糖霜镇都认识你了。</p>
     </div>
 
     <!-- ===== 阶段一：选路线 / 今日战报 ===== -->
@@ -112,7 +112,7 @@
       </div>
     </div>
 
-    <router-link to="/learn" class="adv-link">🎮 想玩小游戏？去学院的小马游乐场 →</router-link>
+    <router-link to="/learn" class="adv-link">🎮 想玩小游戏？去学院的星糖游乐场 →</router-link>
   </div>
 </template>
 
@@ -136,13 +136,13 @@ const RANKS = [
 const ROUTES = [
   {
     id: 'forest', name: '森林边境', icon: '🌲', color: '#7fd4a8', risk: '轻松',
-    desc: '柔柔带路，树影里全是小动物的脚步声。',
+    desc: '茸茸带路，树影里全是小动物的脚步声。',
     events: [
       {
         scene: '🌿 岔路口',
         text: '小径分成两条：左边有一串新鲜的蹄印，右边飘来青草与野莓的香味。',
         options: [
-          { label: '跟着蹄印走', points: 9, text: '蹄印尽头是一头迷路的小鹿，你把它送回妈妈身边，柔柔远远地朝你竖起翅膀。' },
+          { label: '跟着蹄印走', points: 9, text: '蹄印尽头是一头迷路的小鹿，你把它送回妈妈身边，茸茸远远地朝你竖起翅膀。' },
           { label: '循着香味走', points: 6, text: '一片野莓丛。你采了满满一篮，还顺手分给了路边探头的小松鼠。' }
         ]
       },
@@ -167,18 +167,18 @@ const ROUTES = [
         text: '一群蝴蝶停在路中央，像是特意等着你，又像是在引路。',
         options: [
           { label: '跟它们走', points: 9, text: '蝴蝶把你带到一片花海，花心里藏着蜂蜜糖，甜得像偷来的。' },
-          { label: '轻轻绕开', points: 6, text: '你安静地绕过，没惊动它们休息。柔柔说，这叫体贴。' }
+          { label: '轻轻绕开', points: 6, text: '你安静地绕过，没惊动它们休息。茸茸说，这叫体贴。' }
         ]
       }
     ]
   },
   {
     id: 'mist', name: '云雾山道', icon: '⛰️', color: '#6ec6e6', risk: '刺激',
-    desc: '云宝的赛道，风比路还长，脚下全是云。',
+    desc: '云驰的赛道，风比路还长，脚下全是云。',
     events: [
       {
         scene: '⚡ 乱流',
-        text: '云层里的气流乱窜，云宝在前面喊：抓稳了，这段不好走！',
+        text: '云层里的气流乱窜，云驰在前面喊：抓稳了，这段不好走！',
         options: [
           { label: '全速冲过去', points: 12, text: '你在气流里打了个漂亮的滚，落地时彩虹在身后炸开。' },
           { label: '压低身子慢慢挪', points: 7, text: '稳稳通过。慢是慢了点，但一点没磕着。' }
@@ -212,7 +212,7 @@ const ROUTES = [
   },
   {
     id: 'crystal', name: '水晶遗迹', icon: '💎', color: '#b79cf0', risk: '解谜',
-    desc: '珍奇最爱的废墟，每一块石头都藏着机关。',
+    desc: '绮罗最爱的废墟，每一块石头都藏着机关。',
     events: [
       {
         scene: '💎 宝石之门',
@@ -242,7 +242,7 @@ const ROUTES = [
         scene: '✨ 裂了缝的水晶',
         text: '一块水晶裂了缝，里面似乎封着什么东西，微微透出暖色。',
         options: [
-          { label: '小心地敲开', points: 10, text: '裂缝里躺着一小段琥珀色的光，被珍奇郑重地收进了设计图。' },
+          { label: '小心地敲开', points: 10, text: '裂缝里躺着一小段琥珀色的光，被绮罗郑重地收进了设计图。' },
           { label: '原样放回去', points: 8, text: '你把它摆回原位，裂缝在光里慢慢合上了。' }
         ]
       }
@@ -250,13 +250,13 @@ const ROUTES = [
   },
   {
     id: 'candy', name: '糖果溪谷', icon: '🍬', color: '#f7a8c4', risk: '嘴馋',
-    desc: '碧琪的主场，河是糖霜做的，屋子是蛋糕盖的。',
+    desc: '泡芙的主场，河是糖霜做的，屋子是蛋糕盖的。',
     events: [
       {
         scene: '🍬 糖霜河',
-        text: '河水是粉色的糖霜，河面上只有几块软糖当落脚点。',
+        text: '河水是粉色的糖霜，河面上只有几块糖豆当落脚点。',
         options: [
-          { label: '踩着软糖跳过去', points: 11, text: '软糖弹力惊人，你连跳三下过了河，落地时还舔了舔鞋底。' },
+          { label: '踩着糖豆跳过去', points: 11, text: '糖豆弹力惊人，你连跳三下过了河，落地时还舔了舔鞋底。' },
           { label: '去上游找石桥', points: 8, text: '石桥很稳，桥头有个卖棒棒糖的小摊，摊主请你吃了一根。' }
         ]
       },
@@ -264,7 +264,7 @@ const ROUTES = [
         scene: '🎂 蛋糕屋',
         text: '整间屋子都是蛋糕做的，屋檐正往下滴奶油。',
         options: [
-          { label: '先敲门', points: 10, text: '开门的是纸杯蛋糕夫人，她请你尝了一块刚出炉的试作品。' },
+          { label: '先敲门', points: 10, text: '开门的是奶油夫人，她请你尝了一块刚出炉的试作品。' },
           { label: '先舔一口墙', points: 7, text: '被夫人抓个正着。她笑着递给你一把勺子，说：至少用勺子。' }
         ]
       },
@@ -273,7 +273,7 @@ const ROUTES = [
         text: '一大群气球不知被谁放了出来，满天乱飞，绳头缠成一团。',
         options: [
           { label: '跳起来抓最漂亮的那只', points: 9, text: '抓住时发现下面系着一张派对邀请函，写着你的名字。' },
-          { label: '把气球一只只拉回架子', points: 8, text: '你忙了半天，碧琪扑过来给了你一个大大的拥抱。' }
+          { label: '把气球一只只拉回架子', points: 8, text: '你忙了半天，泡芙扑过来给了你一个大大的拥抱。' }
         ]
       },
       {
@@ -281,7 +281,7 @@ const ROUTES = [
         text: '一位糖匠蹲在路边发愁，说他的配方被风吹跑了。',
         options: [
           { label: '帮他一起找', points: 12, text: '配方卡在树梢上，你爬上去取回来，他送了你一罐手工糖。' },
-          { label: '陪他重想一份', points: 9, text: '你们一起试了七次，第八次的酸角软糖意外地好吃。' }
+          { label: '陪他重想一份', points: 9, text: '你们一起试了七次，第八次的酸角糖豆意外地好吃。' }
         ]
       }
     ]

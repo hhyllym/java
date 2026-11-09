@@ -25,6 +25,6 @@ public interface CategoryService {
      */
     List<Long> descendantIds(Long categoryId);
 
-    /** 从一级分类到自己的名字链，如 ["种族", "飞马"]；查不到返回空集合 */
+    /** 从一级分类到自己的名字链，如 ["种族", "云翼驹"]；查不到返回空集合 */
     List<String> pathNames(Long categoryId);
 }

@@ -19,4 +19,7 @@ public interface UserService {
      * 以及——如果名字或英文名正好和图鉴里某只小马对上——那只小马的完整卡片。
      */
     Result<?> profile(Long id);
+
+    /** 新人大礼包：每人限领一次（一次性 10000 积分） */
+    Result<?> claimNewbieBonus(Long userId);
 }

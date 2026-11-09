@@ -19,7 +19,7 @@
 - 前端登录/注册调用的接口：`POST /api/auth/login`、`POST /api/auth/register`（见 `src/auth.js` 的 `API_BASE = '/api/auth'`）
 - **首页图鉴**调用的接口：`/api/home/overview`、`/api/home/search`、`/api/category/tree`、`/api/pony/{id}`（见 `src/home.js`）
 - 开发时用 vite 代理转发：`/api` → `http://localhost:8081`（见 `vite.config.js`）
-- 主题：小马宝莉 / 马卡龙可爱风，中文界面，不要改成英文或商务风。
+- 主题：原创「星糖谷」小马 / 马卡龙可爱风，中文界面，不要改成英文或商务风。角色、心印、元素、地名均为本项目原创，禁止再引入任何既有动画作品的专有设定。
 
 ---
 
@@ -168,7 +168,7 @@
 - `git merge-tree` 预演结论：**无冲突**
 - 身份配置在仓库本地 `.git/config`（`user.name=hhyllym` / `hhyllym@users.noreply.github.com`），全局被重置也不影响提交
 - 沙箱里访问 GitHub 要 `GIT_SSL_NO_VERIFY=1`；用户双击 bat 不受影响
-- 仓库里那批 `*.rar / *.zip / 小马宝莉登录.html / 新建文本文档.txt / java-main\* / 根目录 .gitignore、AGENTS.md`
+- 仓库里那批 `*.rar / *.zip / 星糖谷登录.html / 新建文本文档.txt / java-main\* / 根目录 .gitignore、AGENTS.md`
   在本地工作区已经不存在，提交后会从仓库里去掉；**GitHub 上本来也没有它们**（远程只有 `README.md` + `java-main.rar`），
   所以推送不会删掉远程任何东西。
 
@@ -187,10 +187,10 @@
 
 | 表 | 作用 | 要点 |
 |---|---|---|
-| `t_category` | **分级分类**，自关联 | `parent_id=0` 是一级；现在两层：一级=`种族/元素/栖息地`，二级=`飞马/忠诚/小马谷`… 结构本身支持任意层级 |
+| `t_category` | **分级分类**，自关联 | `parent_id=0` 是一级；现在两层：一级=`种族/元素/栖息地`，二级=`云翼驹/忠诚/糖霜镇`… 结构本身支持任意层级 |
 | `t_pony` | 图鉴条目 | `mark` 是 `CutieMark.vue` 支持的图案 key，没有对应图案的用 `emoji` 兜底 |
-| `t_pony_category` | 条目 ↔ 分类 **多对多** | 一只小马同时挂到「飞马 + 忠诚 + 云中城」三个节点上 |
-| `t_pony_tag` | 关键词标签 | 搜「派对」能搜出碧琪，命中的就是这张表 |
+| `t_pony_category` | 条目 ↔ 分类 **多对多** | 一只小马同时挂到「云翼驹 + 忠诚 + 流云城」三个节点上 |
+| `t_pony_tag` | 关键词标签 | 搜「派对」能搜出泡芙，命中的就是这张表 |
 | `t_search_word` | 热搜词 | 每次带关键词搜索 `hit_count + 1`，首页热搜是**活的**（`INSERT ... ON DUPLICATE KEY UPDATE`） |
 
 数据规模：17 个分类 / 16 只小马 / 40 条分类关联 / 80 个标签 / 10 个热搜词。
@@ -217,7 +217,7 @@
    ```
 3. 展开后的 id 列表丢给 `PonyMapper.xml` 的 `search`，做 `p.id IN (SELECT pony_id FROM t_pony_category WHERE category_id IN (...))`，
    再叠加关键词条件（`name / alias / intro / tag` 四路 LIKE）。
-4. 分类树上的「共 N 位」也**不能把子分类数量相加**：紫悦同时属于「独角兽」和「天角兽」，
+4. 分类树上的「共 N 位」也**不能把子分类数量相加**：星澜同时属于「星角驹」和「星翼驹」，
    直接相加「种族」会变成 17。`CategoryServiceImpl.collect()` 是自底向上求 **集合并集**再取 size，实测「种族」= 16 ✓。
 
 #### 其它要注意的
@@ -243,12 +243,12 @@
 
 ```json
 { "code": 200, "msg": "ok", "data": {
-    "id": 1, "name": "碧琪",
+    "id": 1, "name": "泡芙",
     "createTime": "2026-10-14 09:05",
     "days": 1,
-    "pony": { "id": 2, "name": "碧琪", "alias": "Pinkie Pie", "mark": "pinkie",
+    "pony": { "id": 2, "name": "泡芙", "alias": "Puffette", "mark": "pinkie",
               "emoji": "🎈", "color": "#f7a8c4", "rarity": "稀有",
-              "tags": ["派对", ...], "categories": [{ "parentName": "种族", "name": "陆马", ... }] }
+              "tags": ["派对", ...], "categories": [{ "parentName": "种族", "name": "原野驹", ... }] }
 }}
 ```
 
@@ -268,6 +268,43 @@
   分类树还没到手时判定不出一级还是二级，调换顺序就失效。
 - 新增样式：`.dash-kv / .dash-sec / .dash-pony / .dash-face / .dash-tip / .dash-actions`。
 
+### ✅ 5.8 后台管理系统（2026-11-09 完善版）
+
+入口：`/admin/login`（管理员登录）→ `/admin`（后台）。首页顶栏对 `permission=0/2` 的账号
+显示「🛠 后台管理」入口；普通登录页底部也有「管理员登录」链接。
+
+**账号体系复用 `t_user`**：`permission` 1=普通用户（进不了后台）/ 0=普通管理员 / 2=超级管理员。
+密码**明文存储**（当前 User 实体与 AdminController 都是明文比对，别按 5.1 的加盐哈希老笔记改）。
+
+**会话**：登录成功后前端 `src/adminAuth.js` 存 `{ name, token, ts }` 到 localStorage（key
+`mlp_admin_session`），7 天自动过期；每个后台请求带 `X-Admin-Token` 头，后端 `AdminAuth`
+用 `app.admin.secret`（application-*.properties）核对，令牌 = Base64(登录名|secret)，无时效。
+
+**前端**：`src/views/AdminLoginView.vue`（登录页）+ `src/views/AdminView.vue`（后台主界面，
+侧边菜单：概览/小马/分类/标签/用户/消息）+ `src/adminAuth.js`（全部 /api/admin 接口封装）。
+
+**后端接口**（源码在 `backend-src\...\controller\Admin*.java`，改完必须同步 `D:\workSpace\springBootTest`，
+`启动后端.bat` 发现空壳会自动调 `恢复后端.bat` 装回）：
+
+| 接口 | 说明 |
+|---|---|
+| `POST /api/admin/login` / `GET /api/admin/me` | 登录 + 校验令牌（me 返回 permission） |
+| `/api/admin/pony/*` | 图鉴 CRUD（AdminPonyController） |
+| `/api/admin/category/*` | 分类 CRUD（AdminCategoryController） |
+| `/api/admin/tag/*` | 标签 增/改名/删（AdminTagController） |
+| `GET /api/admin/user/list` | 用户列表，`keyword` 搜名字 + **`permission` 筛选（-1=全部）** |
+| `PUT /api/admin/user/{id}/points` | 调积分 |
+| `PUT /api/admin/user/{id}/password` | **重置密码**（6~32 位；普通管理员只能重置普通用户） |
+| `PUT /api/admin/user/{id}/permission` | 调权限（仅超管；不能改自己） |
+| `DELETE /api/admin/user/{id}` | 删号（普通管理员删不了超管；超管删不了自己） |
+| `GET /api/admin/message/list` | 消息列表（type/keyword 过滤） |
+| `POST /api/admin/message/send` | **发系统通知**（NOTIFY；`toName` 留空=全员广播 toId=-1） |
+| `DELETE /api/admin/message/{id}` | 删消息 |
+
+2026-11-09 这轮完善了：概览页四块小面板（热搜词/热门小马/最近注册/最新动态，统计卡可点击跳转）、
+用户权限筛选 + 重置密码、发系统通知、管理员会话 7 天过期。前端 `vite build` 与后端 `mvn compile`
+均实测通过。
+
 ---
 
 ## 6. 文件地图（前端）
@@ -281,7 +318,7 @@ mlp-login-vue/                                     ← 前端项目就在这里
 ├── 环境检测.bat                  Node/JDK/Maven/目录/端口 一次性自检
 ├── 打开网页.bat                  内部用：轮询端口起来后再开默认浏览器
 ├── tools/static-server.cjs       零依赖兜底：起 dist/ + 代理 /api → 8081
-├── index.html                    入口，挂 #app，title=小马王国 · 账号中心
+├── index.html                    入口，挂 #app，title=星糖谷 · 账号中心
 ├── vite.config.js                5180，open:false，strictPort，proxy /api → 8081
 ├── package.json                  dev / build / preview 三个脚本
 ├── .gitignore                    node_modules, dist
@@ -348,5 +385,5 @@ D:\workSpace\springBootTest\
 - 首页/搜索继续做：`首页图鉴还要加 XXX 功能，数据走 /api/home/*，分类数据在 sql\mlp_home.sql 里加，别把分级搜索写成只查单层 category_id。`
 - 一键启动又坏了：`启动全部.bat 起不来，先看 AGENTS.md 第 1、3、5.3 节，别重新摸环境。`
 - 推代码：`双击 推送GitHub.bat 把代码推到 hhyllym/java；要是报 non-fast-forward 或者冲突，看 AGENTS.md 5.4 节。`
-- 继续做页面：`在 mlp-login-vue 里加 XXX 页面，保持马卡龙 / 小马宝莉风格。`
+- 继续做页面：`在 mlp-login-vue 里加 XXX 页面，保持马卡龙 / 星糖谷原创小马风格。`
 - 提速：`看看怎么让 启动前端.bat / 启动后端.bat 更快。`

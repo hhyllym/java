@@ -68,6 +68,7 @@
     <div class="dash-sec">
       <h4>💎 积分中心</h4>
       <div class="dash-point-actions">
+        <button @click="$router.push({ name: 'earn' })">💰 赚积分</button>
         <button @click="$router.push({ name: 'shop' })">🧧 积分商店</button>
         <button @click="showRank = !showRank">🏆 排行榜</button>
         <button @click="toggleLogs">📜 积分流水</button>
@@ -156,7 +157,8 @@ import { apiPresenceOffline } from '../presence'
 import { apiProfile } from '../user'
 import { apiAccountProfile, apiAccountUpdate } from '../account'
 import { apiPointBalance, apiPointLogs, apiPointRank } from '../point'
-import { apiTaskToday, apiTaskClaim, apiTaskBump } from '../task'
+import { apiTaskToday, apiTaskClaim } from '../task'
+import { bump } from '../quest'
 import sound from '../sound'
 import CutieMark from '../components/CutieMark.vue'
 import PetBadge from '../components/PetBadge.vue'
@@ -207,13 +209,12 @@ export default {
   created() {
     this.loadProfile()
     this.loadAccount()
-    this.loadTasks()
     this.loadRank()
     // 读回本地保存的自定义图片头像
     const saved = localStorage.getItem('mlp_avatar_' + this.session.id)
     if (saved) this.customAvatar = saved
-    // 每日登录任务顺手达成
-    apiTaskBump(this.session.id, 'login')
+    // 每日登录任务顺手达成；上报完再拉列表，避免竞态看不到进度
+    bump('login').then(() => this.loadTasks())
   },
   methods: {
     hasMark(mark) {

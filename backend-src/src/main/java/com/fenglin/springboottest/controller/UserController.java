@@ -157,6 +157,13 @@ public class UserController {
         return Result.ok("已解除绑定");
     }
 
+    /** 查可用积分余额（大富翁上桌门槛与结算会用） */
+    public int pointsOf(Long userId) {
+        if (userId == null) return 0;
+        User u = userMapper.selectById(userId);
+        return u == null || u.getPoints() == null ? 0 : u.getPoints();
+    }
+
     /** 给用户加积分并记流水（事务内调用） */
     public void addPoints(Long userId, int amount, String biz, String remark) {
         userMapper.update(null, new LambdaUpdateWrapper<User>()

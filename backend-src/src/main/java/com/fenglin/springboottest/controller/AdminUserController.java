@@ -22,8 +22,9 @@ import java.util.Map;
 
 /**
  * 后台管理系统 · 用户管理（t_user 里注册的小马账号）。
- *   GET    /api/admin/user/list           分页列表（可按名字搜）
+ *   GET    /api/admin/user/list           分页列表（可按名字搜、按权限筛）
  *   PUT    /api/admin/user/{id}/points    调整积分余额
+ *   PUT    /api/admin/user/{id}/password  重置密码
  *   PUT    /api/admin/user/{id}/permission   调整权限等级（仅超级管理员 permission=2 可调用）
  *   DELETE /api/admin/user/{id}           删除账号（普通管理员不能删超级管理员）
  */
@@ -51,6 +52,7 @@ public class AdminUserController {
     @GetMapping("/list")
     public Result<?> list(HttpServletRequest request,
                         @RequestParam(defaultValue = "") String keyword,
+                        @RequestParam(defaultValue = "-1") int permission,
                         @RequestParam(defaultValue = "1") int page,
                         @RequestParam(defaultValue = "12") int size) {
         Result<?> a = auth(request);
@@ -58,13 +60,17 @@ public class AdminUserController {
         String kw = keyword == null ? "" : keyword.trim();
         page = Math.max(1, page);
         size = Math.max(1, Math.min(50, size));
+        // permission: -1=全部；否则 0=普通管理员 / 1=普通用户 / 2=超级管理员
+        boolean filterPerm = permission == 0 || permission == 1 || permission == 2;
 
         LambdaQueryWrapper<User> countW = new LambdaQueryWrapper<>();
         if (!kw.isEmpty()) countW.like(User::getName, kw);
+        if (filterPerm) countW.eq(User::getPermission, permission);
         long total = userMapper.selectCount(countW);
 
         LambdaQueryWrapper<User> listW = new LambdaQueryWrapper<>();
         if (!kw.isEmpty()) listW.like(User::getName, kw);
+        if (filterPerm) listW.eq(User::getPermission, permission);
         listW.orderByDesc(User::getCreateTime).orderByAsc(User::getId)
                 .last("LIMIT " + ((page - 1) * size) + ", " + size);
         List<User> rows = userMapper.selectList(listW);
@@ -76,6 +82,40 @@ public class AdminUserController {
         data.put("size", size);
         data.put("pages", (total + size - 1) / Math.max(1, size));
         return Result.ok(data);
+    }
+
+    /**
+     * 重置某账号的登录密码（按需求明文存储）。
+     * 权限规则：普通管理员只能重置普通用户；超级管理员可以重置任何人。
+     */
+    @PutMapping("/{id}/password")
+    public Result<?> resetPassword(HttpServletRequest request,
+                                   @PathVariable("id") Long id,
+                                   @RequestBody Map<String, Object> body) {
+        Result<?> a = auth(request);
+        if (a != null) return a;
+        if (id == null) return Result.fail("缺少用户 id");
+        String password = body == null ? null : String.valueOf(body.get("password"));
+        if (password == null || password.trim().isEmpty()) {
+            return Result.fail("新密码不能为空");
+        }
+        password = password.trim();
+        if (password.length() < 6 || password.length() > 32) {
+            return Result.fail("密码长度要在 6~32 位之间");
+        }
+        User u = userMapper.selectById(id);
+        if (u == null) return Result.fail("找不到这个用户");
+
+        User me = currentAdmin(request);
+        Integer myPerm = me == null || me.getPermission() == null ? 1 : me.getPermission();
+        Integer targetPerm = u.getPermission() == null ? 1 : u.getPermission();
+        // 普通管理员不能重置管理员/超级管理员的密码，避免越权
+        if (myPerm != 2 && targetPerm != 1) {
+            return Result.fail("普通管理员只能重置普通用户的密码");
+        }
+        u.setPassword(password);
+        userMapper.updateById(u);
+        return Result.ok("已重置「" + u.getName() + "」的密码", null);
     }
 
     @PutMapping("/{id}/points")

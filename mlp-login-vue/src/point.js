@@ -43,3 +43,13 @@ export function apiPointRank() {
 export function apiPointGift(fromId, toId) {
   return post('/gift', { fromId, toId })
 }
+
+/** 领取新人大礼包（每人限一次） */
+export function apiClaimBonus(userId) {
+  return post('/claim-bonus', { userId })
+}
+
+/** 查询新人大礼包是否已领过（领过的账号不再显示横幅） */
+export function apiBonusStatus(userId) {
+  return get('/bonus-status?userId=' + userId)
+}

@@ -23,7 +23,7 @@
       </button>
     </div>
 
-    <div class="party-tip">💡 碧琪的秘诀：给卡片位置编个故事，记住更快哦</div>
+    <div class="party-tip">💡 泡芙的秘诀：给卡片位置编个故事，记住更快哦</div>
   </div>
 </template>
 
@@ -33,7 +33,7 @@ const DURATION = 60
 const EMOJIS = ['🎈', '🎂', '🎁', '🌟', '🍬', '🌈']
 
 export default {
-  name: 'GamePinkie',
+  name: 'GameFlipCard',
   emits: ['score', 'over'],
   data() {
     return {

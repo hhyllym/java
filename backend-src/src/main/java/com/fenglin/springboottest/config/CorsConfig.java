@@ -10,9 +10,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * 所以后端仍会做 CORS 校验 —— 前端端口一变（5173 → 5180 → 以后可能再变）就会
  * 直接 403 "Invalid CORS request"，连登录逻辑都走不到。
  *
- * 因此这里用 allowedOriginPatterns 按端口通配 localhost / 127.0.0.1，
- * 避免每次换端口都要改后端。仅限本机开发环境使用。
- * 注意：因为要带 JSESSIONID（验证码靠 session），所以不能用 "*"。
+ * 大富翁四人联机时，其他同学的电脑/手机会用「主机局域网 IP:5180」访问前端，
+ * Origin 就变成 http://192.168.x.x:5180 这类地址，所以这里额外放行局域网与
+ * 泛域名来源。allowedOriginPatterns 会回显具体 Origin（不是字面 "*"），
+ * 因此配合 allowCredentials(true) 带 JSESSIONID 也是安全的。
+ * 注意：仅限本地 / 局域网开发环境使用，部署到公网时请收紧来源。
  */
 @Configuration
 public class CorsConfig implements WebMvcConfigurer {
@@ -22,7 +24,13 @@ public class CorsConfig implements WebMvcConfigurer {
         registry.addMapping("/api/**")
                 .allowedOriginPatterns(
                         "http://localhost:*",
-                        "http://127.0.0.1:*"
+                        "http://127.0.0.1:*",
+                        // 同一 WiFi 下别的设备：局域网 IP / 主机名 / 公网发布页
+                        "http://192.168.*",
+                        "http://10.*",
+                        "http://172.*",
+                        "http://*",
+                        "https://*"
                 )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")

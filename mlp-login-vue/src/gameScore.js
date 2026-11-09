@@ -24,9 +24,9 @@ async function post(path, body) {
   }
 }
 
-/** 提交一局成绩 */
-export function apiGameScore(gameId, userId, score) {
-  return post('/score', { gameId, userId, score })
+/** 提交一局成绩（同时把破纪录增量作为真实积分发放到账号） */
+export function apiGameScore(gameId, userId, score, name) {
+  return post('/score', { gameId, userId, score, name })
 }
 
 /** 某游戏排行榜 top 20 */

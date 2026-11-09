@@ -8,7 +8,7 @@
       </router-link>
       <div class="home-greet">
         <h2>你好，{{ session.name || '小马' }}！</h2>
-        <p>小马王国图鉴 · 欢迎回来 ✨</p>
+        <p>小马乐园图鉴 · 欢迎回来 ✨</p>
       </div>
       <button class="logout" title="退出登录" @click="handleLogout">退出</button>
     </div>
@@ -18,7 +18,7 @@
       <router-link to="/home" class="nav-item active">🏠 首页</router-link>
       <router-link to="/home" class="nav-item" @click.native="scrollTop">📚 图鉴</router-link>
       <router-link to="/learn" class="nav-item">🎓 学院</router-link>
-      <router-link to="/adventure" class="nav-item">🗺️ 探险</router-link>
+      <router-link to="/games" class="nav-item">🎮 游戏</router-link>
       <router-link to="/diary" class="nav-item">📔 日记本</router-link>
       <router-link to="/fortune" class="nav-item">🎲 幸运</router-link>
       <router-link to="/shop" class="nav-item nav-extra">🧧 商店</router-link>
@@ -35,6 +35,12 @@
         {{ navExpanded ? '⌃ 收起' : '⌄ 展开更多' }}
       </button>
     </nav>
+
+    <!-- 新人大礼包：每人限领一次 -->
+    <div v-if="!bonusClaimed" class="bonus-banner" @click="claimBonus">
+      <span class="gift">🎁</span> <b>新人大礼包</b> 点击领取 <span class="bonus-amt">10000</span> 积分
+      <span class="bonus-tag">限领 1 次</span>
+    </div>
 
     <!-- 统计条（全部来自后端 /api/home/overview） -->
     <div class="stat-bar">
@@ -208,12 +214,14 @@ import { getSession, clearSession } from '../auth'
 import { apiOverview, apiSearch, apiPonyDetail } from '../home'
 import { apiUnread } from '../message'
 import { apiPresenceOffline } from '../presence'
+import { bump } from '../quest'
 import { apiChatUnread } from '../chat'
+import { apiClaimBonus, apiBonusStatus } from '../point'
 import CutieMark from '../components/CutieMark.vue'
 import PonyAssistant from '../components/PonyAssistant.vue'
 import PetBadge from '../components/PetBadge.vue'
 
-/** CutieMark.vue 里真正画了图案的几种可爱标志，其余用 emoji 兜底 */
+/** CutieMark.vue 里真正画了图案的几种心印徽记，其余用 emoji 兜底 */
 const MARKS = ['pinkie', 'twilight', 'dash', 'applejack', 'fluttershy', 'rarity']
 const RARITY_CLASS = { 常见: 'rr-common', 稀有: 'rr-rare', 传说: 'rr-legend' }
 const PAGE_SIZE = 12
@@ -231,6 +239,10 @@ export default {
       customAvatar,
 
       session,
+
+      // 新人大礼包：先按「已领」处理（不显示），等后端确认没领过再亮出来，
+      // 这样领过的账号无论刷新还是换浏览器都不会再看到横幅
+      bonusClaimed: true,
 
       // 导航展开状态：默认 false = 只露出前两排（前 6 项），其余收起
       navExpanded: (() => { try { return localStorage.getItem('mlp_nav_expand') === '1' } catch (e) { return false } })(),
@@ -277,7 +289,7 @@ export default {
       const node = this.categoryTree.find(c => c.id === this.level1Id)
       return node ? node.children : []
     },
-    /** 面包屑：不限 › 种族 › 飞马 */
+    /** 面包屑：不限 › 种族 › 云翼驹 */
     crumbs() {
       const arr = []
       const l1 = this.categoryTree.find(c => c.id === this.level1Id)
@@ -295,7 +307,7 @@ export default {
       if (this.keyword) parts.push(`关键词「${this.keyword}」`)
       if (this.crumbs.length) parts.push('分类 ' + this.crumbs.map(c => c.name).join(' › '))
       if (parts.length) return `${parts.join(' + ')}：共 ${this.total} 位小马`
-      return `王国成员 · 全部 ${this.total} 位`
+      return `星糖谷的居民 · 全部 ${this.total} 位`
     },
     emptyText() {
       return this.keyword
@@ -305,6 +317,7 @@ export default {
   },
   async created() {
     this.loadPage(true)
+    this.loadBonusStatus()
     await this.loadOverview()   // 先拿分类树，applyQuery 要用它判断一级/二级
     this.applyQuery()
     this.refreshUnread()
@@ -316,6 +329,32 @@ export default {
     if (this.chatTimer) clearInterval(this.chatTimer)
   },
   methods: {
+    /** 新人大礼包状态：后端确认这个账号没领过才显示横幅 */
+    async loadBonusStatus() {
+      if (!this.session || !this.session.id) return
+      const res = await apiBonusStatus(this.session.id)
+      // 接口挂了就保持隐藏，宁可少展示也不要打扰已领过的账号
+      if (res && res.code === 200 && res.data && res.data.claimed === false) {
+        this.bonusClaimed = false
+      }
+    },
+    /** 新人大礼包：每人限领一次 */
+    async claimBonus() {
+      if (this.bonusClaimed) return
+      const res = await apiClaimBonus(this.session.id)
+      if (res && res.code === 200) {
+        if (res.data === 'already') {
+          this.bonusClaimed = true
+          this.toast('你已经领过新人大礼包啦 🎁', 'ok')
+        } else {
+          this.bonusClaimed = true
+          this.toast('🎁 领取成功，+10000 积分！', 'ok')
+          bump('gift')
+        }
+      } else {
+        this.toast((res && res.msg) || '领取失败', 'err')
+      }
+    },
     /** 展开/收起导航：默认只露前两排，其余的展开后才出现；选择存本地下次进来不变 */
     toggleNav() {
       this.navExpanded = !this.navExpanded
@@ -351,7 +390,7 @@ export default {
     rarityClass(rarity) {
       return RARITY_CLASS[rarity] || 'rr-common'
     },
-    /** 卡片上那行小字：飞马 · 忠诚 · 云中城 */
+    /** 卡片上那行小字：云翼驹 · 忠诚 · 流云城 */
     labelOf(pony) {
       const names = (pony.categories || []).filter(c => c.level >= 2).map(c => c.name)
       return names.length ? names.join(' · ') : (pony.alias || '')
@@ -475,6 +514,7 @@ export default {
         return
       }
       this.detail = res.data
+      bump('view')
     },
 
     scrollTop() {

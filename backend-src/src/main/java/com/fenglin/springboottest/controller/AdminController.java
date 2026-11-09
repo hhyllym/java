@@ -17,7 +17,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * 后台管理系统 · 登录（复用小马王国用户表 t_user）。
+ * 后台管理系统 · 登录（复用小马乐园用户表 t_user）。
  *   POST /api/admin/login  { username, password } → { token, name }
  *   GET  /api/admin/me     校验令牌，返回当前管理员名字
  * 只有 t_user 中 permission=0（普通管理员）或 2（超级管理员）的账号能登录后台。

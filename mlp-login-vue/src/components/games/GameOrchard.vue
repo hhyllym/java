@@ -32,7 +32,7 @@ const FALL_SPEED = 1.6     // 每帧下落像素（60fps）
 const FIELD_H = 340        // 农场高度（与 CSS 一致）
 
 export default {
-  name: 'GameApplejack',
+  name: 'GameOrchard',
   emits: ['score', 'over'],
   data() {
     return {

@@ -37,7 +37,7 @@
     <!-- 流星：偶尔斜划而过 -->
     <span class="shooting-star"></span>
 
-    <!-- 可爱标志：缓缓漂浮，悬停停顿，点击去看该小马的课程 -->
+    <!-- 心印徽记：缓缓漂浮，悬停停顿，点击去看该小马的课程 -->
     <div
       v-for="(m, i) in marks"
       :key="'m' + i"
@@ -73,17 +73,26 @@
     >
       <svg viewBox="0 0 120 100" xmlns="http://www.w3.org/2000/svg">
         <g :fill="p.c">
-          <rect x="32" y="66" width="9" height="26" rx="4" />
-          <rect x="44" y="66" width="9" height="26" rx="4" />
-          <rect x="74" y="66" width="9" height="26" rx="4" />
-          <rect x="86" y="66" width="9" height="26" rx="4" />
-          <ellipse cx="55" cy="56" rx="32" ry="18" />
-          <path d="M80 52 q8 -22 24 -26 l6 9 q-14 6 -16 26 z" />
-          <ellipse cx="102" cy="30" rx="14" ry="12" />
-          <ellipse cx="115" cy="36" rx="7" ry="5" />
-          <path d="M99 20 l3 -12 l9 8 z" />
-          <path d="M90 22 q-12 2 -10 18 q8 -8 14 -5 q-4 -10 6 -13 z" />
-          <path d="M24 50 q-14 4 -12 26 q9 -9 15 -7 q-5 -11 1 -19 z" />
+          <!-- Q 版小马：短圆腿 -->
+          <rect x="38" y="68" width="11" height="24" rx="5.5" />
+          <rect x="52" y="70" width="11" height="24" rx="5.5" />
+          <rect x="72" y="70" width="11" height="24" rx="5.5" />
+          <rect x="84" y="66" width="11" height="24" rx="5.5" />
+          <!-- 圆润胖身体 -->
+          <ellipse cx="58" cy="58" rx="31" ry="18" />
+          <!-- 脖子 -->
+          <path d="M68 40 q-2 12 -8 18 l18 4 q4 -10 8 -16 z" />
+          <!-- 大圆头 -->
+          <circle cx="86" cy="30" r="17" />
+          <!-- 口鼻 -->
+          <ellipse cx="100" cy="36" rx="8" ry="6" />
+          <!-- 尖耳朵 -->
+          <path d="M76 14 l3 -12 l10 8 z" />
+          <!-- 飘逸鬃毛 -->
+          <path d="M74 16 q-14 4 -16 20 q8 -6 13 -4 q-2 -12 12 -12 z" />
+          <path d="M92 12 q12 0 16 10 q-9 -2 -12 4 q-2 -10 -10 -8 z" />
+          <!-- 云朵状尾巴 -->
+          <path d="M30 50 q-18 0 -20 20 q7 -3 9 3 q5 -9 12 -6 q-2 -12 8 -12 z" />
         </g>
       </svg>
     </div>
@@ -118,33 +127,33 @@ export default {
         { c: '#a9d6a8', x: '88%', dur: '31s', delay: '-21s' }
       ],
       ponies: [
-        { c: '#b79cf0', x: '2%', y: '10%', s: 98, d: 0   },
-        { c: '#8fc7f0', x: '85%', y: '14%', s: 86, d: 1.4 },
-        { c: '#f7a8c4', x: '2%', y: '56%', s: 92, d: 2.2 },
-        { c: '#f3c969', x: '86%', y: '52%', s: 90, d: 0.8 },
-        { c: '#f0a06a', x: '2%', y: '85%', s: 82, d: 1.9 },
-        { c: '#a9d6e5', x: '86%', y: '84%', s: 94, d: 3.0 }
+        { c: '#b79cf0', x: '2%',  y: '6%',  s: 96, d: 0   },
+        { c: '#f7a8c4', x: '1%',  y: '38%', s: 88, d: 2.2 },
+        { c: '#f0a06a', x: '3%',  y: '74%', s: 82, d: 1.9 },
+        { c: '#8fc7f0', x: '85%', y: '20%', s: 86, d: 1.4 },
+        { c: '#f3c969', x: '86%', y: '55%', s: 90, d: 0.8 },
+        { c: '#a9d6e5', x: '84%', y: '88%', s: 94, d: 3.0 }
       ],
-      // 漂浮的可爱标志：全部贴屏幕左右外缘，中间留给卡片内容
+      // 漂浮的心印徽记：全部贴屏幕左右外缘，中间留给卡片内容
       marks: [
-        { pony: 'pinkie',     title: '碧琪 · 气球标志',    x: '3%',  y: '14%', s: 38, dur: '10s', delay: '-1s'  },
-        { pony: 'twilight',   title: '紫悦 · 六芒星标志',  x: '93%', y: '10%', s: 34, dur: '12s', delay: '-4s'  },
-        { pony: 'dash',       title: '云宝 · 彩虹闪电标志', x: '2%',  y: '40%', s: 36, dur: '11s', delay: '-7s'  },
-        { pony: 'applejack',  title: '苹果嘉儿 · 苹果标志', x: '94%', y: '62%', s: 34, dur: '13s', delay: '-2s'  },
-        { pony: 'fluttershy', title: '柔柔 · 蝴蝶标志',    x: '6%',  y: '78%', s: 36, dur: '10s', delay: '-5s'  },
-        { pony: 'rarity',     title: '珍奇 · 钻石标志',    x: '91%', y: '84%', s: 32, dur: '12s', delay: '-8s'  },
-        { pony: 'pinkie',     title: '碧琪 · 气球标志',    x: '3%',  y: '3%',  s: 28, dur: '9s',  delay: '-3s'  },
-        { pony: 'twilight',   title: '紫悦 · 六芒星标志',  x: '92%', y: '90%', s: 30, dur: '11s', delay: '-6s'  }
+        { pony: 'pinkie',     title: '泡芙 · 糖霜杯糕心印',    x: '3%',  y: '14%', s: 38, dur: '10s', delay: '-1s'  },
+        { pony: 'twilight',   title: '星澜 · 星芒书页心印',  x: '93%', y: '10%', s: 34, dur: '12s', delay: '-4s'  },
+        { pony: 'dash',       title: '云驰 · 彗星流云心印', x: '2%',  y: '40%', s: 36, dur: '11s', delay: '-7s'  },
+        { pony: 'applejack',  title: '金穗 · 金麦穗心印', x: '94%', y: '62%', s: 34, dur: '13s', delay: '-2s'  },
+        { pony: 'fluttershy', title: '茸茸 · 嫩叶绒球心印',    x: '6%',  y: '78%', s: 36, dur: '10s', delay: '-5s'  },
+        { pony: 'rarity',     title: '绮罗 · 缎带菱晶心印',    x: '91%', y: '84%', s: 32, dur: '12s', delay: '-8s'  },
+        { pony: 'pinkie',     title: '泡芙 · 糖霜杯糕心印',    x: '3%',  y: '3%',  s: 28, dur: '9s',  delay: '-3s'  },
+        { pony: 'twilight',   title: '星澜 · 星芒书页心印',  x: '92%', y: '90%', s: 30, dur: '11s', delay: '-6s'  }
       ]
     }
   },
   methods: {
-    /** 点击可爱标志：去看该小马的课程 */
+    /** 点击心印徽记：去看该小马的课程 */
     goPony(pony) {
       sound.twinkle()
       this.$router.push({ path: '/learn', query: { pony } })
     },
-    /** 悬停可爱标志：极轻一声 */
+    /** 悬停心印徽记：极轻一声 */
     markHover() {
       sound.hover()
     }

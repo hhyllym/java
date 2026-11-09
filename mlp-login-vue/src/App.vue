@@ -1,5 +1,7 @@
 <template>
   <PonyBackground />
+  <ParticleBg />
+  <ClickSparkle />
 
   <div class="card" :class="{ 'card-wide': $route.meta.wide }">
     <div class="rainbow"></div>
@@ -35,6 +37,8 @@
 
 <script>
 import PonyBackground from './components/PonyBackground.vue'
+import ParticleBg from './components/ParticleBg.vue'
+import ClickSparkle from './components/ClickSparkle.vue'
 import sound from './sound'
 import { initPresence, stopPresence } from './presence'
 
@@ -43,7 +47,7 @@ const AUTO_INTERVAL = 8000 // 自动变色：每套主题停留 8 秒（颜色�
 
 export default {
   name: 'App',
-  components: { PonyBackground },
+  components: { PonyBackground, ParticleBg, ClickSparkle },
   provide() {
     return { toast: this.toast, sound }
   },
@@ -54,12 +58,12 @@ export default {
       autoIndex: 0,
       soundMuted: sound.muted,
       themeList: [
-        { name: 'default', color: '#f7a8c4', title: '碧琪粉（默认）' },
-        { name: 'twilight', color: '#8f7ae8', title: '紫悦紫' },
-        { name: 'dash', color: '#6ec6e6', title: '云宝蓝' },
+        { name: 'default', color: '#f7a8c4', title: '泡芙粉（默认）' },
+        { name: 'twilight', color: '#8f7ae8', title: '星澜紫' },
+        { name: 'dash', color: '#6ec6e6', title: '云驰蓝' },
         { name: 'applejack', color: '#f0a06a', title: '苹果橙' },
-        { name: 'fluttershy', color: '#7fd4a8', title: '柔柔绿' },
-        { name: 'night', color: '#3a3153', title: '坎特洛特之夜' }
+        { name: 'fluttershy', color: '#7fd4a8', title: '茸茸绿' },
+        { name: 'night', color: '#3a3153', title: '云顶城之夜' }
       ],
       toastMsg: '',
       toastClass: '',

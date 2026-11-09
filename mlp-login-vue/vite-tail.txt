@@ -1,0 +1,15 @@
+node.exe : [33mThe CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cj
+s-node-api-deprecated for more details.[39m
+???? ?:445 ??: 49
++ ... login-vue'; & 'C:\Users\18017\.workbuddy\binaries\node\versions\22.22 ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([33mThe CJS bu...e details.[39m:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+  [32m[1mVITE[22m v5.4.21[39m  [2mready in [0m[1m1016[22m[2m[0m ms[22m
+
+  [32m??[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5180[22m/[39m
+  [32m??[39m  [1mNetwork[22m: [36mhttp://192.168.1.2:[1m5180[22m/[39m
+  [32m??[39m  [1mNetwork[22m: [36mhttp://192.168.147.1:[1m5180[22m/[39m
+  [32m??[39m  [1mNetwork[22m: [36mhttp://192.168.188.1:[1m5180[22m/[39m

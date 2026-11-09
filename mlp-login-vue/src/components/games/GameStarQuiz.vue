@@ -44,7 +44,7 @@ const BASE = 20           // 答对基础分
 const COMBO = 5           // 连对奖励
 
 export default {
-  name: 'GameTwilight',
+  name: 'GameStarQuiz',
   emits: ['score', 'over'],
   data() {
     return {

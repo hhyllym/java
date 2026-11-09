@@ -8,7 +8,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 
 /**
- * 条目标签 t_pony_tag：搜索时「碧琪」能搜到「派对」，命中的就是这张表。
+ * 条目标签 t_pony_tag：搜索时「泡芙」能搜到「派对」，命中的就是这张表。
  */
 @TableName("t_pony_tag")
 public class PonyTag implements Serializable {

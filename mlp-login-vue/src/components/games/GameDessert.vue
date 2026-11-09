@@ -32,7 +32,7 @@
       >{{ d.emoji }}<em>{{ d.name }}</em></button>
     </div>
 
-    <div class="shop-tip">💡 碧琪的店规：看清楚订单再动手，连对越多小费越高</div>
+    <div class="shop-tip">💡 泡芙的店规：看清楚订单再动手，连对越多小费越高</div>
   </div>
 </template>
 

@@ -1,7 +1,7 @@
 @echo off
 chcp 936 >nul
 setlocal
-title 小马王国 - 环境自检
+title 小马乐园 - 环境自检
 cd /d "%~dp0..\mlp-login-vue"
 
 echo ==========================================================

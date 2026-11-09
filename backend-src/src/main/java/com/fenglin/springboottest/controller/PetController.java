@@ -57,7 +57,7 @@ public class PetController {
     @Transactional(rollbackFor = Exception.class)
     public Result<?> adopt(@RequestBody Map<String, Object> body) {
         Long userId = toLong(body.get("userId"));
-        String kind = body.get("kind") == null ? "" : String.valueOf(body.get("kind")).trim();
+        String kind = ShopDefs.normalizePetKind(body.get("kind") == null ? "" : String.valueOf(body.get("kind")).trim());
         String name = body.get("name") == null ? "" : String.valueOf(body.get("name")).trim();
         if (userId == null || kind.isEmpty()) {
             return Result.fail("参数不完整");
@@ -247,7 +247,7 @@ public class PetController {
 
     private Map<String, Object> toVO(Pet p) {
         Map<String, Object> m = new LinkedHashMap<>();
-        m.put("kind", p.getKind());
+        m.put("kind", ShopDefs.normalizePetKind(p.getKind()));
         m.put("name", p.getName());
         m.put("level", p.getLevel() == null ? 1 : p.getLevel());
         m.put("exp", p.getExp() == null ? 0 : p.getExp());

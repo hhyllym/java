@@ -127,7 +127,7 @@ server.on('error', (e) => {
 
 server.listen(PORT, () => {
   console.log('');
-  console.log('  小马王国 - 静态预览（兜底模式）已启动');
+  console.log('  星糖谷 - 静态预览（兜底模式）已启动');
   console.log('  网页地址 : http://localhost:' + PORT + '/');
   console.log('  接口代理 : /api  ->  http://localhost:' + BACK_PORT);
   console.log('  静态目录 : ' + DIST);

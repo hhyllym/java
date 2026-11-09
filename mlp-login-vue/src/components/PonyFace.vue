@@ -1,7 +1,7 @@
 <template>
   <!-- 助手头像：按 id 画可爱的卡通小马脸；没有对应画风的回退到 emoji -->
   <span class="pf">
-    <!-- 穗龙：紫脸 + 绿耳绿角 + 大绿眼 + 笑嘴 -->
+    <!-- 豆豆龙：紫脸 + 绿耳绿角 + 大绿眼 + 笑嘴 -->
     <svg v-if="drawId === 'spike'" class="pf-svg" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <defs>
         <linearGradient :id="gid + 'h'" x1="0.25" y1="0" x2="0.75" y2="1">
@@ -25,7 +25,7 @@
       <path d="M17 27.4 Q20 32.6 23 27.4 Z" fill="#6b4a8f" /><ellipse cx="20" cy="29.2" rx="1.4" ry=".75" fill="#ff9ec4" />
     </svg>
 
-    <!-- 月亮公主：深蓝夜空脸 + 弯月额饰 + 青蓝眼 -->
+    <!-- 月汐院长：深蓝夜空脸 + 弯月额饰 + 青蓝眼 -->
     <svg v-else-if="drawId === 'luna'" class="pf-svg" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <defs>
         <linearGradient :id="gid + 'h'" x1="0.25" y1="0" x2="0.75" y2="1">
@@ -45,7 +45,7 @@
       <path d="M17.5 28 Q20 31 22.5 28" fill="none" stroke="#1f1e44" stroke-width="1.4" stroke-linecap="round" />
     </svg>
 
-    <!-- 宇宙公主：奶白金脸 + 小太阳 + 暖橙粉眼 -->
+    <!-- 曦光院长：奶白金脸 + 小太阳 + 暖橙粉眼 -->
     <svg v-else-if="drawId === 'celestia'" class="pf-svg" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <defs>
         <linearGradient :id="gid + 'h'" x1="0.25" y1="0" x2="0.75" y2="1">
@@ -67,7 +67,7 @@
       <path d="M17.5 28 Q20 31.4 22.5 28" fill="none" stroke="#8a5a2a" stroke-width="1.5" stroke-linecap="round" />
     </svg>
 
-    <!-- 紫悦：薰衣草脸 + 独角 + 六芒星 + 紫眼 -->
+    <!-- 星澜：薰衣草脸 + 小角 + 六瓣星芒 + 紫眼 -->
     <svg v-else-if="drawId === 'twilight'" class="pf-svg" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <defs>
         <linearGradient :id="gid + 'h'" x1="0.25" y1="0" x2="0.75" y2="1">
@@ -76,7 +76,15 @@
       </defs>
       <path d="M20 3 L22 12 L18 12 Z" fill="#7c5cc4" />
       <ellipse cx="20" cy="22" rx="12.6" ry="11.6" :fill="'url(#' + gid + 'h)'" />
-      <path d="M27 12 l1.1 2.4 -2.5 -.4 1.8 2 -2.1 -1 1.5 2.2 -2.3 -1.1 1 -.2 -2.3 1.1 1.5 -2.2 -2.1 1 1.8 -2 -2.5 .4 1.1 -2.4 z" fill="#fff" opacity=".85" />
+      <g fill="#fff" opacity=".88" transform="translate(27 13)">
+        <ellipse cx="0" cy="-2.4" rx="1.1" ry="2.2" />
+        <ellipse cx="0" cy="-2.4" rx="1.1" ry="2.2" transform="rotate(60)" />
+        <ellipse cx="0" cy="-2.4" rx="1.1" ry="2.2" transform="rotate(120)" />
+        <ellipse cx="0" cy="-2.4" rx="1.1" ry="2.2" transform="rotate(180)" />
+        <ellipse cx="0" cy="-2.4" rx="1.1" ry="2.2" transform="rotate(240)" />
+        <ellipse cx="0" cy="-2.4" rx="1.1" ry="2.2" transform="rotate(300)" />
+        <circle r="1.2" fill="#f8e9a0" />
+      </g>
       <g class="pf-eyes">
         <ellipse cx="14.8" cy="22" rx="3.8" ry="4.6" fill="#fff" /><circle cx="14.9" cy="22.2" r="2.7" fill="#8a5cd0" /><circle cx="14.9" cy="22.4" r="1.4" fill="#2a1a4e" /><circle cx="13.8" cy="20.9" r="1" fill="#fff" />
         <ellipse cx="25.2" cy="22" rx="3.8" ry="4.6" fill="#fff" /><circle cx="25.1" cy="22.2" r="2.7" fill="#8a5cd0" /><circle cx="25.1" cy="22.4" r="1.4" fill="#2a1a4e" /><circle cx="24" cy="20.9" r="1" fill="#fff" />
@@ -86,7 +94,7 @@
       <path d="M17.5 28 Q20 31 22.5 28" fill="none" stroke="#3d2a58" stroke-width="1.4" stroke-linecap="round" />
     </svg>
 
-    <!-- 珍奇：白紫脸 + 三钻额饰 + 紫睫大眼 -->
+    <!-- 绮罗：白紫脸 + 缎带菱晶额饰 + 紫睫大眼 -->
     <svg v-else-if="drawId === 'rarity'" class="pf-svg" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <defs>
         <linearGradient :id="gid + 'h'" x1="0.25" y1="0" x2="0.75" y2="1">
@@ -94,9 +102,9 @@
         </linearGradient>
       </defs>
       <g fill="#b58fe0">
-        <path d="M14 4 l1.6 3.2 -3.2 0 z" transform="rotate(0 14 5.6)" />
-        <path d="M20 3 l1.6 3.2 -3.2 0 z" />
-        <path d="M26 4 l1.6 3.2 -3.2 0 z" />
+        <path d="M14 3 l1.7 2.6 -1.7 2.6 -1.7 -2.6 z" />
+        <path d="M20 2 l1.9 3 -1.9 3 -1.9 -3 z" />
+        <path d="M26 3 l1.7 2.6 -1.7 2.6 -1.7 -2.6 z" />
       </g>
       <ellipse cx="20" cy="22" rx="12.6" ry="11.6" :fill="'url(#' + gid + 'h)'" />
       <g class="pf-eyes">
@@ -110,7 +118,7 @@
       <path d="M17.5 28 Q20 30.6 22.5 28" fill="none" stroke="#7a5aa8" stroke-width="1.4" stroke-linecap="round" />
     </svg>
 
-    <!-- 云宝黛西：天蓝脸 + 彩虹鬃毛小簇 + 小白翅 + 亮蓝大眼 -->
+    <!-- 云驰：天蓝脸 + 流云鬃毛小簇 + 小白翅 + 亮蓝大眼 -->
     <svg v-else-if="drawId === 'rainbow'" class="pf-svg" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <defs>
         <linearGradient :id="gid + 'h'" x1="0.25" y1="0" x2="0.75" y2="1">
@@ -118,9 +126,9 @@
         </linearGradient>
       </defs>
       <g>
-        <path d="M20 2.5 q-3 1 -2 6 q3 -2 2 -6 z" fill="#ff6b6b" />
-        <path d="M20 2.5 q0 3 1 6 q-3 -2 -1 -6 z" fill="#ffd166" />
-        <path d="M20 2.5 q3 1 2 6 q-3 -2 -2 -6 z" fill="#5ad1e6" />
+        <path d="M20 2.5 q-3 1 -2 6 q3 -2 2 -6 z" fill="#a8dcf5" />
+        <path d="M20 2.5 q0 3 1 6 q-3 -2 -1 -6 z" fill="#6fb9e8" />
+        <path d="M20 2.5 q3 1 2 6 q-3 -2 -2 -6 z" fill="#8fa9e8" />
       </g>
       <ellipse cx="7" cy="24" rx="3.2" ry="2" fill="#ffffff" opacity=".85" transform="rotate(-18 7 24)" />
       <ellipse cx="33" cy="24" rx="3.2" ry="2" fill="#ffffff" opacity=".85" transform="rotate(18 33 24)" />
@@ -134,7 +142,7 @@
       <path d="M17.5 28 Q20 31 22.5 28" fill="none" stroke="#2a6f8f" stroke-width="1.4" stroke-linecap="round" />
     </svg>
 
-    <!-- 苹果嘉儿：暖橘脸 + 棕黄鬃毛 + 绿眼 + 雀斑 -->
+    <!-- 金穗：暖橘脸 + 棕黄鬃毛 + 绿眼 + 雀斑 -->
     <svg v-else-if="drawId === 'applejack'" class="pf-svg" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <defs>
         <linearGradient :id="gid + 'h'" x1="0.25" y1="0" x2="0.75" y2="1">
@@ -157,7 +165,7 @@
       <path d="M17.5 28 Q20 31 22.5 28" fill="none" stroke="#9a6a32" stroke-width="1.4" stroke-linecap="round" />
     </svg>
 
-    <!-- 柔柔：鹅黄脸 + 粉鬃毛 + 大眼长睫 + 蝴蝶小标志 -->
+    <!-- 茸茸：鹅黄脸 + 粉鬃毛 + 大眼长睫 + 嫩叶小标志 -->
     <svg v-else-if="drawId === 'fluttershy'" class="pf-svg" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <defs>
         <linearGradient :id="gid + 'h'" x1="0.25" y1="0" x2="0.75" y2="1">
@@ -175,16 +183,16 @@
         <path d="M21.6 19.6 q3.8 -2.6 7.6 0" fill="none" stroke="#d98fb8" stroke-width="1" stroke-linecap="round" />
         <circle cx="25.3" cy="22.4" r="3" fill="#7fb0e0" /><circle cx="25.3" cy="22.6" r="1.6" fill="#3a2a4e" /><circle cx="24" cy="20.9" r="1.1" fill="#fff" /><circle cx="26.6" cy="23.6" r=".5" fill="#fff" opacity=".85" />
       </g>
-      <g transform="translate(31 14)" fill="#f29ab5" opacity=".9">
-        <ellipse cx="-1.4" cy="0" rx="1.6" ry="2.2" /><ellipse cx="1.4" cy="0" rx="1.6" ry="2.2" />
-        <circle cx="0" cy="0" r=".7" />
+      <g transform="translate(31 14)" fill="#8fce9f" opacity=".95">
+        <path d="M0 2 Q-4 0 -3 -3 Q0 -3 0 2 Z" />
+        <path d="M0 2 Q4 0 3 -3 Q0 -3 0 2 Z" />
       </g>
       <ellipse cx="9.4" cy="27.4" rx="3" ry="1.8" fill="#ff9ec4" opacity=".5" />
       <ellipse cx="30.6" cy="27.4" rx="3" ry="1.8" fill="#ff9ec4" opacity=".5" />
       <path d="M17.5 28 Q20 30.4 22.5 28" fill="none" stroke="#c79a3a" stroke-width="1.4" stroke-linecap="round" />
     </svg>
 
-    <!-- 碧琪：粉脸 + 蓬松卷鬃毛 + 气球簇 + 闪亮大眼 + 大笑 -->
+    <!-- 泡芙：粉脸 + 蓬松卷鬃毛 + 糖珠 + 闪亮大眼 + 大笑 -->
     <svg v-else-if="drawId === 'pinkie'" class="pf-svg" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <defs>
         <linearGradient :id="gid + 'h'" x1="0.25" y1="0" x2="0.75" y2="1">

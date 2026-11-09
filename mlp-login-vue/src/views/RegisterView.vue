@@ -3,8 +3,8 @@
     <div class="particle-layer" ref="particleLayer"></div>
     <div class="head">
       <div class="logo">🦄</div>
-      <h1>小马王国</h1>
-      <p>创建你的小马账号，加入友谊的魔法 ✨</p>
+      <h1>小马乐园</h1>
+      <p>创建你的小马账号，一起住进星糖谷 ✨</p>
     </div>
 
     <div class="tabs">
@@ -88,10 +88,35 @@
         </div>
         <div class="err">{{ errors.captcha }}</div>
       </div>
+      <!-- 用户协议勾选：不勾不允许注册 -->
+      <label class="agree-row">
+        <input type="checkbox" v-model="form.agree" />
+        <span>
+          我已阅读并同意
+          <a href="#" @click.prevent.stop="openAgreement">《用户协议》</a>和<a href="#" @click.prevent.stop="openAgreement">《隐私政策》</a>
+        </span>
+      </label>
+      <div class="err">{{ errors.agree }}</div>
+
       <button type="submit" class="submit" ref="registerBtn" :class="{ popping: rainbow }" :disabled="submitting">
         {{ submitting ? '正在创建…' : '加入我们 🎀' }}
       </button>
     </form>
+
+    <!-- 协议弹窗 -->
+    <Teleport to="body">
+      <div v-if="agreeOpen" class="agree-mask" @click.self="agreeOpen = false">
+        <div class="agree-dialog">
+          <h3>小马乐园 · 用户协议与隐私政策</h3>
+          <div class="agree-body">
+            <p><b>【用户协议】</b>本站为课程实训演示项目。注册即视为同意友善使用：不冒充他人、不发不当内容、不利用漏洞刷积分。管理员可对违规账号进行处理。</p>
+            <p><b>【隐私政策】</b>我们仅收集昵称与密码（本地数据库存储，密码按需求明文保存，仅用于教学演示），不收集真实姓名、手机号等敏感信息，也不会向任何第三方提供你的数据。聊天与游戏记录仅保存在本地数据库中。</p>
+            <p>仍在施工中的小镇规则会不定期更新，更新后会在首页公告～ 🐴</p>
+          </div>
+          <button class="agree-btn" @click="agreeOpen = false">我知道了</button>
+        </div>
+      </div>
+    </Teleport>
 
   </div>
 </template>
@@ -104,12 +129,13 @@ export default {
   inject: ['toast'],
   data() {
     return {
-      form: { name: '', password: '', password2: '', captcha: '' },
+      form: { name: '', password: '', password2: '', captcha: '', agree: false },
       show: { password: false, password2: false },
       errors: {},
       submitting: false,
       rainbow: false,
-      captchaUrl: ''
+      captchaUrl: '',
+      agreeOpen: false
     }
   },
   mounted() {
@@ -226,6 +252,40 @@ export default {
 .submit {
   position: relative;
   z-index: 1;
+}
+/* 用户协议勾选行 */
+.agree-row {
+  display: flex; align-items: flex-start; gap: 7px;
+  font-size: 12.5px; color: var(--muted);
+  margin: 2px 0 0; cursor: pointer; line-height: 1.55;
+  user-select: none;
+}
+.agree-row input { margin-top: 2px; accent-color: var(--primary); cursor: pointer; }
+.agree-row a { color: var(--primary); text-decoration: none; font-weight: 700; }
+.agree-row a:hover { text-decoration: underline; }
+/* 协议弹窗 */
+.agree-mask {
+  position: fixed; inset: 0; z-index: 9998;
+  background: rgba(60, 40, 90, .38);
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+  animation: agreeFade .18s ease;
+}
+@keyframes agreeFade { from { opacity: 0; } to { opacity: 1; } }
+.agree-dialog {
+  background: var(--card, #fff); border-radius: 18px;
+  max-width: 420px; width: 100%; padding: 20px 22px;
+  box-shadow: 0 18px 50px rgba(60, 40, 90, .3);
+  animation: agreePop .22s cubic-bezier(.22,.61,.36,1);
+}
+@keyframes agreePop { from { transform: translateY(14px) scale(.96); opacity: 0; } to { transform: none; opacity: 1; } }
+.agree-dialog h3 { margin: 0 0 10px; font-size: 15.5px; color: var(--primary, #a06cd5); }
+.agree-body { max-height: 46vh; overflow-y: auto; }
+.agree-body p { margin: 0 0 9px; font-size: 12.5px; line-height: 1.7; color: #6b5b85; }
+.agree-body b { color: var(--primary, #a06cd5); }
+.agree-btn {
+  width: 100%; margin-top: 8px; padding: 10px; border: none; border-radius: 10px;
+  background: linear-gradient(135deg, var(--pink, #f7a8c4), var(--purple, #b79cf0));
+  color: #fff; font-weight: 700; font-size: 13.5px; cursor: pointer;
 }
 /* 点击：按钮轻微弹一下 */
 .submit.popping {

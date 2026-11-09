@@ -13,7 +13,8 @@ import FriendsView from '../views/FriendsView.vue'
 import ChatView from '../views/ChatView.vue'
 import AdminLoginView from '../views/AdminLoginView.vue'
 import AdminView from '../views/AdminView.vue'
-import AdventureView from '../views/AdventureView.vue'
+import GameHubView from '../views/GameHubView.vue'
+import EarnView from '../views/EarnView.vue'
 import DiaryView from '../views/DiaryView.vue'
 import { getSession } from '../auth'
 import { getAdminSession } from '../adminAuth'
@@ -24,12 +25,15 @@ const router = createRouter({
     { path: '/', redirect: { name: 'home' } },
     { path: '/home', name: 'home', component: HomeView, meta: { requiresAuth: true } },
     { path: '/dashboard', name: 'dashboard', component: DashboardView, meta: { requiresAuth: true } },
+    { path: '/earn', name: 'earn', component: EarnView, meta: { requiresAuth: true } },
     { path: '/shop', name: 'shop', component: ShopView, meta: { requiresAuth: true, wide: true } },
     { path: '/pet', name: 'pet', component: PetView, meta: { requiresAuth: true } },
     { path: '/message', name: 'message', component: MessageCenterView, meta: { requiresAuth: true } },
     { path: '/fortune', name: 'fortune', component: FortuneView, meta: { requiresAuth: true } },
     { path: '/learn', name: 'learn', component: LearnView, meta: { requiresAuth: true } },
-    { path: '/adventure', name: 'adventure', component: AdventureView, meta: { requiresAuth: true } },
+    { path: '/games', name: 'games', component: GameHubView, meta: { requiresAuth: true } },
+    // 旧「探险」地址留个重定向，老链接/书签不会 404
+    { path: '/adventure', redirect: { name: 'games' } },
     { path: '/diary', name: 'diary', component: DiaryView, meta: { requiresAuth: true } },
     { path: '/game/:id', name: 'game', component: GameView, meta: { requiresAuth: true } },
     { path: '/friends', name: 'friends', component: FriendsView, meta: { requiresAuth: true } },
@@ -44,7 +48,8 @@ const router = createRouter({
 router.beforeEach((to) => {
   const session = getSession()
   const admin = getAdminSession()
-  if (to.meta.requiresAuth && !session) return { name: 'login' }
+  // 未登录时把原地址带到登录页：四人联机的邀请链接 ?room=XXXX 登录后还能跳回房间
+  if (to.meta.requiresAuth && !session) return { name: 'login', query: { redirect: to.fullPath } }
   // 已登录的人访问登录/注册页，直接送去首页
   if ((to.name === 'login' || to.name === 'register') && session) return { name: 'home' }
   // 后台管理页：必须持有管理员令牌

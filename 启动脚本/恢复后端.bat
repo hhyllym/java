@@ -1,7 +1,7 @@
 @echo off
 chcp 936 >nul
 setlocal
-title 小马王国 - 恢复后端代码
+title 小马乐园 - 恢复后端代码
 cd /d "%~dp0"
 
 set "SRC=%~dp0..\backend-src"
@@ -12,7 +12,7 @@ set "AUTO="
 if /I "%~1"=="auto" set "AUTO=1"
 
 echo ==========================================================
-echo   小马王国 - 恢复后端代码
+echo   小马乐园 - 恢复后端代码
 echo   备份: %SRC%
 echo ==========================================================
 echo.
@@ -55,15 +55,15 @@ if not exist "%BACKEND_DIR%" mkdir "%BACKEND_DIR%" >nul 2>nul
 
 echo [1/3] 复制源码 ...
 xcopy "%SRC%\src" "%BACKEND_DIR%\src" /E /Y /I /Q >nul
-if errorlevel 1 (echo [X] 复制 src 失败) else (echo       src  -> OK)
+if errorlevel 1 (echo [X] 复制 src 失败) else (echo       src  -^> OK)
 
 echo [2/3] 复制 pom.xml ...
 copy /Y "%SRC%\pom.xml" "%BACKEND_DIR%\pom.xml" >nul
-if errorlevel 1 (echo [X] 复制 pom.xml 失败) else (echo       pom.xml -> OK)
+if errorlevel 1 (echo [X] 复制 pom.xml 失败) else (echo       pom.xml -^> OK)
 
 if exist "%SRC%\sql" (
     xcopy "%SRC%\sql" "%BACKEND_DIR%\sql" /E /Y /I /Q >nul
-    echo       sql  -> OK
+    echo       sql  -^> OK
 )
 
 echo [3/3] 建数据库（mlp_login：账号表 + 首页图鉴表 + 消息中心表）...

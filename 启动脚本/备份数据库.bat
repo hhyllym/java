@@ -1,7 +1,7 @@
 @echo off
 chcp 936 >nul
 setlocal enabledelayedexpansion
-title 小马王国 - 数据库备份/恢复
+title 小马乐园 - 数据库备份/恢复
 cd /d "%~dp0"
 
 set "DB_NAME=mlp_login"
@@ -19,7 +19,7 @@ if not defined DUMP_EXE for /d %%D in ("D:\Program Files\MySQL\*") do if not def
 if not defined MYSQL_EXE for /d %%D in ("D:\Program Files\MySQL\*") do if not defined MYSQL_EXE if exist "%%~D\bin\mysql.exe" set "MYSQL_EXE=%%~D\bin\mysql.exe"
 
 echo ==========================================================
-echo   小马王国 - 数据库备份 / 恢复
+echo   小马乐园 - 数据库备份 / 恢复
 echo   数据库: %DB_NAME%    备份文件: 数据库备份\mlp_login_latest.sql
 echo ==========================================================
 echo.

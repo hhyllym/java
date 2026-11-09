@@ -1,5 +1,10 @@
 <template>
   <div class="mo-wrap">
+    <!-- 🎈 氛围层：漂浮气球 + 彩虹粒子（纯装饰，不挡点击） -->
+    <div class="mo-sky" aria-hidden="true">
+      <span v-for="(b, i) in balloons" :key="'b' + i" class="mo-balloon" :style="b.style">{{ b.icon }}</span>
+      <i v-for="(p, i) in sparkles" :key="'s' + i" class="mo-spark" :style="p.style"></i>
+    </div>
     <!-- ============ 未入房：创建 / 加入 ============ -->
     <template v-if="!joined">
       <div class="mo-card mo-setup">
@@ -11,16 +16,34 @@
           <input v-model.trim="nickname" maxlength="12" placeholder="显示在棋盘上的名字" />
         </div>
 
-        <div class="mo-lan">
-          <b>📶 发给同学的网址</b>
-          <code>{{ inviteBase }}</code>
-          <button class="mo-mini" @click="copy(inviteBase)">{{ copied ? '已复制 ✓' : '复制' }}</button>
-          <small>{{ lanTip }}</small>
+        <div class="mo-lobby">
+          <div class="mo-lobby-head">
+            <b>🎮 匹配大厅 · 正在等待的玩家</b>
+            <button class="mo-mini" @click="loadRooms">🔄 刷新</button>
+          </div>
+          <p v-if="waitingRooms.length === 0" class="mo-lobby-empty">
+            暂时没有等待中的房间——点下面的「创建房间」当第一个房主吧！
+          </p>
+          <div v-else class="mo-room-list">
+            <div v-for="r in waitingRooms" :key="r.roomId" class="mo-room-item">
+              <span class="mo-room-code">{{ r.roomId }}</span>
+              <span class="mo-room-host">👑 {{ r.host }}</span>
+              <span class="mo-room-meta">{{ r.humans }}/4 人 · {{ r.mode === 'team' ? '2v2 组队' : '四人混战' }}</span>
+              <button class="mo-mini go" :disabled="loading" @click="joinDirect(r)">一键加入</button>
+            </div>
+          </div>
+
+          <div v-if="onlineUsers.length" class="mo-online">
+            <b>👥 在线的小伙伴 · {{ onlineUsers.length }}</b>
+            <span v-for="u in onlineUsers" :key="u.userId" class="mo-online-chip">
+              {{ u.avatar || '🐴' }} {{ u.name }}{{ u.userId === userId ? '（我）' : '' }}
+            </span>
+          </div>
         </div>
 
         <button class="mo-btn big" :disabled="loading" @click="createRoom">🎉 创建房间（当房主）</button>
 
-        <div class="mo-or">—— 或者加入别人的房间 ——</div>
+        <div class="mo-or">—— 或输入 4 位房间号加入 ——</div>
         <div class="mo-join">
           <input
             v-model.trim="joinCode" maxlength="4" placeholder="4 位房间号"
@@ -30,7 +53,7 @@
         </div>
 
         <p v-if="err" class="mo-err">{{ err }}</p>
-        <p class="mo-tip">💡 每人用自己的账号登录（没有账号先注册一个）。只要连同一个 WiFi 就行，不需要公网；网址里的 localhost 要换成上面给的 IP。</p>
+        <p class="mo-tip">💡 每人用自己的账号登录（没有账号先注册一个）。只要连同一个 WiFi 就行，不需要公网；大厅里的房间所有人都能看到，点「一键加入」直接上桌。</p>
       </div>
     </template>
 
@@ -210,7 +233,7 @@
 import { getSession } from '../../auth'
 import { bump } from '../../quest'
 import { apiPointBalance } from '../../point'
-import { mpLan, mpCreate, mpJoin, mpStart, mpState, mpAction, mpLeave } from '../../monopolyRoom'
+import { mpLan, mpCreate, mpJoin, mpStart, mpState, mpAction, mpLeave, mpRooms, mpHeartbeat, mpOnline } from '../../monopolyRoom'
 import sound from '../../sound'
 
 /** 顺时针把第 i 格映射到 7×7 网格的 (行, 列) */
@@ -229,6 +252,33 @@ const PAWN_POS = [
 ]
 
 /** 房间凭据：好友页「邀请组队」建房后跳过来、或刷新页面，都能自动回到原座位 */
+/** 氛围层装饰：气球 + 彩虹粒子的确定性伪随机布局（避免每次渲染跳变） */
+function makeSky() {
+  const bIcons = ['🎈', '🎈', '🎈', '🎀', '🎈', '🌈', '🎈']
+  const balloons = bIcons.map((icon, i) => ({
+    icon,
+    style: {
+      left: (4 + i * 13.5 + (i % 3) * 3) + '%',
+      fontSize: (24 + ((i * 7) % 20)) + 'px',
+      animationDuration: (15 + ((i * 5) % 11)) + 's',
+      animationDelay: (-i * 3.4) + 's'
+    }
+  }))
+  const colors = ['#ff8fa8', '#ffb86b', '#ffe066', '#8fd694', '#7cc4ff', '#b79cf0']
+  const sparkles = Array.from({ length: 30 }, (_, i) => ({
+    style: {
+      left: (2 + ((i * 37) % 95)) + '%',
+      top: (4 + ((i * 53) % 88)) + '%',
+      width: (5 + (i % 3) * 3) + 'px',
+      height: (5 + (i % 3) * 3) + 'px',
+      background: colors[i % colors.length],
+      animationDuration: (3 + (i % 5)) + 's',
+      animationDelay: (-(i % 7) * 0.7) + 's'
+    }
+  }))
+  return { balloons, sparkles }
+}
+
 const ROOM_CRED_KEY = 'mlp_mp_room'
 function saveRoomCred(roomId, seatId, token) {
   try {
@@ -252,7 +302,10 @@ export default {
   emits: ['score', 'over'],
   data() {
     const s = getSession() || {}
+    const sky = makeSky()
     return {
+      balloons: sky.balloons,
+      sparkles: sky.sparkles,
       nickname: s.name || '',
       userId: s.id || null,
       joinCode: '',
@@ -264,6 +317,9 @@ export default {
       roomMode: 'team',
       lanIp: '',
       lanIps: [],
+      waitingRooms: [],
+      onlineUsers: [],
+      roomsTimer: null,
       err: '',
       loading: false,
       acting: false,
@@ -316,6 +372,8 @@ export default {
     if (urlRoom) this.joinCode = urlRoom
     this.loadLan()
     this.loadBalance()
+    this.loadRooms()
+    this.roomsTimer = setInterval(this.loadRooms, 4000)
     this.pollTimer = setInterval(this.poll, 1200)
     // 区分「刷新页面」与「路由离开」：刷新时保留座位与凭据，回来自动恢复
     this.unloadHandler = () => { this.isReloading = true }
@@ -325,6 +383,7 @@ export default {
   beforeUnmount() {
     this.dead = true
     if (this.pollTimer) clearInterval(this.pollTimer)
+    if (this.roomsTimer) clearInterval(this.roomsTimer)
     if (this.copyTimer) clearTimeout(this.copyTimer)
     if (this.unloadHandler) window.removeEventListener('beforeunload', this.unloadHandler)
     if (!this.isReloading && this.joined && this.roomId) {
@@ -414,6 +473,24 @@ export default {
     },
 
     /* ---------- 房间 ---------- */
+    /** 匹配大厅：拉取等待中的房间 + 发心跳上报在线 + 拉在线名单（未入房时每 4 秒自动刷新） */
+    async loadRooms() {
+      if (this.joined || this.dead) return
+      // 心跳上报：让大厅里能看到「我在线」
+      if (this.userId) {
+        const s = getSession() || {}
+        mpHeartbeat(this.userId, s.name || this.nickname, s.avatar || '').catch(() => {})
+      }
+      const [r, o] = await Promise.all([mpRooms(), mpOnline()])
+      if (r && r.code === 200 && Array.isArray(r.data)) this.waitingRooms = r.data
+      if (o && o.code === 200 && Array.isArray(o.data)) this.onlineUsers = o.data
+    },
+    /** 大厅一键加入：直接带上房间号走 joinRoom */
+    async joinDirect(room) {
+      if (this.loading || !room) return
+      this.joinCode = room.roomId
+      await this.joinRoom()
+    },
     async createRoom() {
       if (this.loading) return
       this.loading = true
@@ -436,6 +513,7 @@ export default {
       this.enterRoom(r.data)
     },
     enterRoom(data) {
+      if (this.roomsTimer) { clearInterval(this.roomsTimer); this.roomsTimer = null }
       this.roomId = data.roomId
       this.seatId = data.seatId
       this.token = data.token
@@ -549,7 +627,32 @@ export default {
 </script>
 
 <style scoped>
-.mo-wrap { display: flex; flex-direction: column; gap: 11px; }
+.mo-wrap { display: flex; flex-direction: column; gap: 11px; position: relative; }
+/* 氛围层：气球 + 彩虹粒子，铺满整个页面，纯装饰不挡操作 */
+.mo-sky { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; border-radius: 16px; }
+.mo-wrap > :not(.mo-sky) { position: relative; z-index: 1; }
+.mo-balloon {
+  position: absolute; bottom: -70px; opacity: 0; line-height: 1;
+  animation: moRise linear infinite; will-change: transform, opacity;
+  filter: drop-shadow(0 5px 8px rgba(160, 108, 213, .2));
+}
+@keyframes moRise {
+  0%   { transform: translate(0, 0) rotate(-6deg); opacity: 0; }
+  8%   { opacity: .95; }
+  50%  { transform: translate(16px, -58vh) rotate(7deg); }
+  90%  { opacity: .9; }
+  100% { transform: translate(-4px, -112vh) rotate(-6deg); opacity: 0; }
+}
+.mo-spark { position: absolute; border-radius: 50%; animation: moTwinkle ease-in-out infinite; }
+@keyframes moTwinkle {
+  0%, 100% { opacity: .18; transform: scale(.65) translateY(0); }
+  50%      { opacity: .9;  transform: scale(1.2) translateY(-9px); }
+}
+/* 减少动态效果：气球停用（纯装饰），彩虹粒子保留但静止可见 —— 不完全归零 */
+@media (prefers-reduced-motion: reduce) {
+  .mo-balloon { animation: none; opacity: 0; }
+  .mo-spark { animation: none; opacity: .45; }
+}
 .mo-card {
   padding: 16px; border-radius: 16px; background: var(--panel);
   border: 1.5px solid var(--border);
@@ -588,17 +691,37 @@ export default {
 .mo-join input { text-transform: uppercase; letter-spacing: 2px; font-weight: 800; }
 .mo-or { font-size: 10.5px; color: var(--muted); }
 
-.mo-lan {
-  display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+/* 匹配大厅：等待中的房间列表 */
+.mo-lobby {
   padding: 10px; border-radius: 12px; background: var(--card);
-  border: 1.5px dashed var(--border); text-align: left;
+  border: 1.5px solid var(--border); text-align: left;
 }
-.mo-lan b { font-size: 11px; color: var(--text); width: 100%; }
-.mo-lan code {
-  font-size: 11px; color: var(--primary); background: var(--panel);
-  padding: 5px 8px; border-radius: 8px; word-break: break-all;
+.mo-lobby-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.mo-lobby-head b { font-size: 11px; color: var(--text); white-space: nowrap; }
+.mo-lobby-empty { font-size: 10.5px; color: var(--muted); margin: 8px 0 2px; line-height: 1.5; }
+.mo-room-list { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+.mo-room-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 9px; border-radius: 10px;
+  background: var(--panel); border: 1px solid var(--border);
 }
-.mo-lan small { width: 100%; font-size: 10px; color: var(--muted); line-height: 1.5; }
+.mo-room-code { font-weight: 800; letter-spacing: 1.5px; color: var(--primary); font-size: 12px; }
+.mo-room-host { font-size: 11px; color: var(--text); font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mo-room-meta { font-size: 10px; color: var(--muted); margin-left: auto; white-space: nowrap; }
+.mo-mini.go { background: linear-gradient(135deg, var(--pink), var(--purple)); color: #fff; border: none; }
+.mo-mini.go:disabled { opacity: .5; cursor: not-allowed; }
+/* 在线小伙伴名单 */
+.mo-online {
+  margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border);
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+}
+.mo-online b { font-size: 11px; color: var(--text); white-space: nowrap; }
+.mo-online-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 999px; padding: 4px 10px;
+  font-size: 11px; font-weight: 700; color: var(--text);
+}
 .mo-mini {
   cursor: pointer; border: 1px solid var(--border); background: var(--panel);
   color: var(--primary); font-size: 10.5px; font-weight: 700;

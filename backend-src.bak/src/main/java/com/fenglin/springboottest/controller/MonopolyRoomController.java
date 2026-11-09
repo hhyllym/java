@@ -3,6 +3,7 @@ package com.fenglin.springboottest.controller;
 import com.fenglin.springboottest.common.Result;
 import com.fenglin.springboottest.service.MonopolyRoomService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -39,6 +40,12 @@ public class MonopolyRoomController {
     @Autowired
     private MonopolyRoomService roomService;
 
+    /** 局域网 IP 固定值（application-*.properties 里的 app.lan-ip）。
+     *  机器上常挂多张网卡（VMware / VirtualBox / WSL…），自动探测容易挑错，
+     *  这里允许显式指定，拼「发给同学的大富翁网址」时优先用它。为空则退回自动探测。 */
+    @Value("${app.lan-ip:}")
+    private String configuredLanIp;
+
     @PostMapping("/create")
     public Result<?> create(@RequestBody Map<String, Object> body) {
         return guard(() -> roomService.create(
@@ -66,7 +73,10 @@ public class MonopolyRoomController {
     public Result<?> lan() {
         List<String> ips = lanIps();
         Map<String, Object> m = new LinkedHashMap<>();
-        m.put("ip", ips.isEmpty() ? "" : ips.get(0));
+        // 显式配置了局域网 IP 就优先用它（拼「发给同学的大富翁网址」更可靠）
+        String primary = (configuredLanIp != null && !configuredLanIp.isBlank())
+                ? configuredLanIp.trim() : (ips.isEmpty() ? "" : ips.get(0));
+        m.put("ip", primary);
         m.put("ips", ips);
         m.put("port", 5180);
         return Result.ok(m);
@@ -138,6 +148,11 @@ public class MonopolyRoomController {
         real.sort((a, b) -> Integer.compare(rank(a), rank(b)));
         List<String> out = new ArrayList<>(real);
         for (String ip : virtual) if (!out.contains(ip)) out.add(ip);
+        // 显式配置优先：放到列表最前，确保被选中
+        if (configuredLanIp != null && !configuredLanIp.isBlank()
+                && out.stream().noneMatch(ip -> ip.equals(configuredLanIp.trim()))) {
+            out.add(0, configuredLanIp.trim());
+        }
         return out;
     }
 

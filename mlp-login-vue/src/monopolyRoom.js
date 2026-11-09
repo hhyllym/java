@@ -32,6 +32,21 @@ export function mpLan() {
   return req('/lan', null, 'GET')
 }
 
+/** 匹配大厅：列出所有还在等人的房间（ roomId / host / humans / mode / created ） */
+export function mpRooms() {
+  return req('/rooms?t=' + Date.now(), null, 'GET')
+}
+
+/** 心跳：告诉后端「我在线」（昵称 + 头像），前端大厅每 4 秒发一次 */
+export function mpHeartbeat(userId, name, avatar) {
+  return req('/heartbeat', { userId, name, avatar })
+}
+
+/** 在线小伙伴名单（90 秒内有心跳的） */
+export function mpOnline() {
+  return req('/online?t=' + Date.now(), null, 'GET')
+}
+
 /** 创建房间（创建者自动坐 0 号位，即房主） */
 export function mpCreate(nickname, userId, mode) {
   return req('/create', { nickname, userId, mode })

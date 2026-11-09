@@ -793,11 +793,11 @@ export default {
 .content { flex: 1; padding: 22px 26px; overflow: auto; }
 
 /* 权限徽章 */
-.tag { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 800; }
+.tag { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 800; white-space: nowrap; }
 .tag-admin { background: #efe6fb; color: #7c5cbf; }
 .tag-user { background: #f1eef7; color: #8a7fa3; }
 .tag-super { background: #fff3d6; color: #c08a00; }
-.title { margin: 0 0 4px; font-size: 20px; }
+.title { margin: 0 0 4px; font-size: 20px; white-space: nowrap; }
 .desc { margin: 0 0 16px; color: #9088a0; font-size: 13px; }
 
 .stat-grid { display: flex; gap: 14px; flex-wrap: wrap; }
@@ -828,35 +828,40 @@ export default {
 .rank-no.no-3 { background: #e3ecfb; color: #3f8fd6; }
 .rank-emoji { flex: none; }
 .rank-name { font-weight: 700; color: #5a4b78; }
-.rank-perm { font-size: 11px; font-weight: 800; padding: 1px 8px; border-radius: 999px; flex: none; }
+.rank-perm { font-size: 11px; font-weight: 800; padding: 1px 8px; border-radius: 999px; flex: none; white-space: nowrap; }
 .rank-item .muted { margin-left: auto; font-size: 12px; flex: none; }
 .rank-msg { color: #6b6380; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
 .tip { margin: -4px 0 0; font-size: 12px; color: #a59cba; }
 
-.bar { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+.bar { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+.bar .muted { white-space: nowrap; }
+.bar .title { margin: 0; }
 .spacer { flex: 1; }
 .search { padding: 8px 12px; border: 1.5px solid #e4dcf5; border-radius: 10px; font-size: 13px; outline: none; background: #fff; }
 .search:focus { border-color: #a06cd5; }
 .search.small { padding: 6px 9px; font-size: 12px; }
-.btn { border: 1.5px solid #e0d4f5; background: #fff; color: #6b6380; font-weight: 700; padding: 8px 14px; border-radius: 10px; cursor: pointer; }
+.btn { border: 1.5px solid #e0d4f5; background: #fff; color: #6b6380; font-weight: 700; padding: 8px 14px; border-radius: 10px; cursor: pointer; white-space: nowrap; }
 .btn:hover { background: #f6f1fb; }
 .btn.primary { background: linear-gradient(135deg, #a06cd5, #c89bf0); color: #fff; border: none; }
 .btn:disabled { opacity: .6; cursor: default; }
 
 .tbl { width: 100%; border-collapse: collapse; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 6px 18px rgba(160,108,213,.06); }
 .tbl th, .tbl td { padding: 11px 12px; text-align: left; font-size: 13px; border-bottom: 1px solid #f1ecf8; }
-.tbl th { background: #faf7fe; color: #8a7fa8; font-weight: 700; }
+.tbl th { white-space: nowrap; }
+.tbl td:not(.msg) { white-space: nowrap; }
+.tbl td.msg { white-space: normal; word-break: break-word; max-width: 320px; }
+.tbl th { background: #faf7fe; color: #8a7fa8; font-weight: 700; white-space: nowrap; }
 .tbl tr:last-child td { border-bottom: none; }
 .muted { color: #a59cba; }
 .empty { text-align: center; color: #b3aac6; padding: 24px; }
 .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
-.rarity { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; }
+.rarity { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
 .rr-common { background: #eef0f5; color: #7c7689; }
 .rr-rare { background: #e6f0fb; color: #3f8fd6; }
 .rr-legend { background: #fbe9f3; color: #d6589b; }
-.pill { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: #efe9fb; color: #7c5cbf; }
+.pill { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: #efe9fb; color: #7c5cbf; white-space: nowrap; }
 .msg { max-width: 320px; }
-.link { border: none; background: transparent; color: #7c5cbf; font-weight: 700; cursor: pointer; font-size: 13px; padding: 2px 6px; }
+.link { border: none; background: transparent; color: #7c5cbf; font-weight: 700; cursor: pointer; font-size: 13px; padding: 2px 6px; white-space: nowrap; }
 .link.danger { color: #e06666; }
 .pager { display: flex; align-items: center; gap: 12px; justify-content: center; margin-top: 14px; font-size: 13px; color: #9088a0; }
 .inline-form { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }

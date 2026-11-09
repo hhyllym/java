@@ -507,12 +507,13 @@ export default {
   background: var(--panel); border-radius: 12px; margin-bottom: 12px; padding: 4px;
   font-size: 11px; color: var(--muted);
 }
-.wardrobe-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.wardrobe-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
 .wardrobe-grid button {
-  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  display: flex; flex-direction: row; align-items: center; gap: 7px;
   border: 1.5px solid var(--border); border-radius: 14px;
   background: var(--panel); color: var(--text);
-  padding: 10px 4px; cursor: pointer; transition: all .15s;
+  padding: 9px 10px; cursor: pointer; transition: all .15s;
+  text-align: left;
 }
 .wardrobe-grid button:hover { border-color: var(--primary); transform: translateY(-2px); }
 .wardrobe-grid button.on {
@@ -520,9 +521,9 @@ export default {
   outline: 2px solid var(--primary);
   outline-offset: -1px;
 }
-.wardrobe-face { font-size: 26px; }
-.wardrobe-grid b { font-size: 11px; }
-.wardrobe-grid em { font-style: normal; font-size: 10px; color: var(--primary); font-weight: 700; }
+.wardrobe-face { font-size: 24px; flex-shrink: 0; }
+.wardrobe-grid b { font-size: 12px; }
+.wardrobe-grid em { font-style: normal; font-size: 10px; color: var(--primary); font-weight: 700; white-space: nowrap; }
 .wardrobe-grid button.on b { color: var(--primary); }
 
 /* 通用弹层（领养/衣橱复用） */

@@ -87,7 +87,8 @@ export default {
     const spawn = (x, y) => {
       const pal = readPalette()
       const small = window.innerWidth < 768
-      const count = reduceMotion ? 0 : small ? 11 : 17
+      // 开了"减少动态效果"时给一簇小粒子而不是完全消失（尊重无障碍，但保留可见反馈）
+      const count = reduceMotion ? 7 : small ? 11 : 17
 
       for (let i = 0; i < count; i++) {
         const ang = rand(0, Math.PI * 2)
@@ -138,9 +139,9 @@ export default {
           rings.splice(i, 1)
           continue
         }
-        ctx.globalAlpha = Math.max(0, g.life) * 0.5
+        ctx.globalAlpha = Math.max(0, g.life) * 0.75
         ctx.strokeStyle = g.color
-        ctx.lineWidth = Math.max(0.5, 2.6 * g.life)
+        ctx.lineWidth = Math.max(0.8, 3.2 * g.life)
         ctx.beginPath()
         ctx.arc(g.x, g.y, g.r, 0, Math.PI * 2)
         ctx.stroke()

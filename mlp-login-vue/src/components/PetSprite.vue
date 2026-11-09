@@ -1127,9 +1127,9 @@ export default {
 .ps-state-walk .ps-paw-l { animation-delay: .27s; }
 .ps-state-walk .ps-tail { animation-duration: .5s; }
 
-/* 装扮角标 */
+/* 装扮角标（戴在头顶正中，不再飘右上角） */
 .ps-cosmetic {
-  position: absolute; top: -8%; right: -8%;
+  position: absolute; top: -7%; left: 50%; margin-left: -0.5em;
   line-height: 1;
   filter: drop-shadow(0 2px 3px rgba(160, 108, 213, .4));
   animation: psCosmetic 2.6s ease-in-out infinite;

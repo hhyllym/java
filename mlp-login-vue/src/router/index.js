@@ -35,13 +35,13 @@ const router = createRouter({
     // 旧「探险」地址留个重定向，老链接/书签不会 404
     { path: '/adventure', redirect: { name: 'games' } },
     { path: '/diary', name: 'diary', component: DiaryView, meta: { requiresAuth: true } },
-    { path: '/game/:id', name: 'game', component: GameView, meta: { requiresAuth: true } },
+    { path: '/game/:id', name: 'game', component: GameView, meta: { requiresAuth: true, mp: true } },
     { path: '/friends', name: 'friends', component: FriendsView, meta: { requiresAuth: true } },
     { path: '/chat/:id', name: 'chat', component: ChatView, meta: { requiresAuth: true } },
     { path: '/login', name: 'login', component: LoginView },
     { path: '/register', name: 'register', component: RegisterView },
     { path: '/admin/login', name: 'adminLogin', component: AdminLoginView },
-    { path: '/admin', name: 'admin', component: AdminView, meta: { requiresAdmin: true } }
+    { path: '/admin', name: 'admin', component: AdminView, meta: { requiresAdmin: true, admin: true } }
   ]
 })
 

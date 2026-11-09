@@ -156,6 +156,10 @@ body {
 /* 加宽页（路由 meta.wide，如积分商店）：桌面端放大约 1.5 倍 */
 @media (min-width: 768px) {
   .card.card-wide { max-width: min(840px, 94vw); }
+  /* 后台管理页（路由 meta.admin）：接近全屏的宽度，表格和侧边栏才放得下 */
+  .card.card-admin { max-width: min(1240px, 96vw); }
+  /* 游戏页（路由 meta.mp，大富翁等）：宽屏布局，棋盘和大厅要舒展开 */
+  .card.card-mp { max-width: min(1180px, 96vw); }
 }
 @keyframes cardIn {
   from { opacity: 0; transform: translateY(20px) scale(.97); }

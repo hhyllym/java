@@ -110,7 +110,7 @@ export default {
 }
 .pet3d-canvas { display: block; width: 100%; height: 100%; touch-action: none; }
 .pet3d-cosmetic {
-  position: absolute; top: 2%; right: 4%; z-index: 3; line-height: 1;
+  position: absolute; top: 9%; left: 50%; margin-left: -0.5em; z-index: 3; line-height: 1;
   filter: drop-shadow(0 2px 3px rgba(160, 108, 213, .45));
   pointer-events: none;
   animation: pet3dCos 2.6s ease-in-out infinite;

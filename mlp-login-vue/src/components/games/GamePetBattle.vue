@@ -5,7 +5,7 @@
       <div class="pb-tip">🐾 选一只宠物出战，对手随机匹配：</div>
       <div class="pb-grid">
         <button v-for="p in roster" :key="p.name" class="pb-card" @click="pick(p)">
-          <span class="pb-emoji">{{ p.icon }}</span>
+          <span class="pb-model"><PetSprite :kind="p.kind" :size="56" state="happy" /></span>
           <b>{{ p.name }}</b>
           <em>❤️ {{ p.hp }} · ⚔️ {{ p.atk }}</em>
         </button>
@@ -17,14 +17,14 @@
     <div v-else class="pb-fight">
       <div class="pb-arena">
         <div class="pb-side" :class="{ hurt: meHurt }">
-          <span class="pb-emoji">{{ me.icon }}</span>
+          <span class="pb-model big"><PetSprite :kind="me.kind" :size="88" state="play" /></span>
           <b>{{ me.name }}（你）</b>
           <div class="pb-hp"><i :style="{ width: mePct + '%' }"></i></div>
           <em>{{ meHp }} / {{ me.hp }}</em>
         </div>
         <span class="pb-vs">VS</span>
         <div class="pb-side" :class="{ hurt: foeHurt }">
-          <span class="pb-emoji">{{ foe.icon }}</span>
+          <span class="pb-model big foe"><PetSprite :kind="foe.kind" :size="88" state="play" /></span>
           <b>{{ foe.name }}</b>
           <div class="pb-hp"><i :style="{ width: foePct + '%' }"></i></div>
           <em>{{ foeHp }} / {{ foe.hp }}</em>
@@ -52,18 +52,20 @@
 <script>
 /** ⚔️ 宠物单挑：选宠出战打回合制，赢了按剩余血量折算积分（emit over 自动进结算换积分） */
 const ROSTER = [
-  { icon: '🐶', name: '萨摩耶', hp: 54, atk: 10 },
-  { icon: '🐱', name: '狸花猫', hp: 44, atk: 12 },
-  { icon: '🐰', name: '垂耳兔', hp: 40, atk: 9 },
-  { icon: '🦜', name: '虎皮鹦鹉', hp: 36, atk: 13 },
-  { icon: '🐹', name: '金丝熊', hp: 48, atk: 9 },
-  { icon: '🦊', name: '小狐狸', hp: 42, atk: 12 }
+  { icon: '🐶', kind: 'dog', name: '萨摩耶', hp: 54, atk: 10 },
+  { icon: '🐱', kind: 'cat', name: '狸花猫', hp: 44, atk: 12 },
+  { icon: '🐰', kind: 'rabbit', name: '垂耳兔', hp: 40, atk: 9 },
+  { icon: '🦜', kind: 'budgie', name: '虎皮鹦鹉', hp: 36, atk: 13 },
+  { icon: '🐹', kind: 'hamster', name: '金丝熊', hp: 48, atk: 9 },
+  { icon: '🦊', kind: 'fox', name: '小狐狸', hp: 42, atk: 12 }
 ]
 const rand = (n) => Math.floor(Math.random() * n)
 const pick1 = (arr) => arr[rand(arr.length)]
+import PetSprite from '../PetSprite.vue'
 
 export default {
   name: 'GamePetBattle',
+  components: { PetSprite },
   emits: ['score', 'over'],
   data() {
     return {
@@ -228,6 +230,9 @@ export default {
 }
 .pb-card:hover { transform: translateY(-2px); border-color: var(--primary); }
 .pb-emoji { font-size: 30px; line-height: 1.2; }
+.pb-model { display: inline-flex; align-items: center; justify-content: center; filter: drop-shadow(0 4px 8px rgba(160, 108, 213, .25)); }
+.pb-model.big { margin-bottom: 2px; }
+.pb-model.foe { transform: scaleX(-1); }
 .pb-card b { font-size: 12.5px; color: var(--text); }
 .pb-card em { font-style: normal; font-size: 10.5px; color: var(--muted); }
 .pb-note { text-align: center; font-size: 11px; color: var(--muted); margin-top: 10px; }

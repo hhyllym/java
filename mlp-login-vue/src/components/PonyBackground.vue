@@ -54,6 +54,12 @@
     </div>
 
     <span
+      v-for="(f, i) in floaties"
+      :key="'f' + i"
+      class="float-item"
+      :style="{ top: f.top, left: f.left, fontSize: f.size, animationDelay: f.delay, animationDuration: f.dur }"
+    >{{ f.char }}</span>
+    <span
       v-for="(s, i) in sparkles"
       :key="'s' + i"
       class="sparkle"
@@ -124,7 +130,35 @@ export default {
         { c: '#b79cf0', x: '13%', dur: '34s', delay: '-15s' },
         { c: '#8fc7f0', x: '92%', dur: '29s', delay: '-25s' },
         { c: '#f3c969', x: '80%', dur: '37s', delay: '-8s'  },
-        { c: '#a9d6a8', x: '88%', dur: '31s', delay: '-21s' }
+        { c: '#a9d6a8', x: '88%', dur: '31s', delay: '-21s' },
+        { c: '#ffb3c8', x: '20%', dur: '33s', delay: '-30s' },
+        { c: '#a5d8f0', x: '27%', dur: '28s', delay: '-11s' },
+        { c: '#c9a8f0', x: '72%', dur: '35s', delay: '-19s' },
+        { c: '#ffd9a0', x: '45%', dur: '30s', delay: '-27s' },
+        { c: '#b8e6c9', x: '54%', dur: '32s', delay: '-6s'  },
+        { c: '#f7a8c4', x: '3%',  dur: '29s', delay: '-24s' },
+        { c: '#b79cf0', x: '9%',  dur: '36s', delay: '-33s' },
+        { c: '#8fc7f0', x: '96%', dur: '27s', delay: '-13s' },
+        { c: '#f3c969', x: '84%', dur: '34s', delay: '-4s'  },
+        { c: '#a9d6a8', x: '78%', dur: '30s', delay: '-36s' },
+        { c: '#ffb3c8', x: '34%', dur: '38s', delay: '-22s' },
+        { c: '#a5d8f0', x: '38%', dur: '26s', delay: '-16s' },
+        { c: '#c9a8f0', x: '64%', dur: '31s', delay: '-29s' },
+        { c: '#ffd9a0', x: '58%', dur: '35s', delay: '-9s'  },
+        { c: '#b8e6c9', x: '48%', dur: '28s', delay: '-18s' }
+      ],
+      // 白云与彩虹粒子：缓慢漂浮
+      floaties: [
+        { char: '☁️', top: '8%',  left: '18%', size: '30px', delay: '0s',    dur: '11s' },
+        { char: '☁️', top: '22%', left: '68%', size: '24px', delay: '-3s',   dur: '12s' },
+        { char: '☁️', top: '38%', left: '8%',  size: '20px', delay: '-6s',   dur: '10s' },
+        { char: '☁️', top: '52%', left: '84%', size: '26px', delay: '-2s',   dur: '13s' },
+        { char: '☁️', top: '68%', left: '30%', size: '22px', delay: '-8s',   dur: '11s' },
+        { char: '☁️', top: '84%', left: '62%', size: '28px', delay: '-5s',   dur: '12s' },
+        { char: '🌈', top: '14%', left: '42%', size: '26px', delay: '-1s',   dur: '12s' },
+        { char: '🌈', top: '44%', left: '92%', size: '22px', delay: '-7s',   dur: '13s' },
+        { char: '🌈', top: '74%', left: '16%', size: '24px', delay: '-4s',   dur: '11s' },
+        { char: '🌈', top: '90%', left: '88%', size: '20px', delay: '-9s',   dur: '12s' }
       ],
       ponies: [
         { c: '#b79cf0', x: '2%',  y: '6%',  s: 96, d: 0   },

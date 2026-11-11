@@ -677,6 +677,20 @@ button.submit:active { transform: translateY(1px); }
   50% { opacity: .95; transform: scale(1.25) rotate(20deg); }
 }
 
+/* 白云 / 彩虹粒子漂浮物：上下浮动 + 轻摇摆 */
+.float-item {
+  position: absolute; opacity: .55; z-index: 0;
+  animation-name: floatBob;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  filter: drop-shadow(0 3px 6px rgba(120,90,160,.12));
+  user-select: none;
+}
+@keyframes floatBob {
+  0%,100% { transform: translateY(0) rotate(-5deg); opacity: .4; }
+  50%     { transform: translateY(-16px) rotate(6deg); opacity: .7; }
+}
+
 /* 背景里的小马成员（原创简笔剪影，六种招牌色） */
 .pony {
   position: absolute; opacity: .4; z-index: 0;

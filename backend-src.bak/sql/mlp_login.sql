@@ -1,17 +1,17 @@
 /*
  Navicat Premium Dump SQL
 
- Source Server         : AFSf
+ Source Server         : yy
  Source Server Type    : MySQL
- Source Server Version : 80408 (8.4.8)
+ Source Server Version : 80039 (8.0.39)
  Source Host           : localhost:3306
  Source Schema         : mlp_login
 
  Target Server Type    : MySQL
- Target Server Version : 80408 (8.4.8)
+ Target Server Version : 80039 (8.0.39)
  File Encoding         : 65001
 
- Date: 09/11/2026 09:46:23
+ Date: 11/11/2026 09:56:34
 */
 
 SET NAMES utf8mb4;
@@ -99,13 +99,15 @@ CREATE TABLE `t_friend`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_pair`(`user_id` ASC, `friend_id` ASC) USING BTREE,
   INDEX `idx_friend_status`(`friend_id` ASC, `status` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '好友关系表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 9 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '好友关系表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_friend
 -- ----------------------------
 INSERT INTO `t_friend` VALUES (1, 1, 3, 0, '', '很高兴认识你！', '2026-11-04 08:56:09', '2026-11-04 08:56:09');
 INSERT INTO `t_friend` VALUES (2, 1, 5, 1, 'partner', '很高兴认识你！', '2026-11-04 08:56:16', '2026-11-04 09:52:06');
+INSERT INTO `t_friend` VALUES (7, 1, 4, 0, '', '很高兴认识你！', '2026-11-11 09:39:49', '2026-11-11 09:39:49');
+INSERT INTO `t_friend` VALUES (8, 1, 2, 0, '', '很高兴认识你！', '2026-11-11 09:39:50', '2026-11-11 09:39:50');
 
 -- ----------------------------
 -- Table structure for t_friend_remark
@@ -137,7 +139,7 @@ CREATE TABLE `t_game_score`  (
   `create_time` datetime NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_game`(`game_id` ASC, `score` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 12 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 13 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_game_score
@@ -153,6 +155,7 @@ INSERT INTO `t_game_score` VALUES (8, 'snake', 5, 10, '2026-11-08 21:47:26');
 INSERT INTO `t_game_score` VALUES (9, 'rps', 5, 25, '2026-11-08 22:12:43');
 INSERT INTO `t_game_score` VALUES (10, 'snake', 1, 1, '2026-11-08 22:47:33');
 INSERT INTO `t_game_score` VALUES (11, 'snake', 1, 0, '2026-11-08 22:49:36');
+INSERT INTO `t_game_score` VALUES (12, 'snake', 1, 20, '2026-11-11 09:45:27');
 
 -- ----------------------------
 -- Table structure for t_message
@@ -224,13 +227,13 @@ CREATE TABLE `t_pet_cosmetic`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_user_cosmetic`(`user_id` ASC, `cosmetic_id` ASC) USING BTREE,
   INDEX `idx_equipped`(`user_id` ASC, `equipped` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '宠物装扮' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '宠物装扮' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_pet_cosmetic
 -- ----------------------------
 INSERT INTO `t_pet_cosmetic` VALUES (1, 1, 'cosmetic-hat', 2, 0, '2026-10-17 21:44:06');
-INSERT INTO `t_pet_cosmetic` VALUES (2, 1, 'cosmetic-bow', 1, 0, '2026-10-17 21:44:06');
+INSERT INTO `t_pet_cosmetic` VALUES (2, 1, 'cosmetic-bow', 1, 1, '2026-10-17 21:44:06');
 
 -- ----------------------------
 -- Table structure for t_point_log
@@ -245,7 +248,7 @@ CREATE TABLE `t_point_log`  (
   `create_time` datetime NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_user`(`user_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 37 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 40 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_point_log
@@ -269,6 +272,9 @@ INSERT INTO `t_point_log` VALUES (33, 1, 50, 'gift-in', '收到 钱钱钱 的积
 INSERT INTO `t_point_log` VALUES (34, 1, 1, 'game-reward', '游戏「贪吃蛇」破纪录奖励 +1', '2026-11-08 22:47:33');
 INSERT INTO `t_point_log` VALUES (35, 5, 10000, 'newbie-10000', '新人大礼包', '2026-11-09 09:19:57');
 INSERT INTO `t_point_log` VALUES (36, 5, 5, 'task', '任务奖励：每日登录', '2026-11-09 09:20:12');
+INSERT INTO `t_point_log` VALUES (37, 1, 5, 'task', '任务奖励：每日登录', '2026-11-11 09:36:13');
+INSERT INTO `t_point_log` VALUES (38, 1, 10000, 'newbie-10000', '新人大礼包', '2026-11-11 09:36:16');
+INSERT INTO `t_point_log` VALUES (39, 1, 19, 'game-reward', '游戏「彩虹贪吃蛇」破纪录奖励 +19', '2026-11-11 09:45:27');
 
 -- ----------------------------
 -- Table structure for t_pony
@@ -529,14 +535,14 @@ CREATE TABLE `t_search_word`  (
   `sort_no` int NOT NULL DEFAULT 0 COMMENT '人工置顶权重',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_word`(`word` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 23 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '首页热搜词' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 24 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '首页热搜词' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_search_word
 -- ----------------------------
 INSERT INTO `t_search_word` VALUES (2, '飞行', 22, 8);
 INSERT INTO `t_search_word` VALUES (3, '派对', 19, 7);
-INSERT INTO `t_search_word` VALUES (4, '苹果', 16, 6);
+INSERT INTO `t_search_word` VALUES (4, '苹果', 17, 6);
 INSERT INTO `t_search_word` VALUES (6, '宝石', 10, 4);
 INSERT INTO `t_search_word` VALUES (11, '星辉', 27, 9);
 INSERT INTO `t_search_word` VALUES (12, '院长', 14, 5);
@@ -558,7 +564,7 @@ CREATE TABLE `t_task_progress`  (
   `claimed` tinyint NULL DEFAULT 0,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_user_day_task`(`user_id` ASC, `day` ASC, `task_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 30 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 34 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_task_progress
@@ -579,6 +585,10 @@ INSERT INTO `t_task_progress` VALUES (26, 5, '2026-11-08', 'daily_msg', 3, 0);
 INSERT INTO `t_task_progress` VALUES (27, 5, '2026-11-08', 'daily_gift', 1, 0);
 INSERT INTO `t_task_progress` VALUES (28, 5, '2026-11-09', 'daily_gift', 1, 0);
 INSERT INTO `t_task_progress` VALUES (29, 5, '2026-11-09', 'daily_login', 1, 1);
+INSERT INTO `t_task_progress` VALUES (30, 1, '2026-11-11', 'daily_login', 1, 1);
+INSERT INTO `t_task_progress` VALUES (31, 1, '2026-11-11', 'daily_gift', 1, 0);
+INSERT INTO `t_task_progress` VALUES (32, 1, '2026-11-11', 'daily_game', 1, 0);
+INSERT INTO `t_task_progress` VALUES (33, 1, '2026-11-11', 'daily_checkin', 1, 0);
 
 -- ----------------------------
 -- Table structure for t_user
@@ -599,7 +609,7 @@ CREATE TABLE `t_user`  (
 -- ----------------------------
 -- Records of t_user
 -- ----------------------------
-INSERT INTO `t_user` VALUES (1, '巴啦啦', '', 126, 'Bll123456', '2026-10-28 08:34:08', 1);
+INSERT INTO `t_user` VALUES (1, '巴啦啦', '📚', 10150, 'Bll193746', '2026-10-28 08:34:08', 1);
 INSERT INTO `t_user` VALUES (2, 'admin', '', 0, 'Admin@1234yy', '2026-10-28 09:39:48', 2);
 INSERT INTO `t_user` VALUES (3, '哇哇哇', '', 0, 'Www123456', '2026-10-30 16:07:54', 1);
 INSERT INTO `t_user` VALUES (4, '啦啦啦', '', 0, 'Lll123456', '2026-10-30 16:26:34', 1);

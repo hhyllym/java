@@ -145,6 +145,8 @@ import GameSnake from '../components/games/GameSnake.vue'
 import GameMonopoly from '../components/games/GameMonopoly.vue'
 import GamePetBattle from '../components/games/GamePetBattle.vue'
 import GameRps from '../components/games/GameRps.vue'
+import GameSlotMachine from '../components/games/GameSlotMachine.vue'
+import GameRace from '../components/games/GameRace.vue'
 import sound from '../sound'
 
 /** 游戏 id → 组件 */
@@ -166,7 +168,9 @@ const GAME_COMPS = {
   whack: GameWhack,
   gem: GameGem,
   snake: GameSnake,
-  monopoly: GameMonopoly
+  monopoly: GameMonopoly,
+  slot: GameSlotMachine,
+  race: GameRace
 }
 
 export default {

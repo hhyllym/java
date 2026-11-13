@@ -51,4 +51,16 @@ public class PresenceService {
         }
         return out;
     }
+
+    /** 当前在线的所有用户 id（最近 90 秒有心跳的），星糖大厅的「在线的小马」用它 */
+    public java.util.List<Long> onlineUserIds() {
+        long now = System.currentTimeMillis();
+        java.util.List<Long> out = new java.util.ArrayList<>();
+        for (Map.Entry<Long, Long> e : lastSeen.entrySet()) {
+            if (now - e.getValue() <= TIMEOUT_MS) {
+                out.add(e.getKey());
+            }
+        }
+        return out;
+    }
 }

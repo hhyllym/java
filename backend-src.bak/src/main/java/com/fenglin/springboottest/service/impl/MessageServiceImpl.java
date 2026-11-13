@@ -217,6 +217,13 @@ public class MessageServiceImpl implements MessageService {
     }
 
     private Map<String, Object> toMap(Message m) {
+        return toMap(m, null);
+    }
+
+    /**
+     * @param avs userId -> 当前头像；为 null 时不带头像字段
+     */
+    private Map<String, Object> toMap(Message m, Map<Long, String> avs) {
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("id", m.getId());
         map.put("type", m.getType());
@@ -232,13 +239,36 @@ public class MessageServiceImpl implements MessageService {
         }
         map.put("readFlag", rf);
         map.put("createTime", m.getCreateTime() == null ? "" : m.getCreateTime().format(FMT));
+        // 头像：发件人 + 收件人，前端直接渲染
+        if (avs != null) {
+            map.put("fromAvatar", avs.getOrDefault(m.getFromId(), ""));
+            map.put("toAvatar", avs.getOrDefault(m.getToId(), ""));
+        }
         return map;
+    }
+
+    /** 批量取这些消息涉及的人当前的头像 */
+    private Map<Long, String> avatarsOf(List<Message> list) {
+        Map<Long, String> out = new LinkedHashMap<>();
+        List<Long> ids = new ArrayList<>();
+        for (Message m : list) {
+            if (m.getFromId() != null && !ids.contains(m.getFromId())) ids.add(m.getFromId());
+            if (m.getToId() != null && !BROADCAST.equals(m.getToId()) && !ids.contains(m.getToId())) {
+                ids.add(m.getToId());
+            }
+        }
+        if (ids.isEmpty()) return out;
+        for (User u : userMapper.selectBatchIds(ids)) {
+            out.put(u.getId(), u.getAvatar() == null ? "" : u.getAvatar());
+        }
+        return out;
     }
 
     private List<Map<String, Object>> toMapList(List<Message> list) {
         List<Map<String, Object>> res = new ArrayList<>();
+        Map<Long, String> avs = avatarsOf(list);
         for (Message m : list) {
-            res.add(toMap(m));
+            res.add(toMap(m, avs));
         }
         return res;
     }

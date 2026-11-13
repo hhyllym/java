@@ -147,6 +147,13 @@ import GamePetBattle from '../components/games/GamePetBattle.vue'
 import GameRps from '../components/games/GameRps.vue'
 import GameSlotMachine from '../components/games/GameSlotMachine.vue'
 import GameRace from '../components/games/GameRace.vue'
+import GamePuzzle from '../components/games/GamePuzzle.vue'
+import GameGlide from '../components/games/GameGlide.vue'
+import GameMinesweeper from '../components/games/GameMinesweeper.vue'
+import GameJump from '../components/games/GameJump.vue'
+import GameLuckyWheel from '../components/games/GameLuckyWheel.vue'
+import GameLuckyCard from '../components/games/GameLuckyCard.vue'
+import GameGacha from '../components/games/GameGacha.vue'
 import sound from '../sound'
 
 /** 游戏 id → 组件 */
@@ -170,7 +177,14 @@ const GAME_COMPS = {
   snake: GameSnake,
   monopoly: GameMonopoly,
   slot: GameSlotMachine,
-  race: GameRace
+  race: GameRace,
+  puzzle: GamePuzzle,
+  glide: GameGlide,
+  mine: GameMinesweeper,
+  jump: GameJump,
+  wheel: GameLuckyWheel,
+  card: GameLuckyCard,
+  gacha: GameGacha
 }
 
 export default {

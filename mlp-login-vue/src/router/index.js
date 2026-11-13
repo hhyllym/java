@@ -14,6 +14,7 @@ import ChatView from '../views/ChatView.vue'
 import AdminLoginView from '../views/AdminLoginView.vue'
 import AdminView from '../views/AdminView.vue'
 import GameHubView from '../views/GameHubView.vue'
+import HallView from '../views/HallView.vue'
 import EarnView from '../views/EarnView.vue'
 import DiaryView from '../views/DiaryView.vue'
 import { getSession } from '../auth'
@@ -32,6 +33,7 @@ const router = createRouter({
     { path: '/fortune', name: 'fortune', component: FortuneView, meta: { requiresAuth: true } },
     { path: '/learn', name: 'learn', component: LearnView, meta: { requiresAuth: true } },
     { path: '/games', name: 'games', component: GameHubView, meta: { requiresAuth: true } },
+    { path: '/hall', name: 'hall', component: HallView, meta: { requiresAuth: true } },
     // 旧「探险」地址留个重定向，老链接/书签不会 404
     { path: '/adventure', redirect: { name: 'games' } },
     { path: '/diary', name: 'diary', component: DiaryView, meta: { requiresAuth: true } },

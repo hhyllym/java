@@ -27,7 +27,7 @@
       <div class="stat"><b>{{ GAMES.length }}</b><span>款游戏</span></div>
       <div class="stat"><b>{{ playedCount }}</b><span>已挑战</span></div>
       <div class="stat"><b>{{ totalBest }}</b><span>最佳分总和</span></div>
-      <div class="stat"><b>{{ state.points }}</b><span>可用积分</span></div>
+      <div class="stat"><b>{{ walletPoints }}</b><span>可用积分</span></div>
     </div>
 
     <!-- 按主角筛选 -->
@@ -67,7 +67,7 @@
     </div>
     <div v-if="!shown.length" class="empty">这位主角暂时没有游戏，换一个试试 🥺</div>
 
-    <div class="hub-tip">💡 超过历史最佳的那部分得分会变成积分；结算页还能看排行榜、找好友对战～</div>
+    <div class="hub-tip">💡 这里的「可用积分」和赚积分页、积分商店、大富翁是同一份账户余额；超过历史最佳的那部分得分也会存进来，结算页还能看排行榜、找好友对战～</div>
     <router-link to="/learn" class="hub-link">🎓 想上课？去星辉学院 →</router-link>
   </div>
 </template>
@@ -76,6 +76,7 @@
 import CutieMark from '../components/CutieMark.vue'
 import { GAMES, PONIES } from '../courses'
 import { loadLearn } from '../learn'
+import { fetchBalance } from '../wallet'
 import sound from '../sound'
 
 /** 六位主角在筛选条上的展示顺序与装饰 */
@@ -94,8 +95,16 @@ export default {
   data() {
     return {
       state: loadLearn(),
+      // 可用积分统一读账户余额（和赚积分页 / 商店 / 大富翁同一份）
+      walletPoints: 0,
+      walletOnline: false,
       pony: ''
     }
+  },
+  async created() {
+    const r = await fetchBalance()
+    this.walletPoints = r.value
+    this.walletOnline = r.online
   },
   computed: {
     GAMES: () => GAMES,

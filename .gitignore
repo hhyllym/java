@@ -11,3 +11,22 @@ _清理备份/
 .DS_Store
 Thumbs.db
 启动脚本/数据库备份/自动备份日志.txt
+
+# Node / 前端
+node_modules/
+dist/
+.vite/
+*.local
+.env
+.env.*
+!.env.example
+
+# 编辑器 / IDE
+.idea/
+.vscode/
+*.iml
+
+# 编译产物与本地临时文件
+target/
+mlp-login-vue/vite-tail.txt
+mlp-login-vue/fe-check2.txt

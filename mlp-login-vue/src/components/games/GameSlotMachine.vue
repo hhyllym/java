@@ -6,17 +6,21 @@
       <span>本局得分 <b>{{ score }}</b></span>
     </div>
 
-    <!-- 赌注选择 -->
+    <!-- 投入积分 -->
     <div class="slot-bets">
+      <span>投入</span>
+      <input
+        class="bet-input" type="number" min="10" step="10"
+        v-model.number="betAmount" @change="clampBet"
+        :disabled="spinning"
+      />
+      <span>积分</span>
       <button
-        v-for="b in [1, 2, 3]"
-        :key="b"
-        class="bet"
-        :class="{ on: bet === b }"
-        :disabled="spinning || stage === 'done'"
-        @click="bet = b"
-      >x{{ b }}</button>
-      <span class="bet-hint">每转投入 {{ cost }} 积分（赌注越高投入越多、赢的越多）</span>
+        v-for="p in BET_PRESETS" :key="p"
+        class="bet" :class="{ on: betAmount === p }"
+        :disabled="spinning || points < p" @click="betAmount = p"
+      >{{ p >= 1000 ? (p / 1000) + 'k' : p }}</button>
+      <span class="bet-hint">每转投入 {{ cost }} 积分 · 大注≥5000 时三星头奖概率 30%</span>
     </div>
 
     <!-- 三转轮 -->
@@ -38,8 +42,8 @@
 
     <p class="slot-result" :class="resultKind">{{ resultText }}</p>
 
-    <button class="slot-spin" :disabled="spinning || stage === 'done' || points < cost" @click="spin">
-      {{ spinning ? '转动中…' : (points < cost ? '积分不足，先去赚点积分' : '🎰 投入 ' + cost + ' 积分 · 拉杆！') }}
+    <button class="slot-spin" :disabled="pointsLoading || spinning || stage === 'done' || points < cost" @click="spin">
+      {{ pointsLoading ? '正在读取账户积分…' : (spinning ? '转动中…' : (points < cost ? '积分不足，先去赚点积分' : '🎰 投入 ' + cost + ' 积分 · 拉杆！')) }}
     </button>
 
     <div v-if="stage === 'done'" class="slot-final">
@@ -51,7 +55,8 @@
 
 <script>
 import sound from '../../sound'
-import { loadLearn, addPoints } from '../../learn'
+import { fetchBalance, spend } from '../../wallet'
+import { isBigBet, BET_PRESETS } from './luckyBase'
 
 // 每个符号：emoji + 底色（底色确保即使 emoji 缺字形也不会空着）
 const SYM = [
@@ -82,6 +87,7 @@ export default {
       ],
       bet: 1,
       points: 0,
+      pointsLoading: true,
       invested: 0,
       score: 0,                // 本局赢到的分（用于结算奖励）
       net: 0,                  // 净收益（赢 - 投入）
@@ -93,13 +99,27 @@ export default {
     }
   },
   computed: {
-    cost() { return this.bet * 10 }   // 每转投入积分
+    cost() { return Math.max(0, Math.floor(Number(this.betAmount) || 0)) },
+    big() { return isBigBet(this.betAmount) }
   },
-  mounted() { this.points = (loadLearn().points || 0) },
+  async mounted() { await this.refreshPoints() },
   beforeUnmount() { this.alive = false },
   methods: {
+    async refreshPoints() {
+      this.pointsLoading = true
+      this.points = (await fetchBalance()).value
+      this.pointsLoading = false
+      if (this.betAmount > this.points) this.clampBet()
+    },
+    clampBet() {
+      let v = Math.floor(Number(this.betAmount) || 0)
+      if (!Number.isFinite(v) || v < 10) v = 10
+      if (v > this.points) v = Math.max(10, this.points)
+      this.betAmount = v
+    },
     start() {
       this.stage = 'play'; this.score = 0; this.invested = 0; this.net = 0
+      this.refreshPoints()
       this.emitScore()
     },
     restart() { this.start() },
@@ -108,13 +128,24 @@ export default {
 
     async spin() {
       if (this.spinning || this.points < this.cost) return
-      addPoints(-this.cost)
-      this.points = loadLearn().points || 0
+      this.clampBet()
+      if (this.points < this.cost) return
+      spend(this.cost)
+      this.points = (await fetchBalance()).value
       this.invested += this.cost
       this.spinning = true
       this.resultKind = ''
       this.resultText = '叮铃铃——转起来！'
       sound.click()
+
+      // 大注模式（≥5000）：30% 直接三星头奖；否则正常随机
+      let stops
+      if (isBigBet(this.betAmount) && Math.random() < 0.30) {
+        const si = SYM.findIndex(s => s.e === '⭐')
+        stops = [si, si, si]
+      } else {
+        stops = [0, 1, 2].map(() => Math.floor(Math.random() * SYM.length))
+      }
 
       // 瞬间归位到靠前的起点（无动画），避免位置无限累加滑出空白区
       for (let i = 0; i < 3; i++) {
@@ -123,13 +154,11 @@ export default {
       }
       await this.sleep(20)
 
-      const stops = []
       for (let i = 0; i < 3; i++) {
-        const target = Math.floor(Math.random() * SYM.length)
+        const target = stops[i]
         const base = this.reels[i].pos
         const aligned = base - (base % SYM.length)
         const pos = aligned + SYM.length * this.spins + target
-        stops.push(target)
         const dur = 700 + i * 420
         await new Promise(res => {
           setTimeout(() => {
@@ -149,21 +178,21 @@ export default {
       const [a, b, c] = stops.map(i => SYM[i].e)
       const hit = a === b && b === c
       const pair = a === b || b === c || a === c
+      const M = this.betAmount
       let gain = 0, kind = '', text = ''
 
       if (hit) {
-        if (a === '⭐') { gain = 600; kind = 'jackpot'; text = '💫 三星连珠 · 超级大奖！+' + gain }
-        else { gain = 220; kind = 'win'; text = '🎉 三连 ' + a + ' · 大奖！+' + gain }
+        if (a === '⭐') { gain = Math.round(M * 1.6); kind = 'jackpot'; text = '💫 三星连珠 · 超级大奖！+' + gain }
+        else { gain = Math.round(M * 0.6); kind = 'win'; text = '🎉 三连 ' + a + ' · 大奖！+' + gain }
         sound.success()
       } else if (pair) {
-        gain = 70; kind = 'win'; text = '✨ 双连 · 小奖 +' + gain; sound.pop()
+        gain = Math.round(M * 0.2); kind = 'win'; text = '✨ 双连 · 小奖 +' + gain; sound.pop()
       } else if (stops.includes(SYM.findIndex(s => s.e === '⭐'))) {
-        gain = 25; kind = 'win'; text = '⭐ 落单星也被你捞到 +25'; sound.pop()
+        gain = Math.round(M * 0.08); kind = 'win'; text = '⭐ 落单星也被你捞到 +' + gain; sound.pop()
       } else {
         gain = 0; kind = 'lose'; text = '🙈 差一点～再投一把试试！'; sound.fail()
       }
 
-      gain *= this.bet
       this.score += gain
       this.net = this.score - this.invested
       this.resultKind = kind
@@ -180,8 +209,14 @@ export default {
 .slot-hud { display: flex; gap: 14px; font-size: 12.5px; color: var(--muted); flex-wrap: wrap; justify-content: center; }
 .slot-hud b { color: var(--primary); font-size: 14px; }
 .slot-bets { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.bet-input {
+  width: 92px; height: 38px; border: none; border-radius: 10px; padding: 0 10px;
+  background: var(--card); color: var(--text); font-weight: 800; font-size: 13px;
+  box-shadow: inset 0 0 0 1.5px rgba(150,120,180,.25);
+}
+.bet-input:disabled { opacity: .55; }
 .bet {
-  width: 44px; height: 38px; border: none; border-radius: 10px; cursor: pointer;
+  min-width: 44px; height: 38px; border: none; border-radius: 10px; cursor: pointer;
   background: var(--panel); color: var(--text); font-weight: 700; font-size: 14px;
   box-shadow: inset 0 0 0 1.5px rgba(150,120,180,.2);
 }

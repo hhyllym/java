@@ -110,11 +110,11 @@
           >{{ p.icon }}</span>
         </div>
 
-        <div class="mp-center">
+        <div class="mp-center" :class="{ dimmed: diceShow }">
           <div class="mp-turn-label">
             {{ busy ? `${players[turnIdx].icon} ${label(players[turnIdx])} 行动中…` : `${players[turnIdx].icon} 轮到 ${label(players[turnIdx])}` }}
           </div>
-          <div class="mp-dice" :class="{ rolling: busy }">{{ dice ? dice : '🎲' }}</div>
+          <Dice3D mini :rolling="busy" :value="dice" />
           <p class="mp-log">{{ log }}</p>
 
           <div class="mp-actions">
@@ -123,16 +123,18 @@
               <button class="mp-btn" @click="buy(true)">🏠 买下 · {{ buyTile.price }}币</button>
               <button class="mp-btn ghost" @click="buy(false)">跳过</button>
             </template>
-            <template v-else>
-              <button class="mp-btn" :disabled="busy || !players[turnIdx].human" @click="roll">
-                {{ busy ? '移动中…' : `🎲 ${label(players[turnIdx])} 掷骰子` }}
-              </button>
-            </template>
+              <template v-else>
+                <button class="mp-btn" :disabled="busy || !players[turnIdx].human" @click="roll">
+                  {{ busy ? '移动中…' : `🎲 ${label(players[turnIdx])} 掷骰子` }}
+                </button>
+              </template>
+            </div>
           </div>
+          <!-- 掷骰时浮在棋盘上方的 3D 骰子 -->
+          <Dice3D :show="diceShow" :rolling="diceRolling" :value="dice" />
         </div>
-      </div>
 
-      <div class="mp-legend">
+        <div class="mp-legend">
         <span>🏰 经过起点 +20 分 / +10 币</span>
         <span>🏠 买店后自己踩收营收，对手踩收租金</span>
         <span>🎁 机会卡 · ✨ 魔法事件 · 💸 税务所</span>
@@ -144,6 +146,7 @@
 
 <script>
 import sound from '../../sound'
+import Dice3D from '../Dice3D.vue'
 
 /** 🎲 糖霜镇大富翁：本地四人同桌（练习模式），可 2v2 组队，可本地轮流 / AI 托管 */
 const MAX_ROUND = 8
@@ -219,6 +222,7 @@ function freshSeats() {
 
 export default {
   name: 'MonopolyLocal',
+  components: { Dice3D },
   emits: ['score', 'over'],
   data() {
     return {
@@ -229,6 +233,8 @@ export default {
       busy: false,
       round: 1,
       dice: 0,
+      diceShow: false,       // 掷骰时浮在棋盘上方
+      diceRolling: false,
       log: '',
       players: freshSeats(),
       ranking: [],
@@ -370,7 +376,15 @@ export default {
     /** 一次完整走棋：掷骰 → 移动 → 落地结算 */
     async takeTurn(p) {
       const d = 1 + Math.floor(Math.random() * 6)
+      // 先让 3D 骰子在棋盘上方翻滚一会儿，再定格到真实点数
+      this.dice = 0
+      this.diceShow = true
+      this.diceRolling = true
+      await this.sleep(620)
+      if (this.dead) return
       this.dice = d
+      this.diceRolling = false
+      this.timers.push(setTimeout(() => { this.diceShow = false }, 2000))
       this.log = `${p.icon} ${this.label(p)} 掷出 ${d} 点，出发！`
       await this.walk(p, d)
       if (this.dead) return
@@ -595,6 +609,7 @@ export default {
 
 /* ---- 棋盘 ---- */
 .mp-board {
+  position: relative;   /* 掷骰骰子悬浮层以棋盘为基准 */
   width: 100%; aspect-ratio: 1;
   display: grid; grid-template-columns: repeat(7, 1fr); grid-template-rows: repeat(7, 1fr);
   gap: 3px; padding: 5px; box-sizing: border-box;
@@ -632,17 +647,11 @@ export default {
   border: 1.5px solid var(--border); box-shadow: inset 0 2px 10px rgba(160,108,213,.08);
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: 8px; text-align: center;
+  transition: opacity .3s ease, filter .3s ease;
 }
+/* 掷骰时中央内容柔化淡出，让浮在棋盘上方的 3D 大骰子独占舞台 */
+.mp-center.dimmed { opacity: .14; filter: blur(1.5px); }
 .mp-turn-label { font-size: 11px; font-weight: 800; color: var(--primary); }
-.mp-dice {
-  width: 48px; height: 48px; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  border-radius: 13px; font-size: 24px; font-weight: 800; color: var(--primary);
-  background: var(--card); border: 2px solid var(--border);
-  box-shadow: 0 4px 10px rgba(160,108,213,.18);
-}
-.mp-dice.rolling { animation: mp-shake .5s ease-in-out infinite alternate; }
-@keyframes mp-shake { to { transform: rotate(7deg) scale(.94); } }
 .mp-log {
   margin: 0; min-height: 34px; max-width: 100%;
   font-size: 11px; line-height: 1.5; color: var(--text);

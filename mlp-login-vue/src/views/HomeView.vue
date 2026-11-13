@@ -13,27 +13,28 @@
       <button class="logout" title="退出登录" @click="handleLogout">退出</button>
     </div>
 
-    <!-- 导航栏：默认只露前两排（前 6 项），其余点「展开」才显示 -->
-    <nav class="navbar" :class="{ expanded: navExpanded }">
+    <!-- 导航栏：全部入口常驻，图鉴后面紧跟商店 / 宠物 / 好友 / 消息 / 我的，不再折叠 -->
+    <nav class="navbar">
       <router-link to="/home" class="nav-item active">🏠 首页</router-link>
       <router-link to="/home" class="nav-item" @click.native="scrollTop">📚 图鉴</router-link>
+      <!-- 老大要的入口：紧跟图鉴常驻显示，不再藏在「展开更多」下面 -->
+      <router-link to="/shop" class="nav-item">🧧 商店</router-link>
+      <router-link to="/pet" class="nav-item">🐾 宠物</router-link>
+      <router-link to="/friends" class="nav-item">
+        👥 好友<span v-if="friendUnread > 0" class="nav-badge">{{ friendUnread > 99 ? '99+' : friendUnread }}</span>
+      </router-link>
+      <router-link to="/message" class="nav-item">
+        💬 消息<span v-if="msgUnread > 0" class="nav-badge">{{ msgUnread > 99 ? '99+' : msgUnread }}</span>
+      </router-link>
+      <router-link to="/dashboard" class="nav-item">👤 我的</router-link>
       <router-link to="/learn" class="nav-item">🎓 学院</router-link>
       <router-link to="/games" class="nav-item">🎮 游戏</router-link>
+      <router-link to="/hall" class="nav-item">
+        🏠 大厅<span v-if="hallUnread > 0" class="nav-badge">{{ hallUnread > 99 ? '99+' : hallUnread }}</span>
+      </router-link>
       <router-link to="/diary" class="nav-item">📔 日记本</router-link>
       <router-link to="/fortune" class="nav-item">🎲 幸运</router-link>
-      <router-link to="/shop" class="nav-item nav-extra">🧧 商店</router-link>
-      <router-link to="/pet" class="nav-item nav-extra">🐾 宠物</router-link>
-      <router-link to="/friends" class="nav-item nav-extra">
-        👥 好友<span v-if="chatUnread > 0" class="nav-badge">{{ chatUnread > 99 ? '99+' : chatUnread }}</span>
-      </router-link>
-      <router-link to="/message" class="nav-item nav-extra">
-        💬 消息<span v-if="unread > 0" class="nav-badge">{{ unread > 99 ? '99+' : unread }}</span>
-      </router-link>
-      <router-link to="/dashboard" class="nav-item nav-extra">👤 我的</router-link>
-      <router-link v-if="session.permission === 0 || session.permission === 2" to="/admin" class="nav-item nav-extra admin-entry">🛠 后台管理</router-link>
-      <button class="nav-fold" :title="navExpanded ? '收起，只看前两排' : '展开，看全部导航'" @click="toggleNav">
-        {{ navExpanded ? '⌃ 收起' : '⌄ 展开更多' }}
-      </button>
+      <router-link v-if="session.permission === 0 || session.permission === 2" to="/admin" class="nav-item admin-entry">🛠 后台管理</router-link>
     </nav>
 
     <!-- 新人大礼包：每人限领一次 -->
@@ -135,7 +136,7 @@
         @click="openDetail(p)"
       >
         <span class="rarity" :class="rarityClass(p.rarity)">{{ p.rarity }}</span>
-        <div class="pony-face">
+        <div class="pony-face" :class="{ 'mark-clear': hasMark(p.mark) }">
           <CutieMark v-if="hasMark(p.mark)" :mark="p.mark" />
           <template v-else>{{ p.emoji }}</template>
         </div>
@@ -212,10 +213,9 @@
 <script>
 import { getSession, clearSession } from '../auth'
 import { apiOverview, apiSearch, apiPonyDetail } from '../home'
-import { apiUnread } from '../message'
 import { apiPresenceOffline } from '../presence'
 import { bump } from '../quest'
-import { apiChatUnread } from '../chat'
+import { notify, refreshNotify } from '../notify'
 import { apiClaimBonus, apiBonusStatus } from '../point'
 import CutieMark from '../components/CutieMark.vue'
 import PonyAssistant from '../components/PonyAssistant.vue'
@@ -244,8 +244,7 @@ export default {
       // 这样领过的账号无论刷新还是换浏览器都不会再看到横幅
       bonusClaimed: true,
 
-      // 导航展开状态：默认 false = 只露出前两排（前 6 项），其余收起
-      navExpanded: (() => { try { return localStorage.getItem('mlp_nav_expand') === '1' } catch (e) { return false } })(),
+      // 导航入口全部常驻（原来「消息 / 我的」藏在展开区，已移到图鉴后面）
 
       // 列表与搜索状态
       keyword: '',
@@ -268,13 +267,6 @@ export default {
 
       detail: null,
 
-      /** 导航栏「消息」未读红点 */
-      unread: 0,
-
-      /** 导航栏「好友」聊天未读红点 */
-      chatUnread: 0,
-      chatTimer: null,
-
       /** 请求序号：切筛选切得快时，用它丢弃过期响应 */
       seq: 0
     }
@@ -283,6 +275,18 @@ export default {
     /** 欢迎语头像：本地自定义图片 > 会话 emoji > 默认 🦄 */
     greetAvatar() {
       return this.customAvatar || this.session.avatar || ''
+    },
+    /** 导航栏「消息」红点：读全局 store（私信 + 系统通知未读合计） */
+    msgUnread() {
+      return notify.messageTotal
+    },
+    /** 导航栏「好友」红点：聊天未读 + 收到的好友申请 合计 */
+    friendUnread() {
+      return notify.friendTotal
+    },
+    /** 导航栏「大厅」红点：上次看完之后新发的公共消息条数 */
+    hallUnread() {
+      return notify.hallUnread
     },
     /** 当前一级分类下的二级分类 */
     subCategories() {
@@ -320,14 +324,11 @@ export default {
     this.loadBonusStatus()
     await this.loadOverview()   // 先拿分类树，applyQuery 要用它判断一级/二级
     this.applyQuery()
-    this.refreshUnread()
-    this.refreshChatUnread()
-    // 每 10 秒刷一次聊天未读红点（离开页面时清掉，见 beforeUnmount）
-    this.chatTimer = setInterval(this.refreshChatUnread, 10000)
+    // 未读红点 / 好友申请 统一走全局 notify store（App.vue 每 10 秒轮询）；
+    // 这里立刻拉一次，进首页红点马上亮，不用空白等一轮
+    refreshNotify()
   },
-  beforeUnmount() {
-    if (this.chatTimer) clearInterval(this.chatTimer)
-  },
+  // 未读轮询已提到 App.vue 全局管理，这里无需再清定时器
   methods: {
     /** 新人大礼包状态：后端确认这个账号没领过才显示横幅 */
     async loadBonusStatus() {
@@ -355,11 +356,7 @@ export default {
         this.toast((res && res.msg) || '领取失败', 'err')
       }
     },
-    /** 展开/收起导航：默认只露前两排，其余的展开后才出现；选择存本地下次进来不变 */
-    toggleNav() {
-      this.navExpanded = !this.navExpanded
-      try { localStorage.setItem('mlp_nav_expand', this.navExpanded ? '1' : '0') } catch (e) {}
-    },
+    /** 导航已全部常驻，不再需要展开/收起（原 toggleNav / mlp_nav_expand 已移除） */
     /** 图片型头像（dataURL / 链接）用 <img> 渲染，emoji 走文本 */
     isImage(v) {
       return typeof v === 'string' && (v.startsWith('data:') || v.startsWith('http'))
@@ -522,17 +519,8 @@ export default {
       if (card && card.scrollTo) card.scrollTo({ top: 0, behavior: 'smooth' })
     },
 
-    /** 消息中心未读红点（原来只有调用没定义，消息红点一直不刷新，补上） */
-    async refreshUnread() {
-      const res = await apiUnread(this.session.id)
-      if (res.code === 200) this.unread = res.data || 0
-    },
-
-    /** 好友聊天未读红点 */
-    async refreshChatUnread() {
-      const res = await apiChatUnread(this.session.id)
-      if (res.code === 200) this.chatUnread = res.data || 0
-    },
+    // 未读红点 / 好友申请 现在统一读全局 notify store（见 src/notify.js），
+    // 由 App.vue 启动轮询，导航栏直接绑定 notify.messageTotal / notify.friendTotal。
 
     comingSoon(name) {
       this.toast(name + ' 还在建设中，敬请期待 🚧', 'ok')

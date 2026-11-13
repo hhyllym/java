@@ -67,11 +67,11 @@ public class UserController {
             return Result.fail("没有找到这只小马");
         }
 
-        // 换头像
+        // 换头像：可以是 emoji，也可以是 dataURL 图片（图片压缩后一般几十 KB）
         if (body.get("avatar") != null) {
             String avatar = String.valueOf(body.get("avatar")).trim();
-            if (avatar.length() > 16) {
-                avatar = avatar.substring(0, 16);
+            if (avatar.length() > 200000) {
+                avatar = avatar.substring(0, 200000);
             }
             u.setAvatar(avatar);
         }

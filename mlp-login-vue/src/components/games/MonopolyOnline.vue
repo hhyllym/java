@@ -162,9 +162,9 @@
             >{{ p.icon }}</span>
           </div>
 
-          <div class="mo-center">
+          <div class="mo-center" :class="{ dimmed: diceShow }">
             <div class="mo-turn-label">{{ st.status === 'buy' ? '🏠 买店决策' : `${st.players[st.turn].icon} ${nameOf(st.turn)} 的回合` }}</div>
-            <div class="mo-dice" :class="{ rolling: acting }">{{ st.dice || '🎲' }}</div>
+            <Dice3D mini :rolling="acting" :value="Number(st.dice) || 0" />
             <p class="mo-log">{{ st.log }}</p>
 
             <div class="mo-actions">
@@ -184,6 +184,8 @@
             </div>
             <div class="mo-poll small">🔄 {{ online ? '实时同步中' : '连接中 / 断开' }} · 掉线 20 秒后系统自动代走</div>
           </div>
+          <!-- 掷骰时浮在棋盘上方的 3D 骰子（自己或别人掷骰都会翻滚） -->
+          <Dice3D :show="diceShow" :rolling="diceRolling" :value="diceValue" />
         </div>
 
         <div class="mo-legend">
@@ -235,6 +237,7 @@ import { bump } from '../../quest'
 import { apiPointBalance } from '../../point'
 import { mpLan, mpCreate, mpJoin, mpStart, mpState, mpAction, mpLeave, mpRooms, mpHeartbeat, mpOnline } from '../../monopolyRoom'
 import sound from '../../sound'
+import Dice3D from '../Dice3D.vue'
 
 /** 顺时针把第 i 格映射到 7×7 网格的 (行, 列) */
 function cellOf(i) {
@@ -299,6 +302,7 @@ function clearRoomCred() {
 
 export default {
   name: 'MonopolyOnline',
+  components: { Dice3D },
   emits: ['score', 'over'],
   data() {
     const s = getSession() || {}
@@ -323,6 +327,12 @@ export default {
       err: '',
       loading: false,
       acting: false,
+      // 掷骰骰子：浮在棋盘上方，翻滚 → 定格 → 数秒后淡出
+      diceShow: false,
+      diceRolling: false,
+      diceValue: 0,
+      diceTimer: null,
+      lastDice: 0,
       online: false,
       copied: false,
       lastScore: 0,
@@ -385,6 +395,7 @@ export default {
     if (this.pollTimer) clearInterval(this.pollTimer)
     if (this.roomsTimer) clearInterval(this.roomsTimer)
     if (this.copyTimer) clearTimeout(this.copyTimer)
+    if (this.diceTimer) clearTimeout(this.diceTimer)
     if (this.unloadHandler) window.removeEventListener('beforeunload', this.unloadHandler)
     if (!this.isReloading && this.joined && this.roomId) {
       mpLeave(this.roomId, this.seatId, this.token).catch(() => {})
@@ -466,6 +477,25 @@ export default {
         this.lastScore = state.myScore
         this.$emit('score', state.myScore)
       }
+      // 骰子点数变了 = 有人刚掷过骰，浮出 3D 骰子翻滚并定格到真实点数
+      const d = Number(state.dice) || 0
+      if (d && d !== this.lastDice) {
+        this.lastDice = d
+        this.showDice(d)
+      }
+    },
+    /** 有人掷骰：先翻滚一会儿，再定格到真实点数，停留数秒后淡出 */
+    showDice(d) {
+      if (this.diceTimer) clearTimeout(this.diceTimer)
+      this.diceShow = true
+      this.diceRolling = true
+      this.diceValue = 0
+      this.diceTimer = setTimeout(() => {
+        if (this.dead) return
+        this.diceValue = d
+        this.diceRolling = false
+        this.diceTimer = setTimeout(() => { this.diceShow = false }, 1800)
+      }, 420)
     },
     handleFail(r, fallback) {
       this.err = (r && r.msg) || fallback
@@ -806,6 +836,7 @@ export default {
 
 /* ---- 棋盘 ---- */
 .mo-board {
+  position: relative;   /* 掷骰骰子悬浮层以棋盘为基准 */
   width: 100%; aspect-ratio: 1;
   display: grid; grid-template-columns: repeat(7, 1fr); grid-template-rows: repeat(7, 1fr);
   gap: 3px; padding: 5px; box-sizing: border-box;
@@ -841,17 +872,11 @@ export default {
   border: 1.5px solid var(--border); box-shadow: inset 0 2px 10px rgba(160,108,213,.08);
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: 8px; text-align: center;
+  transition: opacity .3s ease, filter .3s ease;
 }
+/* 掷骰时中央内容柔化淡出，让浮在棋盘上方的 3D 大骰子独占舞台 */
+.mo-center.dimmed { opacity: .14; filter: blur(1.5px); }
 .mo-turn-label { font-size: 11px; font-weight: 800; color: var(--primary); }
-.mo-dice {
-  width: 46px; height: 46px; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  border-radius: 13px; font-size: 23px; font-weight: 800; color: var(--primary);
-  background: var(--card); border: 2px solid var(--border);
-  box-shadow: 0 4px 10px rgba(160,108,213,.18);
-}
-.mo-dice.rolling { animation: mo-shake .5s ease-in-out infinite alternate; }
-@keyframes mo-shake { to { transform: rotate(7deg) scale(.94); } }
 .mo-log { margin: 0; min-height: 34px; max-width: 100%; font-size: 11px; line-height: 1.5; color: var(--text); }
 .mo-buy-who { width: 100%; font-size: 10.5px; color: var(--muted); }
 .mo-legend { display: flex; flex-wrap: wrap; gap: 6px; font-size: 10.5px; color: var(--muted); }

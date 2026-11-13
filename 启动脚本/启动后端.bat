@@ -36,6 +36,7 @@ if "%UP%"=="1" (
 rem ---------- 1) 定位后端项目 ----------
 if defined BACKEND_DIR goto :dir_ok
 for %%D in (
+    "D:\workSpace\java\backend-src.bak"
     "D:\workSpace\springBootTest"
     "%~dp0..\backend-src"
     "C:\workSpace\springBootTest"
@@ -94,6 +95,21 @@ for %%J in ("%JAVA_HOME%") do set "JAVA_HOME=%%~fJ"
 set "PATH=%JAVA_HOME%\bin;%PATH%"
 echo [2/4] JAVA_HOME : %JAVA_HOME%
 
+rem ---------- 2.9) fast path: run compiled classes directly (no Maven) ----------
+rem This machine has no standalone Maven; use the IntelliJ JBR + the jars already
+rem in ~/.m2 with the classpath exported in cp.txt. Falls back to Maven below.
+if exist "%~dp0start-backend-jbr.cjs" (
+    where node >nul 2>nul
+    if not errorlevel 1 (
+        set "SERVER_PORT="
+        set "SERVER__PORT="
+        echo [2.9/4] Fast path: run compiled classes directly (skip Maven) ...
+        set "BACKEND_DIR=%BACKEND_DIR%"
+        set "APP_PORT=%APP_PORT%"
+        node "%~dp0start-backend-jbr.cjs"
+        goto :bye
+    )
+)
 rem ---------- 3) 定位 Maven ----------
 set "MVN_CMD="
 if defined MAVEN_HOME if exist "%MAVEN_HOME%\bin\mvn.cmd" set "MVN_CMD=%MAVEN_HOME%\bin\mvn.cmd"

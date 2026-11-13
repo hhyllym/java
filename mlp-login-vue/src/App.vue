@@ -33,21 +33,26 @@
   </div>
 
   <div class="toast" :class="toastClass">{{ toastMsg }}</div>
+
+  <!-- 全局消息 / 好友申请弹窗：有未读或申请时浮出，点一下直达 -->
+  <NotificationPopup />
 </template>
 
 <script>
 import PonyBackground from './components/PonyBackground.vue'
 import ParticleBg from './components/ParticleBg.vue'
 import ClickSparkle from './components/ClickSparkle.vue'
+import NotificationPopup from './components/NotificationPopup.vue'
 import sound from './sound'
 import { initPresence, stopPresence } from './presence'
+import { startNotifyPolling, stopNotifyPolling } from './notify'
 
 const THEME_KEY = 'mlp_theme'
 const AUTO_INTERVAL = 8000 // 自动变色：每套主题停留 8 秒（颜色用 CSS 过渡平滑渐变，见 style.css）
 
 export default {
   name: 'App',
-  components: { PonyBackground, ParticleBg, ClickSparkle },
+  components: { PonyBackground, ParticleBg, ClickSparkle, NotificationPopup },
   provide() {
     return { toast: this.toast, sound }
   },

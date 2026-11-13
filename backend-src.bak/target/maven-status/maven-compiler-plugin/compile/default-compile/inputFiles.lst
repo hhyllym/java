@@ -14,6 +14,7 @@ D:\workSpace\java\backend-src.bak\src\main\java\com\fenglin\springboottest\contr
 D:\workSpace\java\backend-src.bak\src\main\java\com\fenglin\springboottest\controller\ChatController.java
 D:\workSpace\java\backend-src.bak\src\main\java\com\fenglin\springboottest\controller\FriendController.java
 D:\workSpace\java\backend-src.bak\src\main\java\com\fenglin\springboottest\controller\GameScoreController.java
+D:\workSpace\java\backend-src.bak\src\main\java\com\fenglin\springboottest\controller\HallController.java
 D:\workSpace\java\backend-src.bak\src\main\java\com\fenglin\springboottest\controller\HomeController.java
 D:\workSpace\java\backend-src.bak\src\main\java\com\fenglin\springboottest\controller\MessageController.java
 D:\workSpace\java\backend-src.bak\src\main\java\com\fenglin\springboottest\controller\MonopolyRoomController.java
@@ -30,6 +31,7 @@ D:\workSpace\java\backend-src.bak\src\main\java\com\fenglin\springboottest\entit
 D:\workSpace\java\backend-src.bak\src\main\java\com\fenglin\springboottest\entity\Friend.java
 D:\workSpace\java\backend-src.bak\src\main\java\com\fenglin\springboottest\entity\FriendRemark.java
 D:\workSpace\java\backend-src.bak\src\main\java\com\fenglin\springboottest\entity\GameScore.java
+D:\workSpace\java\backend-src.bak\src\main\java\com\fenglin\springboottest\entity\HallMessage.java
 D:\workSpace\java\backend-src.bak\src\main\java\com\fenglin\springboottest\entity\Message.java
 D:\workSpace\java\backend-src.bak\src\main\java\com\fenglin\springboottest\entity\Pet.java
 D:\workSpace\java\backend-src.bak\src\main\java\com\fenglin\springboottest\entity\PetCosmetic.java
@@ -45,6 +47,7 @@ D:\workSpace\java\backend-src.bak\src\main\java\com\fenglin\springboottest\mappe
 D:\workSpace\java\backend-src.bak\src\main\java\com\fenglin\springboottest\mapper\FriendMapper.java
 D:\workSpace\java\backend-src.bak\src\main\java\com\fenglin\springboottest\mapper\FriendRemarkMapper.java
 D:\workSpace\java\backend-src.bak\src\main\java\com\fenglin\springboottest\mapper\GameScoreMapper.java
+D:\workSpace\java\backend-src.bak\src\main\java\com\fenglin\springboottest\mapper\HallMessageMapper.java
 D:\workSpace\java\backend-src.bak\src\main\java\com\fenglin\springboottest\mapper\MessageMapper.java
 D:\workSpace\java\backend-src.bak\src\main\java\com\fenglin\springboottest\mapper\PetCosmeticMapper.java
 D:\workSpace\java\backend-src.bak\src\main\java\com\fenglin\springboottest\mapper\PetMapper.java
@@ -60,8 +63,10 @@ D:\workSpace\java\backend-src.bak\src\main\java\com\fenglin\springboottest\servi
 D:\workSpace\java\backend-src.bak\src\main\java\com\fenglin\springboottest\service\CategoryServiceImpl.java
 D:\workSpace\java\backend-src.bak\src\main\java\com\fenglin\springboottest\service\ChatService.java
 D:\workSpace\java\backend-src.bak\src\main\java\com\fenglin\springboottest\service\FriendService.java
+D:\workSpace\java\backend-src.bak\src\main\java\com\fenglin\springboottest\service\HallService.java
 D:\workSpace\java\backend-src.bak\src\main\java\com\fenglin\springboottest\service\impl\ChatServiceImpl.java
 D:\workSpace\java\backend-src.bak\src\main\java\com\fenglin\springboottest\service\impl\FriendServiceImpl.java
+D:\workSpace\java\backend-src.bak\src\main\java\com\fenglin\springboottest\service\impl\HallServiceImpl.java
 D:\workSpace\java\backend-src.bak\src\main\java\com\fenglin\springboottest\service\impl\MessageServiceImpl.java
 D:\workSpace\java\backend-src.bak\src\main\java\com\fenglin\springboottest\service\MessageService.java
 D:\workSpace\java\backend-src.bak\src\main\java\com\fenglin\springboottest\service\MonopolyRoomService.java

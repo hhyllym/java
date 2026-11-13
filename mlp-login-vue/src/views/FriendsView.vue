@@ -47,7 +47,7 @@
       <div v-else class="friend-list">
         <div v-for="f in visibleFriends" :key="f.id" class="friend-item" @click="openProfile(f)">
           <div class="friend-face-wrap">
-            <span class="friend-face" :style="{ background: faceBg(f.name) }">{{ f.avatar || f.name.slice(0, 1) }}</span>
+            <UserAvatar :user-id="f.id" :avatar="f.avatar" :name="f.name" :size="36" />
             <span v-if="onlineMap[f.id]" class="online-dot" title="在线"></span>
           </div>
           <div class="friend-main">
@@ -79,7 +79,7 @@
       <div v-else-if="!applies.length" class="empty small">暂时没有新的好友申请 📭</div>
       <div v-else class="friend-list">
         <div v-for="a in applies" :key="a.id" class="friend-item">
-          <span class="friend-face" :style="{ background: faceBg(a.name) }">{{ a.avatar || a.name.slice(0, 1) }}</span>
+          <UserAvatar :user-id="a.userId" :avatar="a.avatar" :name="a.name" :size="36" />
           <div class="friend-main">
             <b>{{ a.name }}</b>
             <em>{{ a.time }} · 「{{ a.applyMsg }}」</em>
@@ -96,7 +96,7 @@
       <div v-else-if="!sentApplies.length" class="empty small">还没有发出去的申请 ✨</div>
       <div v-else class="friend-list">
         <div v-for="a in sentApplies" :key="a.id" class="friend-item">
-          <span class="friend-face" :style="{ background: faceBg(a.name) }">{{ a.avatar || a.name.slice(0, 1) }}</span>
+          <UserAvatar :user-id="a.userId" :avatar="a.avatar" :name="a.name" :size="36" />
           <div class="friend-main">
             <b>{{ a.name }} <span class="state-chip" :class="a.state">{{ a.state === 'waiting' ? '等待对方同意' : '对方暂未通过' }}</span></b>
             <em>{{ a.time }} · 「{{ a.applyMsg }}」</em>
@@ -124,7 +124,7 @@
       <div v-if="searching" class="empty small">正在搜索…</div>
       <div v-else-if="results.length" class="friend-list">
         <div v-for="u in results" :key="u.id" class="friend-item">
-          <span class="friend-face" :style="{ background: faceBg(u.name) }">{{ u.avatar || u.name.slice(0, 1) }}</span>
+          <UserAvatar :user-id="u.id" :avatar="u.avatar" :name="u.name" :size="36" />
           <div class="friend-main">
             <b>{{ u.name }}</b>
             <em>ID: {{ u.id }}</em>
@@ -139,7 +139,7 @@
       <div v-else-if="!suggestions.length" class="empty small">糖霜镇暂时没有新伙伴，搜名字加好友吧 🌈</div>
       <div v-else class="friend-list">
         <div v-for="u in suggestions" :key="u.id" class="friend-item">
-          <span class="friend-face" :style="{ background: faceBg(u.name) }">{{ u.avatar || u.name.slice(0, 1) }}</span>
+          <UserAvatar :user-id="u.id" :avatar="u.avatar" :name="u.name" :size="36" />
           <div class="friend-main">
             <b>{{ u.name }} <span v-if="u.mutual" class="mutual-chip">{{ u.mutual }} 位共同好友</span></b>
             <em>{{ u.reason }}</em>
@@ -154,9 +154,12 @@
       <div v-if="profileTarget" class="sheet-mask" @click.self="profileTarget = null">
         <div class="sheet profile-sheet">
           <div class="profile-head">
-            <span class="friend-face big" :style="{ background: faceBg(profileTarget.name) }">
-              {{ profileTarget.avatar || profileTarget.name.slice(0, 1) }}
-            </span>
+            <UserAvatar
+              :user-id="profileTarget.id"
+              :avatar="profileTarget.avatar"
+              :name="profileTarget.name"
+              :size="56"
+            />
             <div class="ph-main">
               <h3>
                 {{ displayName(profileTarget) }}
@@ -231,7 +234,7 @@
           <div v-else class="invite-list">
             <label v-for="f in friends" :key="f.id" class="invite-row" :class="{ on: inviteIds.includes(f.id) }">
               <input type="checkbox" :value="f.id" v-model="inviteIds" />
-              <span class="friend-face tiny" :style="{ background: faceBg(f.name) }">{{ f.avatar || f.name.slice(0, 1) }}</span>
+              <UserAvatar :user-id="f.id" :avatar="f.avatar" :name="f.name" :size="24" />
               <b>{{ displayName(f) }}</b>
               <em :class="onlineMap[f.id] ? 'st-on' : 'st-off'">{{ onlineMap[f.id] ? '在线' : '离线' }}</em>
             </label>
@@ -314,9 +317,7 @@ import { apiAccountBind, apiAccountUnbind } from '../account'
 import { apiPresenceStatus } from '../presence'
 import { mpCreate, mpLan } from '../monopolyRoom'
 import sound from '../sound'
-
-/** 用名字 hash 生成柔和的头像底色，跟主题色系一致 */
-const FACE_COLORS = ['#f7a8c4', '#b79cf0', '#8fc7f0', '#a7e3c9', '#f7e08a', '#f0a06a', '#c9a0e8']
+import UserAvatar from '../components/UserAvatar.vue'
 
 /** 绑定关系定义（与后端 ShopDefs.relation 一致） */
 const RELATIONS = {
@@ -329,6 +330,7 @@ const RELATIONS = {
 
 export default {
   name: 'FriendsView',
+  components: { UserAvatar },
   inject: ['toast'],
   data() {
     return {
@@ -422,12 +424,6 @@ export default {
       if (res.code === 200 && res.data) this.onlineMap = res.data
     },
     goHome() { this.$router.push({ name: 'home' }) },
-    faceBg(name) {
-      let h = 0
-      const s = name || '小马'
-      for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 997
-      return FACE_COLORS[h % FACE_COLORS.length]
-    },
     displayName(f) { return (f && f.remark) || (f && f.name) || '小马' },
 
     /* ---------- 加载 ---------- */
@@ -705,14 +701,6 @@ export default {
   transition: border-color .15s, transform .15s; cursor: pointer;
 }
 .friend-item:hover { border-color: var(--primary); transform: translateY(-2px); }
-.friend-face {
-  width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  color: #fff; font-size: 17px; font-weight: 700;
-  box-shadow: 0 3px 8px rgba(160,108,213,.22);
-}
-.friend-face.big { width: 58px; height: 58px; font-size: 24px; }
-.friend-face.tiny { width: 28px; height: 28px; font-size: 12px; }
 .friend-face-wrap { position: relative; flex-shrink: 0; }
 .online-dot {
   position: absolute; right: 0; bottom: 0; width: 12px; height: 12px;

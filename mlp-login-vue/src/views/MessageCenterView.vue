@@ -41,7 +41,7 @@
 
       <div class="msg-list">
         <div v-for="m in board.list" :key="m.id" class="msg-item">
-          <span class="msg-avatar">{{ firstChar(m.fromName) }}</span>
+          <UserAvatar :user-id="m.fromId" :avatar="m.fromAvatar" :name="m.fromName" :size="36" />
           <div class="msg-body">
             <div class="msg-head">
               <b>{{ m.fromName }}</b>
@@ -88,7 +88,12 @@
           :class="{ unread: m.readFlag === 0 && pmBox === 'inbox' }"
           @click="openPm(m)"
         >
-          <span class="msg-avatar">{{ firstChar(pmBox === 'inbox' ? m.fromName : m.toName) }}</span>
+          <UserAvatar
+            :user-id="pmBox === 'inbox' ? m.fromId : m.toId"
+            :avatar="pmBox === 'inbox' ? m.fromAvatar : m.toAvatar"
+            :name="pmBox === 'inbox' ? m.fromName : m.toName"
+            :size="36"
+          />
           <div class="msg-body">
             <div class="msg-head">
               <b>{{ pmBox === 'inbox' ? m.fromName : '→ ' + m.toName }}</b>
@@ -117,7 +122,10 @@
           :class="{ unread: m.readFlag === 0 }"
           @click="readNotify(m)"
         >
-          <span class="msg-avatar sys">🔔</span>
+          <span v-if="m.fromId && m.fromId !== -1" class="msg-avatar-wrap">
+            <UserAvatar :user-id="m.fromId" :avatar="m.fromAvatar" :name="m.fromName" :size="36" />
+          </span>
+          <span v-else class="msg-avatar sys">🔔</span>
           <div class="msg-body">
             <div class="msg-head">
               <b>{{ m.fromName }}</b>
@@ -141,6 +149,7 @@ import {
   apiBoardList, apiBoardPost, apiPmList, apiPmSend, apiPmRead,
   apiNotifyList, apiNotifyRead, apiUnread
 } from '../message'
+import UserAvatar from '../components/UserAvatar.vue'
 
 function emptyPage() {
   return { list: [], total: 0, page: 1, hasMore: false, loading: false }
@@ -148,6 +157,7 @@ function emptyPage() {
 
 export default {
   name: 'MessageCenterView',
+  components: { UserAvatar },
   inject: ['toast'],
   data() {
     return {
@@ -177,9 +187,6 @@ export default {
   methods: {
     goHome() {
       this.$router.push({ name: 'home' })
-    },
-    firstChar(name) {
-      return name ? name.charAt(0) : '?'
     },
     async refreshUnread() {
       if (!this.session.id) return

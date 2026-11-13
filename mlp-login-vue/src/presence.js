@@ -58,19 +58,22 @@ export function apiPresenceStatus(ids) {
 let beatTimer = null
 
 /**
- * 启动全局心跳：每 30 秒给"当前登录用户"上报一次。
+ * 启动全局心跳：先立刻上报一次，然后每 30 秒给"当前登录用户"上报一次。
  * 用 getSession 实时读取，所以切换账号 / 退出后自然会对新用户生效。
  */
 export function initPresence() {
   stopPresence()
-  beatTimer = setInterval(() => {
+  const beat = () => {
     try {
       const raw = localStorage.getItem('mlp_session') || sessionStorage.getItem('mlp_session')
       if (!raw) return
       const s = JSON.parse(raw)
       if (s && s.id) apiPresenceBeat(s.id)
     } catch (e) {}
-  }, 30000)
+  }
+  // 立刻打一次：不然刚进大厅 / 好友页时，在线列表要等 30 秒才有自己
+  beat()
+  beatTimer = setInterval(beat, 30000)
 }
 
 /** 停止心跳并上报离线（页面卸载 / 应用销毁时调用） */

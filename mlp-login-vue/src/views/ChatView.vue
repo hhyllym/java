@@ -3,7 +3,9 @@
     <!-- 顶部：返回 + 好友名字（有备注显示备注）+ 快捷打电话 -->
     <div class="home-top">
       <button class="chat-back" title="返回好友列表" @click="goBack">‹</button>
-      <div class="friend-face chat-head-face" :style="{ background: faceBg }">{{ name.slice(0, 1) }}</div>
+      <div class="chat-head-face" :style="{ background: faceBg }">
+            <UserAvatar :user-id="id" :avatar="friendAvatar" :name="name" :size="40" />
+          </div>
       <div class="home-greet">
         <h2>{{ remark || name }}</h2>
         <p>{{ remark ? '备注 ' + name + ' · ' : '' }}ID: {{ id }} · {{ typingHint || onlineText }}</p>
@@ -29,7 +31,9 @@
           <!-- 时间分隔线：第一条，或与上一条间隔 ≥5 分钟 -->
           <div v-if="needTimeSep(m, i)" class="time-sep"><span>{{ m.time }}</span></div>
           <div class="bubble-row" :class="{ mine: m.mine }">
-            <span v-if="!m.mine" class="bubble-face" :style="{ background: faceBg }">{{ name.slice(0, 1) }}</span>
+            <span v-if="!m.mine" class="bubble-face" :style="{ background: faceBg }">
+              <UserAvatar :user-id="id" :avatar="friendAvatar" :name="name" :size="32" />
+            </span>
             <div class="bubble" :class="{ mine: m.mine, call: m.type === 'call' }">
               <!-- 撤回态 -->
               <span v-if="m.recalled" class="bubble-text recalled">{{ m.mine ? '你撤回了一条消息' : '对方撤回了一条消息' }}</span>
@@ -133,7 +137,7 @@
       <div v-if="call" class="call-mask">
         <div class="call-body">
           <div class="call-avatar" :class="{ ring: call.state === 'calling' }" :style="{ background: faceBg }">
-            {{ name.slice(0, 1) }}
+            <UserAvatar :user-id="id" :avatar="friendAvatar" :name="name" :size="108" />
           </div>
           <h3>{{ name }}</h3>
           <p class="call-status">{{ callStatusText }}</p>
@@ -153,10 +157,12 @@
 <script>
 import { getSession } from '../auth'
 import { apiHistory, apiSend, apiSendImage, apiRecall, apiCallLog, apiMarkRead } from '../chat'
+import { apiAccountProfile } from '../account'
 import { apiPresenceStatus } from '../presence'
 import { bump } from '../quest'
 import sound from '../sound'
 import PetBadge from '../components/PetBadge.vue'
+import UserAvatar from '../components/UserAvatar.vue'
 
 /** 表情面板：小马乐园常用萌系表情 */
 const EMOJIS = ['😊', '😂', '🥰', '😍', '🤩', '😘', '😜', '🤗', '😴', '😎',
@@ -166,7 +172,7 @@ const EMOJIS = ['😊', '😂', '🥰', '😍', '🤩', '😘', '😜', '🤗', 
 
 export default {
   name: 'ChatView',
-  components: { PetBadge },
+  components: { PetBadge, UserAvatar },
   inject: ['toast'],
   data() {
     return {
@@ -174,6 +180,8 @@ export default {
       id: this.$route.params.id,
       name: this.$route.query.name || '小马',
       remark: this.$route.query.remark || '',
+      // 对方的头像（打开聊天时查一次账号资料）
+      friendAvatar: this.$route.query.avatar || '',
       messages: [],
       draft: '',
       loading: true,
@@ -285,6 +293,15 @@ export default {
       // 打开聊天就把对方发来的消息标为已读
       apiMarkRead(this.session.id, this.id)
       this.refreshPresence()
+      this.loadFriendAvatar()
+    },
+    /** 拉一次对方的当前头像（聊天接口不返回头像） */
+    async loadFriendAvatar() {
+      if (!this.id) return
+      try {
+        const r = await apiAccountProfile(this.id)
+        if (r.code === 200 && r.data) this.friendAvatar = r.data.avatar || ''
+      } catch (e) { /* 拿不到就用默认小马脸 */ }
     },
     async poll() {
       const res = await apiHistory(this.session.id, this.id)
@@ -644,6 +661,8 @@ export default {
   width: 40px; height: 40px; font-size: 17px; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
   color: #fff; font-weight: 700;
+  background: transparent !important;
+  box-shadow: none;
 }
 .chat-call-btn {
   border: none; background: var(--panel); color: var(--primary);
@@ -677,6 +696,8 @@ export default {
   width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
   color: #fff; font-size: 14px; font-weight: 700;
+  background: transparent !important;
+  box-shadow: none;
 }
 .bubble {
   position: relative; max-width: 72%; padding: 7px 11px 6px;
@@ -932,6 +953,8 @@ export default {
   border-radius: 50%; font-size: 42px; font-weight: 700;
   display: flex; align-items: center; justify-content: center;
   box-shadow: 0 12px 36px rgba(0,0,0,.4);
+  background: transparent !important;
+  overflow: hidden;
 }
 .call-avatar.ring { animation: callRing 1.6s ease-in-out infinite; }
 @keyframes callRing {

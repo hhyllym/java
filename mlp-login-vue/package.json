@@ -2,6 +2,28 @@
   "name": "mlp-login-vue",
   "private": true,
   "version": "1.0.0",
+  "description": "星糖谷 · 原创小马主题全栈实训项目前端（Vue 3 + Vite）",
+  "license": "MIT",
+  "author": "hhyllym",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hhyllym/java.git",
+    "directory": "mlp-login-vue"
+  },
+  "homepage": "https://github.com/hhyllym/java#readme",
+  "bugs": {
+    "url": "https://github.com/hhyllym/java/issues"
+  },
+  "keywords": [
+    "vue3",
+    "vite",
+    "spring-boot",
+    "minigame",
+    "star-sugar-valley"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",

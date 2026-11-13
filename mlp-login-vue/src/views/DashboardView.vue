@@ -280,7 +280,7 @@ export default {
     isImage(v) {
       return typeof v === 'string' && (v.startsWith('data:') || v.startsWith('http'))
     },
-    /** 上传本地图片当作头像：读图 → 居中裁成 160×160 → 压成 PNG dataURL → 存本地 */
+    /** 上传本地图片当作头像：读图 → 居中裁成 160×160 → 压成 PNG dataURL → 存后端 + 本地 */
     async onAvatarFile(e) {
       const file = e.target.files && e.target.files[0]
       if (!file) return
@@ -289,8 +289,15 @@ export default {
         this.toast('图片读取出错啦', 'err')
         return
       }
+      // 先存后端：这样大厅、好友列表里别人也能看到我的头像
+      const r = await apiAccountUpdate(this.session.id, { avatar: dataUrl })
+      if (r.code !== 200) {
+        this.toast(r.msg || '头像上传失败', 'err')
+        return
+      }
       localStorage.setItem('mlp_avatar_' + this.session.id, dataUrl)
       this.customAvatar = dataUrl
+      this.account.avatar = dataUrl
       this.avatarPicker = false
       this.toast('头像换好啦 🖼', 'ok')
     },
@@ -318,9 +325,12 @@ export default {
       })
     },
     /** 清除本地自定义图片，回到 emoji 默认 */
-    resetCustomAvatar() {
+    async resetCustomAvatar() {
       localStorage.removeItem('mlp_avatar_' + this.session.id)
       this.customAvatar = ''
+      // 后端也清掉（换成默认的 🦄），否则别人那边还显示着旧图片
+      const r = await apiAccountUpdate(this.session.id, { avatar: '🦄' })
+      if (r.code === 200) this.account.avatar = '🦄'
       this.toast('已切换回默认头像 🦄', 'ok')
     },
     startRename() {

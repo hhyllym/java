@@ -2,3 +2,17 @@ node_modules
 dist
 .DS_Store
 *.local
+
+# 日志 / 本地临时文件
+*.log
+vite-tail.txt
+fe-check2.txt
+
+# 编辑器
+.vscode/
+.idea/
+
+# 环境变量
+.env
+.env.*
+!.env.example

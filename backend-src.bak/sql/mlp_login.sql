@@ -1,17 +1,17 @@
 /*
  Navicat Premium Dump SQL
 
- Source Server         : AFSf
+ Source Server         : yy
  Source Server Type    : MySQL
- Source Server Version : 80408 (8.4.8)
+ Source Server Version : 80039 (8.0.39)
  Source Host           : localhost:3306
  Source Schema         : mlp_login
 
  Target Server Type    : MySQL
- Target Server Version : 80408 (8.4.8)
+ Target Server Version : 80039 (8.0.39)
  File Encoding         : 65001
 
- Date: 13/11/2026 20:59:18
+ Date: 16/11/2026 11:52:29
 */
 
 SET NAMES utf8mb4;
@@ -137,7 +137,7 @@ CREATE TABLE `t_game_score`  (
   `create_time` datetime NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_game`(`game_id` ASC, `score` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 29 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 29 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_game_score
@@ -186,7 +186,7 @@ CREATE TABLE `t_hall_message`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_t_hall_message_time`(`create_time` ASC) USING BTREE,
   INDEX `idx_t_hall_message_user`(`user_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 23 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '星糖谷大厅公共聊天' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 23 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '星糖谷大厅公共聊天' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_hall_message
@@ -284,7 +284,7 @@ CREATE TABLE `t_pet_cosmetic`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_user_cosmetic`(`user_id` ASC, `cosmetic_id` ASC) USING BTREE,
   INDEX `idx_equipped`(`user_id` ASC, `equipped` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '宠物装扮' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '宠物装扮' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_pet_cosmetic

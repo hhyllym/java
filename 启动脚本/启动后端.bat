@@ -103,7 +103,7 @@ if exist "%~dp0start-backend-jbr.cjs" (
     if not errorlevel 1 (
         set "SERVER_PORT="
         set "SERVER__PORT="
-        echo [2.9/4] Fast path: run compiled classes directly (skip Maven) ...
+        echo [2.9/4] Fast path: run compiled classes directly ^(skip Maven^) ...
         set "BACKEND_DIR=%BACKEND_DIR%"
         set "APP_PORT=%APP_PORT%"
         node "%~dp0start-backend-jbr.cjs"

@@ -3,8 +3,8 @@
     <!-- HUD：剩余步数 + 提示按钮 + 当前得分 -->
     <div class="m3-hud">
       <span class="m3-moves">剩余步数 <b>{{ moves }}</b></span>
-      <button class="m3-auto-btn" :class="{ on: auto }" @click="toggleAuto">
-        {{ auto ? '✨ 智能点消' : '✋ 手动交换' }}
+      <button class="m3-auto-btn" :class="{ on: mode === 'pick' }" @click="toggleAuto">
+        {{ mode === 'pick' ? '👆 点击消除' : (mode === 'auto' ? '✨ 智能点消' : '✋ 手动交换') }}
       </button>
       <button class="m3-hint-btn" :disabled="busy || stage !== 'play'" @click="showHint">💡 提示</button>
       <span class="m3-total">得分 {{ score }}</span>
@@ -14,12 +14,13 @@
     <div v-if="stage === 'ready'" class="m3-stage m3-ready">
       <div class="m3-mascot">🍬</div>
       <h3>糖豆消消乐</h3>
-      <p>泡芙的糖果罐打翻啦！把 <b>3 颗以上同色糖豆</b> 连成一线就能消除，<br>步数内尽量刷高分，连锁消除还有翻倍奖励 ✨</p>
+      <p>泡芙的糖果罐打翻啦！点 <b>2 颗以上相邻的同色糖豆</b> 就能消除，<br>步数内尽量刷高分，连锁消除还有翻倍奖励 ✨</p>
       <ul class="m3-tip-list">
-        <li>👆 <b>点一下任意糖豆</b>，泡芙会自动帮你换到能消的位置 —— <b>点哪颗都能消</b>！</li>
-        <li>✋ 想自己找？点上面的「✨ 智能点消」切到手动，先点一颗再点相邻那颗交换</li>
-        <li>💡 点「提示」会<b>发光标出一对</b>；全场没组合了会自动重排，不会卡死</li>
-        <li>🔥 一次交换引发连锁，每多消一轮得分翻倍</li>
+        <li>👆 <b>点第一颗，再点相邻的同色糖豆</b> —— 凑够 <b>2 颗</b> 就消除，连成 <b>3 颗以上</b> 整条一起消！</li>
+        <li>✋ 想省事？点上面的按钮切到「✨ 智能点消」，点任意一颗泡芙就帮你消</li>
+        <li>🔁 想自己找？再点一次按钮切到「✋ 手动交换」，先点一颗再点相邻那颗交换</li>
+        <li>💡 点「提示」会<b>发光标出</b>能消的一组；全场没组合了会自动重排，不会卡死</li>
+        <li>🔥 一次消除引发连锁，每多消一轮得分翻倍</li>
       </ul>
       <button class="m3-btn big" @click="start">开始消除！</button>
     </div>
@@ -32,7 +33,7 @@
           :key="i"
           class="m3-cell"
           :class="{
-            sel: i === sel,
+            sel: i === sel || picked.includes(i),
             breaking: cell.breaking,
             hint: hintCells.includes(i),
             autoPick: swapCells.includes(i),
@@ -42,7 +43,7 @@
           @click="tap(i)"
         ><span v-if="cell.type != null">{{ TYPES[cell.type].e }}</span></button>
       </div>
-      <p class="m3-hint">{{ busy ? '消除中…' : (auto ? '点任意一颗糖豆，泡芙自动帮你消 ✨' : (sel == null ? '点一颗糖豆开始' : '再点相邻的那颗交换')) }}</p>
+      <p class="m3-hint">{{ busy ? '消除中…' : bottomHint }}</p>
       <p v-if="notice" class="m3-notice">{{ notice }}</p>
       <button class="m3-btn ghost" @click="restart">重开一局</button>
     </div>
@@ -78,6 +79,8 @@ export default {
       stage: 'ready',
       cells: [],          // 长度 R*C，元素 { type:0..5|null, breaking:bool }
       sel: null,
+      // 点选模式下已选中的格子下标（相邻同色链）
+      picked: [],
       moves: 20,
       usedMoves: 0,
       score: 0,
@@ -86,7 +89,8 @@ export default {
       // ↓ 本次新增：提示 / 无效交换反馈 / 死局洗牌
       hintCells: [],
       swapCells: [],
-      auto: true,
+      // 玩法模式：'pick'=点击消除（默认） 'auto'=智能点消 'swap'=手动交换
+      mode: 'pick',
       queuedTap: null,
       shakeCells: [],
       hintsUsed: 0,
@@ -97,8 +101,28 @@ export default {
     }
   },
   created() {
-    // 默认「点一下就消」；想自己交换的玩家可切手动，选择记在本地
-    try { this.auto = localStorage.getItem('mlp_m3_auto') !== '0' } catch (e) { this.auto = true }
+    // 默认「点选消除」；玩家切过模式就记在本地
+    // （兼容老版本存下来的 mlp_m3_auto：'0'=手动交换, '1'=智能点消）
+    try {
+      const saved = localStorage.getItem('mlp_m3_mode')
+      if (saved === 'pick' || saved === 'auto' || saved === 'swap') {
+        this.mode = saved
+      } else {
+        const old = localStorage.getItem('mlp_m3_auto')
+        this.mode = old === '0' ? 'swap' : 'pick'
+      }
+    } catch (e) { this.mode = 'pick' }
+  },
+  computed: {
+    /** 底部提示文案：跟着当前模式走 */
+    bottomHint() {
+      if (this.mode === 'pick') {
+        if (this.picked.length === 0) return '点一颗糖豆，再点相邻的同色糖豆，凑够 2 颗就消除 👆'
+        return `已选 ${this.picked.length} 颗，再点相邻同色的就消除 ✨`
+      }
+      if (this.mode === 'auto') return '点任意一颗糖豆，泡芙自动帮你消 ✨'
+      return this.sel == null ? '点一颗糖豆开始' : '再点相邻的那颗交换'
+    }
   },
   beforeUnmount() {
     this.alive = false
@@ -120,6 +144,7 @@ export default {
       this.maxCascade = 1
       this.hintsUsed = 0
       this.sel = null
+      this.picked = []
       this.busy = false
       this.hintCells = []
       this.swapCells = []
@@ -135,6 +160,8 @@ export default {
       this.notice = ''
       this.hintCells = []
       this.swapCells = []
+      this.picked = []
+      this.sel = null
       this.queuedTap = null
       this.shakeCells = []
       clearTimeout(this.noticeTimer)
@@ -142,7 +169,7 @@ export default {
       this.$emit('score', 0)
     },
 
-    /* 生成无初始三连、且「保证有可行交换」的棋盘 */
+    /* 生成无初始三连、且「保证有可行组合」的棋盘 */
     genBoard() {
       for (let attempt = 0; attempt < 40; attempt++) {
         const arr = new Array(this.R * this.C)
@@ -159,7 +186,12 @@ export default {
           }
         }
         this.cells = arr
-        if (this.findHint()) return
+        // 点选模式：只要有相邻同色就能消；其它模式要能交换出三连
+        if (this.mode === 'pick') {
+          if (this.findClickablePair()) return
+        } else if (this.findHint()) {
+          return
+        }
       }
       // 极端兜底：直接重排现有糖豆，直到有解
       this.shuffleBoard()
@@ -237,7 +269,7 @@ export default {
       return null
     },
 
-    /** 洗牌：随机重排现有糖豆，直到「无自动三连」且「有可行交换」 */
+    /** 洗牌：随机重排现有糖豆，直到「无自动三连」且「有可行组合」 */
     shuffleBoard() {
       const types = this.cells.map(c => c.type)
       for (let attempt = 0; attempt < 80; attempt++) {
@@ -246,7 +278,12 @@ export default {
           const t = types[i]; types[i] = types[j]; types[j] = t
         }
         this.cells = types.map(t => ({ type: t, breaking: false }))
-        if (this.findMatches().length === 0 && this.findHint()) return
+        // 点选模式：只要有相邻同色即可消
+        if (this.mode === 'pick') {
+          if (this.findClickablePair()) return
+        } else if (this.findMatches().length === 0 && this.findHint()) {
+          return
+        }
       }
       // 实在洗不出来就整盘重生成
       this.cells = types.map(t => ({ type: t, breaking: false }))
@@ -254,7 +291,11 @@ export default {
 
     /** 每轮连锁结束后兜底：全场没组合就自动洗牌，不让玩家卡死 */
     async ensurePlayable() {
-      if (this.findHint()) return
+      // 点选模式：只要有「相邻同色」就能消；其它模式需要「能交换出三连」
+      const hasCombo = this.mode === 'pick'
+        ? !!this.findClickablePair()
+        : !!this.findHint()
+      if (hasCombo) return
       this.notice = '🌀 没有能消的组合啦，糖豆自动重排一下～'
       sound.magic()
       await this.sleep(420)
@@ -268,23 +309,55 @@ export default {
       if (this.stage !== 'play' || this.busy) return
       this.idleTimer = setTimeout(() => {
         if (!this.alive || this.stage !== 'play' || this.busy || this.sel != null) return
-        const h = this.findHint()
+        // 点选模式下找「能直接点消的一对」，其它模式沿用原来的交换提示
+        const h = this.mode === 'pick' ? this.findClickablePair() : this.findHint()
         if (h) {
           this.hintCells = h
-          this.notice = this.auto ? '💡 点任意一颗糖豆，泡芙就会帮你消～' : '💡 卡住了？发光的这两颗换一下就能消～'
+          this.notice = this.mode === 'pick'
+            ? '💡 卡住了？发光的这两颗点一下就能消～'
+            : (this.mode === 'auto'
+              ? '💡 点任意一颗糖豆，泡芙就会帮你消～'
+              : '💡 卡住了？发光的这两颗换一下就能消～')
         }
       }, 6000)
     },
 
+    /**
+     * 找一对「相邻且同色」的糖豆 —— 点选模式下这俩直接点就能消除。
+     * 顺带把整条同色连线都标出来（3 颗以上整条消）。
+     */
+    findClickablePair() {
+      const { R, C } = this
+      for (let r = 0; r < R; r++) {
+        for (let c = 0; c < C; c++) {
+          const a = this.idx(r, c)
+          const ta = this.cellAt(r, c).type
+          if (ta == null) continue
+          // 先看左右
+          if (c + 1 < C && this.cellAt(r, c + 1).type === ta) {
+            return this.expandLine([a, this.idx(r, c + 1)])
+          }
+          // 再看上下
+          if (r + 1 < R && this.cellAt(r + 1, c).type === ta) {
+            return this.expandLine([a, this.idx(r + 1, c)])
+          }
+        }
+      }
+      return null
+    },
+
     showHint() {
       if (this.busy || this.stage !== 'play') return
-      const h = this.findHint()
+      // 点选模式：直接点亮可以点消的一对（不需要交换）
+      const h = this.mode === 'pick' ? this.findClickablePair() : this.findHint()
       if (!h) { this.ensurePlayable(); return }
       this.hintCells = h
       this.hintsUsed += 1
-      this.notice = this.auto
-        ? '✨ 智能点消已开，直接点任意一颗就能消～'
-        : '✨ 发光的这两颗换一下就能消啦（不扣步数）'
+      this.notice = this.mode === 'pick'
+        ? '✨ 发光的这几颗点一下就能消啦（不扣步数）'
+        : (this.mode === 'auto'
+          ? '✨ 智能点消已开，直接点任意一颗就能消～'
+          : '✨ 发光的这两颗换一下就能消啦（不扣步数）')
       sound.twinkle()
       clearTimeout(this.noticeTimer)
       this.noticeTimer = setTimeout(() => {
@@ -335,8 +408,156 @@ export default {
       // 消除动画期间的点击不丢：记下最后一次，动画结束自动补消
       if (this.busy) { this.queuedTap = i; return }
       clearTimeout(this.idleTimer)
-      if (!this.auto) return this.manualTap(i)
-      return this.autoPlay(i)
+      // 三种玩法：pick=点击消除（默认） / auto=智能点消 / swap=手动交换
+      if (this.mode === 'pick') return this.tapPick(i)
+      if (this.mode === 'auto') return this.autoPlay(i)
+      return this.manualTap(i)
+    },
+
+    /* ---------- 点选消除模式 ---------- */
+    // 规则：点第一颗 → 再点相邻同色的糖豆把它们连起来，
+    //       凑够 2 颗就消除，连成 3 颗以上则整条一起消。
+    //       点非相邻的糖豆 = 重新开始选；再点已选的 = 取消选中。
+
+    /** 与格子 i 相邻的格子下标 */
+    neighborsOf(i) {
+      const r = Math.floor(i / this.C), c = i % this.C
+      const out = []
+      if (r > 0) out.push(this.idx(r - 1, c))
+      if (r < this.R - 1) out.push(this.idx(r + 1, c))
+      if (c > 0) out.push(this.idx(r, c - 1))
+      if (c < this.C - 1) out.push(this.idx(r, c + 1))
+      return out
+    },
+
+    /**
+     * 以已选链的最后一颗为端点，试着把 i 接上去。
+     * 只有「与链尾相邻」且「同色」才接得上。
+     */
+    canExtendChain(i) {
+      if (this.picked.length === 0) return true
+      if (this.picked.includes(i)) return false
+      const tail = this.picked[this.picked.length - 1]
+      const t1 = this.cellAt(Math.floor(tail / this.C), tail % this.C).type
+      const t2 = this.cellAt(Math.floor(i / this.C), i % this.C).type
+      if (t1 == null || t2 == null || t1 !== t2) return false
+      return this.neighborsOf(tail).includes(i)
+    },
+
+    /** 点选消除的主入口 */
+    async tapPick(i) {
+      const cell = this.cellAt(Math.floor(i / this.C), i % this.C)
+      if (!cell || cell.type == null) return
+
+      // 已经选中的 → 取消选中
+      if (this.picked.includes(i)) {
+        this.picked = this.picked.filter(x => x !== i)
+        sound.hover()
+        this.updatePickHint()
+        return
+      }
+
+      // 不能接到当前链尾 → 重新开始选
+      if (!this.canExtendChain(i)) {
+        this.picked = [i]
+        sound.hover()
+        this.updatePickHint()
+        return
+      }
+
+      this.picked = [...this.picked, i]
+      sound.click()
+
+      // 满 2 颗就消除
+      if (this.picked.length >= 2) {
+        await this.eliminatePicked()
+        return
+      }
+      this.updatePickHint()
+    },
+
+    /** 提示文字：告诉玩家现在选了几颗、还能怎么点 */
+    updatePickHint() {
+      if (this.picked.length === 0) {
+        this.notice = ''
+        return
+      }
+      this.notice = `已选 ${this.picked.length} 颗，再点一颗相邻同色的就消除 ✨`
+    },
+
+    /** 把选中的那几颗消掉，并结算连锁 */
+    async eliminatePicked() {
+      this.busy = true
+      const picked = [...this.picked]
+      this.picked = []
+      this.hintCells = []
+      this.swapCells = []
+      this.shakeCells = []
+
+      this.moves -= 1
+      this.usedMoves += 1
+
+      // 选中的是 2 颗时，再看看能不能顺带连成更长的线（3+ 整条消）
+      const line = this.expandLine(picked)
+      this.score += line.length * 10
+      this.$emit('score', this.score)
+      if (line.length >= 3) sound.magic(); else sound.pop()
+
+      for (const m of line) this.cells[m].breaking = true
+      this.cells = this.cells.slice()
+      await this.sleep(220)
+      for (const m of line) this.cells[m].type = null
+      this.cells = this.cells.slice()
+      this.gravityRefill()
+      await this.sleep(120)
+
+      // 消除后可能又自动连出新的一组，继续连锁
+      await this.cascade()
+
+      this.busy = false
+      this.afterAction()
+    },
+
+    /**
+     * 把选中的几颗往两端扩展，找出一条完整的同色连线。
+     * 例如选中 (2,2) 和 (2,3)，若 (2,1)(2,4) 也同色，则 4 颗整条消除。
+     */
+    expandLine(picked) {
+      const { R, C } = this
+      const type = this.cellAt(Math.floor(picked[0] / C), picked[0] % C).type
+      if (type == null) return picked
+
+      const inSet = new Set(picked)
+      const typeAt = (r, c) => {
+        if (r < 0 || r >= R || c < 0 || c >= C) return null
+        return this.cellAt(r, c).type
+      }
+
+      // 选中的是竖直相邻 → 找竖直连线；横向相邻 → 找横向连线
+      const r0 = Math.floor(picked[0] / C), c0 = picked[0] % C
+      const r1 = Math.floor(picked[picked.length - 1] / C), c1 = picked[picked.length - 1] % C
+      const vertical = r0 !== r1
+
+      const line = new Set(picked)
+      if (vertical) {
+        const col = c0
+        let up = r0
+        while (typeAt(up - 1, col) === type) { up--; line.add(this.idx(up, col)) }
+        let down = r1
+        while (typeAt(down + 1, col) === type) { down++; line.add(this.idx(down, col)) }
+      } else {
+        const row = r0
+        let left = c0
+        while (typeAt(row, left - 1) === type) { left--; line.add(this.idx(row, left)) }
+        let right = c1
+        while (typeAt(row, right + 1) === type) { right++; line.add(this.idx(row, right)) }
+      }
+      // 去掉选中的链里非同色的（理论上不会有，保险）
+      for (const p of [...line]) {
+        const r = Math.floor(p / C), c = p % C
+        if (typeAt(r, c) !== type) line.delete(p)
+      }
+      return [...line]
     },
 
     /* 一次操作结束：解锁 + 结算检查 + 补上动画期间排队的点击 */
@@ -352,12 +573,20 @@ export default {
     },
 
     toggleAuto() {
-      this.auto = !this.auto
-      try { localStorage.setItem('mlp_m3_auto', this.auto ? '1' : '0') } catch (e) { /* 隐私模式忽略 */ }
+      // 三态循环：点击消除 → 智能点消 → 手动交换 → 点击消除
+      const order = ['pick', 'auto', 'swap']
+      const next = order[(order.indexOf(this.mode) + 1) % order.length]
+      this.mode = next
+      try { localStorage.setItem('mlp_m3_mode', next) } catch (e) { /* 隐私模式忽略 */ }
       this.sel = null
+      this.picked = []
       this.queuedTap = null
       this.clearFeedback()
-      this.notice = this.auto ? '✨ 智能点消已开：点任意一颗就能消～' : '✋ 手动交换：先点一颗，再点上下左右相邻的那颗'
+      this.notice = next === 'pick'
+        ? '👆 点击消除：点一颗，再点相邻同色的，凑够 2 颗就消'
+        : (next === 'auto'
+          ? '✨ 智能点消已开：点任意一颗就能消～'
+          : '✋ 手动交换：先点一颗，再点上下左右相邻的那颗')
       sound.click()
       clearTimeout(this.noticeTimer)
       this.noticeTimer = setTimeout(() => { this.notice = '' }, 2600)
@@ -478,11 +707,36 @@ export default {
       this.afterAction()
     },
 
+    /**
+     * 找出当前模式下应该被消除的格子。
+     * - pick 模式：相邻 2 颗同色就算一组（点一下就能消）
+     * - 其它模式：3 颗以上连成一线
+     */
+    findEliminations() {
+      if (this.mode !== 'pick') return this.findMatches()
+      const { R, C } = this
+      const set = new Set()
+      for (let r = 0; r < R; r++) {
+        for (let c = 0; c < C; c++) {
+          const t = this.cellAt(r, c).type
+          if (t == null) continue
+          const right = c + 1 < C ? this.cellAt(r, c + 1).type : null
+          const down = r + 1 < R ? this.cellAt(r + 1, c).type : null
+          if (right === t || down === t) {
+            set.add(this.idx(r, c))
+            if (right === t) set.add(this.idx(r, c + 1))
+            if (down === t) set.add(this.idx(r + 1, c))
+          }
+        }
+      }
+      return [...set]
+    },
+
     /* 连锁消除，每多一轮得分翻倍 */
     async cascade() {
       let chain = 0
       while (this.alive) {
-        const matches = this.findMatches()
+        const matches = this.findEliminations()
         if (matches.length === 0) break
         chain += 1
         this.maxCascade = Math.max(this.maxCascade, chain)

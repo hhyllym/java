@@ -133,7 +133,8 @@ if (missing.length) {
   console.error(`[X] 有 ${missing.length} 个依赖 jar 不在本地仓库（~/.m2），需要先跑一次 Maven 下载：`)
   missing.slice(0, 8).forEach(m => console.error('    ' + m))
   if (missing.length > 8) console.error(`    ... 还有 ${missing.length - 8} 个`)
-  process.exit(1)
+  console.error("    （启动脚本检测到退出码 2，会自动回退 Maven 联网补齐）")
+  process.exit(2)
 }
 const cp = [classes, ...jars].join(';')
 
@@ -145,6 +146,88 @@ delete env.SERVER__PORT
 env.JAVA_HOME = JAVA_HOME
 env.SERVER_PORT = APP_PORT
 
+// --- 源码新鲜度自检：源码改了没重编就自动编译 ----------------------------
+// 背景（2026-11-18 大厅发消息 404 事故）：Git 检出的 target/classes 是旧产物，
+// 新增的 HallController 等源码从未编译，fast path 直接跑旧 class -> 接口 404。
+// 这里在启动前逐个比对 .java 与 .class，发现源码更新 / class 缺失就自动 mvn compile。
+function walkJava(dir, out) {
+  let ents = []
+  try { ents = fs.readdirSync(dir, { withFileTypes: true }) } catch (_) { return out }
+  for (const e of ents) {
+    const full = path.join(dir, e.name)
+    if (e.isDirectory()) walkJava(full, out)
+    else if (e.name.endsWith('.java')) out.push(full)
+  }
+  return out
+}
+function detectMavenCmd() {
+  const cands = []
+  for (const k of ['MAVEN_HOME', 'M2_HOME']) {
+    if (process.env[k]) cands.push(path.join(process.env[k], 'bin', 'mvn.cmd'))
+  }
+  const roots = ['D:\\', 'C:\\', 'D:\\Program Files\\JetBrains', 'C:\\Program Files\\JetBrains']
+  for (const r of roots) {
+    let names = []
+    try { names = fs.readdirSync(r) } catch (_) { continue }
+    for (const n of names) {
+      cands.push(path.join(r, n, 'plugins', 'maven', 'lib', 'maven3', 'bin', 'mvn.cmd'))
+      cands.push(path.join(r, n, 'bin', 'mvn.cmd'))
+    }
+  }
+  try {
+    const w = execSync('where mvn.cmd', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] })
+    for (const line of w.split(/\r?\n/)) if (line.trim()) cands.push(line.trim())
+  } catch (_) {}
+  return cands.find(p => { try { return fs.existsSync(p) } catch (_) { return false } }) || null
+}
+function sourceIsStale() {
+  const srcRoot = path.join(BACKEND_DIR, 'src', 'main', 'java')
+  if (!fs.existsSync(srcRoot)) return false
+  const files = walkJava(srcRoot, [])
+  for (const jf of files) {
+    const name = path.basename(jf)
+    if (name === 'package-info.java' || name === 'module-info.java') continue
+    const rel = path.relative(srcRoot, jf).replace(/\.java$/, '.class')
+    const cf = path.join(classes, rel)
+    try {
+      if (!fs.existsSync(cf)) {
+        console.log('[后端] 发现源码未编译: ' + rel)
+        return true
+      }
+      if (fs.statSync(jf).mtimeMs > fs.statSync(cf).mtimeMs + 1000) {
+        console.log('[后端] 发现源码比 class 新: ' + rel)
+        return true
+      }
+    } catch (_) {}
+  }
+  return false
+}
+if (sourceIsStale()) {
+  const mvnCmd = detectMavenCmd()
+  if (!mvnCmd) {
+    console.error('[X] 源码有更新，需要重新编译，但找不到 Maven。')
+    process.exit(2)  // 让 bat 回退到 Maven 路径（那条路径本身会编译）
+  }
+  console.log('[后端] 源码有更新，自动重新编译（约 10 秒）...')
+  console.log('[后端] Maven: ' + mvnCmd)
+  let compiled = false
+  for (const extra of [['-o'], []]) {
+    try {
+      const cmd = '"' + mvnCmd + '" -f "' + path.join(BACKEND_DIR, 'pom.xml') +
+                  '" -DskipTests ' + extra.join(' ') + ' compile'
+      execSync(cmd, { cwd: BACKEND_DIR, stdio: 'inherit', env })
+      compiled = true
+      break
+    } catch (e) {
+      console.warn('[后端] 离线编译未成功，尝试联网... ' + (extra.length ? '' : '（最后一次）'))
+    }
+  }
+  if (!compiled) {
+    console.error('[X] 自动编译失败，请手动在后端目录执行 mvn compile。')
+    process.exit(1)
+  }
+  console.log('[后端] 自动编译完成，继续启动。')
+}
 const args = ['-Dfile.encoding=UTF-8', '-cp', cp, MAIN_CLASS]
 const bg = process.argv.includes('--bg')
 

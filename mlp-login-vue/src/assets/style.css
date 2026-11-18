@@ -165,8 +165,8 @@ body {
   from { opacity: 0; transform: translateY(20px) scale(.97); }
   to { opacity: 1; transform: none; }
 }
-/* 顶部彩虹条 */
-.rainbow {
+/* 顶部彩虹条（卡片内） */
+.card-rainbow {
   height: 8px;
   background: linear-gradient(90deg,
     #f7a8c4 0%, #f7e08a 20%, #a7e3c9 40%,
@@ -674,6 +674,82 @@ button.submit:active { transform: translateY(1px); }
   50% { opacity: .95; transform: scale(1.25) rotate(20deg); }
 }
 
+/* 夜色流星：仅深色主题显示，深色背景上比白天的流星更亮、拖尾更长
+   与白天一致，统一朝右下飞，左右位置镜像 */
+.night-star {
+  position: absolute;
+  width: 200px; height: 4px; border-radius: 2px;
+  background:
+    radial-gradient(ellipse 26px 4px at 191px 50%, #fff 0, rgba(255,255,255,.95) 38%, rgba(240,230,255,0) 100%),
+    linear-gradient(270deg,
+      rgba(255,255,255,.98) 0%,
+      rgba(236,226,255,.7) 20%,
+      rgba(205,185,255,.36) 48%,
+      rgba(180,160,255,.14) 74%,
+      rgba(255,255,255,0) 100%);
+  box-shadow: 0 0 18px 5px rgba(195,175,255,.55);
+  opacity: 0;
+  animation-name: shootNight;
+  animation-timing-function: cubic-bezier(.3,.1,.5,1);
+  animation-iteration-count: infinite;
+}
+@keyframes shootNight {
+  0%   { opacity: 0;    transform: translate(0, 0) rotate(28deg) scaleX(.25); }
+  1.5% { opacity: 1; }
+  10%  { opacity: 1; }
+  24%  { opacity: .7; }
+  38%  { opacity: 0;    transform: translate(14vw, 9vh) rotate(28deg) scaleX(1); }
+  100% { opacity: 0;    transform: translate(14vw, 9vh) rotate(28deg) scaleX(1); }
+}
+
+/* 星球：仅深色主题显示，取代白天的云朵与彩虹 */
+.night-planet {
+  position: absolute;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 28%, rgba(255,255,255,.85) 0, rgba(255,255,255,.28) 16%, rgba(255,255,255,0) 42%),
+    radial-gradient(circle at 62% 66%, var(--pc, #8f7ae8) 0, color-mix(in srgb, var(--pc, #8f7ae8) 55%, #120e22) 62%, #0e0b1c 100%);
+  box-shadow: 0 0 18px 4px var(--pgl, rgba(143,122,232,.5)), inset -4px -6px 12px rgba(0,0,0,.45);
+  opacity: .9;
+  animation-name: planetFloat;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+/* 带环星球：外圈一道倾斜的光环 */
+.night-planet.has-ring::after {
+  content: "";
+  position: absolute; left: 50%; top: 50%;
+  width: 178%; height: 42%;
+  transform: translate(-50%, -50%) rotate(-18deg);
+  border: 2px solid var(--pgl, rgba(143,122,232,.5));
+  border-radius: 50%;
+  box-shadow: 0 0 8px 1px var(--pgl, rgba(143,122,232,.35));
+}
+@keyframes planetFloat {
+  0%,100% { transform: translateY(0) rotate(0deg); }
+  50%     { transform: translateY(-9px) rotate(6deg); }
+}
+
+/* 浅色主题：隐藏夜色流星与星球 */
+.night-star { display: none; }
+.night-planet { display: none; }
+body[data-theme="night"] .night-star { display: block; }
+body[data-theme="night"] .night-planet { display: block; }
+/* 深色主题：气球太扎眼，改用流星点缀夜空 */
+body[data-theme="night"] .balloon { display: none; }
+/* 深色主题：云朵与彩虹是白天的元素，深空里换成星球更贴切
+   —— 既包括 emoji 云朵 ☁️🌈，也包括 CSS 绘制的白色云朵 .cloud */
+body[data-theme="night"] .float-cloud { display: none; }
+body[data-theme="night"] .cloud { display: none; }
+/* 深色主题：糖果甜品也是白天的元素，深空里只看得到星星、流星与星球 */
+body[data-theme="night"] .float-dessert { display: none; }
+/* 深色主题：星光更亮一点，才看得见 */
+body[data-theme="night"] .sparkle {
+  color: #f0eaff;
+  opacity: .75;
+  text-shadow: 0 0 8px rgba(200,180,255,.9);
+}
+
 /* 白云 / 彩虹粒子漂浮物：上下浮动 + 轻摇摆 */
 .float-item {
   position: absolute; opacity: .55; z-index: 0;
@@ -682,10 +758,12 @@ button.submit:active { transform: translateY(1px); }
   animation-iteration-count: infinite;
   filter: drop-shadow(0 3px 6px rgba(120,90,160,.12));
   user-select: none;
+  /* 关键帧用 var() 取透明度，子类可单独调淡而不必重写动画 */
+  --fo-lo: .4; --fo-hi: .7;
 }
 @keyframes floatBob {
-  0%,100% { transform: translateY(0) rotate(-5deg); opacity: .4; }
-  50%     { transform: translateY(-16px) rotate(6deg); opacity: .7; }
+  0%,100% { transform: translateY(0) rotate(-5deg); opacity: var(--fo-lo); }
+  50%     { transform: translateY(-16px) rotate(6deg); opacity: var(--fo-hi); }
 }
 
 /* 背景里的小马成员（原创简笔剪影，六种招牌色） */
@@ -730,20 +808,8 @@ button.submit:active { transform: translateY(1px); }
   50%     { transform: translate(-7vw, 6vh) scale(1.2); }
 }
 
-/* 彩虹弧：16 秒一个呼吸周期，淡入 → 停留 → 淡出 */
-.rainbow {
-  position: absolute; top: 5%; left: 50%;
-  width: min(620px, 88vw); height: auto;
-  transform: translateX(-50%);
-  opacity: 0;
-  animation: rainbowBreath 16s ease-in-out infinite;
-}
-@keyframes rainbowBreath {
-  0%,100% { opacity: 0;    transform: translateX(-50%) translateY(12px); }
-  30%     { opacity: .5;  }
-  50%     { opacity: .36; transform: translateX(-50%) translateY(-8px); }
-  70%     { opacity: .5;  }
-}
+/* 注：背景里的 SVG 彩虹弧已移除（原 .rainbow 规则会与卡片顶部彩虹条同名冲突，
+   现已把卡片彩虹条独立为 .card-rainbow） */
 
 /* 气球：整体匀速升空，内层左右摇摆 */
 .balloon {
@@ -772,19 +838,40 @@ button.submit:active { transform: translateY(1px); }
   background: linear-gradient(rgba(120,100,150,.4), rgba(120,100,150,.05));
 }
 
-/* 流星：11 秒一轮，只在第 4%~14% 的时间可见 */
+/* 甜品漂浮物：复用 float-item 的浮动动画，整体更淡更小，不抢内容 */
+.float-dessert {
+  opacity: .32;
+  filter: drop-shadow(0 2px 4px rgba(170,130,160,.10));
+  --fo-lo: .22; --fo-hi: .38;
+}
+
+/* 流星：彗核 + 渐变拖尾 + 外发光
+   统一朝「右下」方向飞（斜杠「\」），彗核在右上端前沿，拖尾甩向左上
+   左右两侧位置互为镜像，飞向一致，画面更均衡 */
 .shooting-star {
-  position: absolute; top: 12%; left: 84%;
-  width: 90px; height: 2px; border-radius: 2px;
-  background: linear-gradient(90deg, rgba(255,255,255,0), #fff);
+  position: absolute;
+  width: 170px; height: 4px; border-radius: 2px;
+  background:
+    radial-gradient(ellipse 22px 4px at 162px 50%, #fff 0, rgba(255,255,255,.9) 40%, rgba(255,255,255,0) 100%),
+    linear-gradient(270deg,
+      rgba(255,255,255,.95) 0%,
+      rgba(226,238,255,.62) 18%,
+      rgba(190,215,255,.3) 45%,
+      rgba(170,200,255,.1) 72%,
+      rgba(255,255,255,0) 100%);
+  box-shadow: 0 0 14px 3px rgba(190,215,255,.45);
   opacity: 0;
-  animation: shoot 11s ease-in infinite 4s;
+  animation-name: shoot;
+  animation-timing-function: cubic-bezier(.3,.1,.5,1);
+  animation-iteration-count: infinite;
 }
 @keyframes shoot {
-  0%   { opacity: 0;    transform: translate(0, 0) rotate(28deg) scaleX(.4); }
-  4%   { opacity: .95; }
-  14%  { opacity: 0;    transform: translate(-48vw, 27vh) rotate(28deg) scaleX(1); }
-  100% { opacity: 0;    transform: translate(-48vw, 27vh) rotate(28deg) scaleX(1); }
+  0%   { opacity: 0;    transform: translate(0, 0) rotate(28deg) scaleX(.25); }
+  1.5% { opacity: 1; }
+  8%   { opacity: 1; }
+  20%  { opacity: .7; }
+  34%  { opacity: 0;    transform: translate(14vw, 9vh) rotate(28deg) scaleX(1); }
+  100% { opacity: 0;    transform: translate(14vw, 9vh) rotate(28deg) scaleX(1); }
 }
 
 /* 漂浮的心印徽记：上下浮 + 轻摆；悬停停顿并放大；点击进小马课程 */

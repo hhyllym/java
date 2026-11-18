@@ -98,18 +98,23 @@ echo [2/4] JAVA_HOME : %JAVA_HOME%
 rem ---------- 2.9) fast path: run compiled classes directly (no Maven) ----------
 rem This machine has no standalone Maven; use the IntelliJ JBR + the jars already
 rem in ~/.m2 with the classpath exported in cp.txt. Falls back to Maven below.
-if exist "%~dp0start-backend-jbr.cjs" (
-    where node >nul 2>nul
-    if not errorlevel 1 (
-        set "SERVER_PORT="
-        set "SERVER__PORT="
-        echo [2.9/4] Fast path: run compiled classes directly ^(skip Maven^) ...
-        set "BACKEND_DIR=%BACKEND_DIR%"
-        set "APP_PORT=%APP_PORT%"
-        node "%~dp0start-backend-jbr.cjs"
-        goto :bye
-    )
-)
+rem 退出码约定：node 启动器返回 2 = 依赖 jar 不齐，自动回退 Maven 联网补齐。
+if not exist "%~dp0start-backend-jbr.cjs" goto :maven_path
+where node >nul 2>nul
+if errorlevel 1 goto :maven_path
+set "SERVER_PORT="
+set "SERVER__PORT="
+echo [2.9/4] Fast path: run compiled classes directly ^(skip Maven^) ...
+set "BACKEND_DIR=%BACKEND_DIR%"
+set "APP_PORT=%APP_PORT%"
+node "%~dp0start-backend-jbr.cjs"
+set "FAST_RC=%ERRORLEVEL%"
+if not "%FAST_RC%"=="2" goto :bye
+echo.
+echo [注意] 快速启动缺少依赖 jar，自动回退到 Maven 联网下载并编译 ...
+echo        第一次会慢一些，大约 1~3 分钟，请耐心等待。
+echo.
+:maven_path
 rem ---------- 3) 定位 Maven ----------
 set "MVN_CMD="
 if defined MAVEN_HOME if exist "%MAVEN_HOME%\bin\mvn.cmd" set "MVN_CMD=%MAVEN_HOME%\bin\mvn.cmd"

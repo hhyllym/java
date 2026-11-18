@@ -4,7 +4,7 @@
   <ClickSparkle />
 
   <div class="card" :class="{ 'card-wide': $route.meta.wide, 'card-admin': $route.meta.admin, 'card-mp': $route.meta.mp }">
-    <div class="rainbow"></div>
+    <div class="card-rainbow"></div>
     <div class="themes">
       <button
         class="theme-dot sound-toggle"

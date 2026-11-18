@@ -5,7 +5,7 @@
  *  - 只上报 score 用于顶部展示，**不 emit('over')**：GameView 的 onOver 会额外发「破纪录积分」，
  *    而下注类游戏的积分进出已经全部由 wallet.spend / wallet.earn 完成，再结算会重复发分。
  *  - 全程只用游戏内虚拟积分，不接任何真实货币；概率表由各组件公开显示。
- *  - 每局固定 ROUNDS 次机会，用完出结算面板，避免无限刷。
+ *  - 不限次数：可一直抽，只要余额够；ROUNDS 仅作历史兼容常量，不再用于限制。
  *  - 自定义投注：betAmount 为实际投入积分（想投多少投多少，≥10，不超过余额）。
  *  - 大注模式：单笔 betAmount ≥ BIG_BET(5000) 时，头奖概率拉到约 30%，并把头奖倍数反推到整体返还≈95%，
  *    既给「30% 中头奖」的爽感，又不会让积分被刷爆。
@@ -85,7 +85,8 @@ export const luckyBase = {
     cost() { return Math.max(0, Math.floor(Number(this.betAmount) || 0)) },
     big() { return isBigBet(this.betAmount) },
     net() { return this.won - this.invested },
-    finished() { return this.spinsLeft <= 0 }
+    /** 不再限制次数：永远不结束，只要积分够就能一直抽。清空战绩走 resetRound。 */
+    finished() { return false }
   },
   async created() { await this.refreshPoints() },
   beforeUnmount() { this.alive = false },
@@ -104,7 +105,7 @@ export const luckyBase = {
       this.pointsLoading = false
       if (this.betAmount > this.points) this.clampBet()
     },
-    /** 扣下注、占用一次机会；返回 true 表示可以开始演出 */
+    /** 扣下注；返回 true 表示可以开始演出。不限次数，只要余额够就能一直抽。 */
     async placeBet() {
       if (this.busy || this.finished || this.pointsLoading) return false
       this.clampBet()
@@ -112,7 +113,6 @@ export const luckyBase = {
       if (this.points < this.cost) return false
       spend(this.cost)
       this.invested += this.cost
-      this.spinsLeft -= 1
       this.busy = true
       this.points = (await fetchBalance()).value
       return true
@@ -129,7 +129,6 @@ export const luckyBase = {
     },
     /** 重置一局；组件可在自己的 restart() 里先调它，再清自己的演出状态 */
     async resetRound() {
-      this.spinsLeft = ROUNDS
       this.invested = 0
       this.won = 0
       this.history = []

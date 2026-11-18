@@ -7,7 +7,6 @@
       <span>本局投入 <b>{{ invested }}</b></span>
       <span>本局赢得 <b>{{ won }}</b></span>
       <span>净收益 <b :class="net >= 0 ? 'up' : 'down'">{{ net >= 0 ? '+' : '' }}{{ net }}</b></span>
-      <span>剩余 <b>{{ spinsLeft }}</b>/{{ ROUNDS }} 次</span>
     </div>
 
     <div class="lk-bets">
@@ -74,9 +73,9 @@
       </span>
     </div>
 
-    <div v-if="finished && !busy && phase === 'result'" class="lk-final">
+    <div v-if="invested > 0 && !busy && phase === 'result'" class="lk-final">
       <b>本局净收益 {{ net >= 0 ? '+' : '' }}{{ net }} 积分</b>
-      <button class="lk-final-btn" @click="restart">🔁 再来一局</button>
+      <button class="lk-final-btn" @click="restart">🧹 清空战绩</button>
     </div>
   </div>
 </template>
@@ -123,7 +122,6 @@ export default {
     },
     playLabel() {
       if (this.pointsLoading) return '正在读取账户积分…'
-      if (this.finished && this.phase === 'result') return '本局结束，点「再来一局」'
       if (this.phase === 'shuffle') return '洗牌中…'
       if (this.phase === 'choose') return '👆 点一张牌'
       if (this.phase === 'result') return '🔁 盖牌 · 下一把'

@@ -85,7 +85,7 @@ export default {
         { pos: 14, dur: 0 },
         { pos: 21, dur: 0 }
       ],
-      bet: 1,
+      betAmount: 10,          // 实际投入积分（v-model 绑定，必须声明为响应式，否则 cost 不更新）
       points: 0,
       pointsLoading: true,
       invested: 0,

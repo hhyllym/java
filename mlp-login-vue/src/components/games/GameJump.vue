@@ -23,22 +23,12 @@
         </button>
       </div>
 
-      <div class="jp-models">
-        <span class="jp-model-label">🎨 主角建模</span>
-        <div class="jp-model-row">
-          <button
-            v-for="m in MODEL_LIST"
-            :key="m.key"
-            class="jp-model"
-            :class="{ on: model === m.key }"
-            @click="pickModel(m.key)"
-          >
-            <span>{{ m.emoji }}</span>
-            <b>{{ m.name }}</b>
-            <small>{{ m.desc }}</small>
-          </button>
+      <div class="jp-pet-hint">
+        <span class="jp-pet-hint-icon">🎨</span>
+        <div>
+          <b>{{ petLabel }}</b>
+          <small>{{ petDesc }}</small>
         </div>
-        <em class="jp-model-note">3D 建模为 Three.js 实时渲染；设备不支持 WebGL 会自动用经典造型</em>
       </div>
 
       <div class="jp-how">
@@ -74,11 +64,11 @@
           {{ time < 8 ? '🌤 热身中 · 慢慢跑，撞到不掉心' : (inv > 0 ? '✨ 短暂无敌' : '⬆️ 点一下 / 空格起跳') }}
         </div>
 
-        <!-- 小马：3D 建模主角（WebGL 不可用时回退 emoji） -->
+        <!-- 主角：自动跟随用户领养的宠物（WebGL 不可用 / 无宠物时回退 emoji） -->
         <div class="jp-pony" :style="{ bottom: (16 + py) + '%' }">
-          <canvas v-if="model !== 'classic' && model3d" ref="cv" class="jp-pony-canvas"></canvas>
-          <span v-else class="jp-pony-emoji" :class="{ jumping: py > 0.5 }">🦄</span>
-          <span v-if="model !== 'classic' && model3d" class="jp-pony-tag">{{ model === 'star' ? '星澜' : '云驰' }}</span>
+          <canvas v-if="myPetKind && model3d" ref="cv" class="jp-pony-canvas"></canvas>
+          <span v-else class="jp-pony-emoji" :class="{ jumping: py > 0.5 }">{{ myPetKind ? '🐾' : '🦄' }}</span>
+          <span v-if="myPetKind && model3d" class="jp-pony-tag">{{ myPetName }}</span>
         </div>
 
         <!-- 障碍 -->
@@ -104,7 +94,7 @@
 
       <div class="jp-mobile">
         <button class="jp-jump-btn" @click="jump">⬆️ 跳！</button>
-        <span>躲过 {{ dodged }} 个障碍 · 难度 {{ cfg.name }} ×{{ cfg.mul }} · {{ modelName }}</span>
+        <span>躲过 {{ dodged }} 个障碍 · 难度 {{ cfg.name }} ×{{ cfg.mul }} · {{ petLabel }}</span>
       </div>
 
       <div v-if="stage === 'over'" class="jp-result" :class="result">
@@ -118,7 +108,7 @@
         <div class="r-score">+{{ score }} 分</div>
         <div class="r-btns">
           <button class="jp-btn" @click="restart">🔁 再来一局</button>
-          <button class="jp-ghost" @click="backToReady">换个难度 / 建模</button>
+          <button class="jp-ghost" @click="backToReady">换个难度</button>
         </div>
       </div>
     </template>
@@ -127,6 +117,9 @@
 
 <script>
 import sound from '../../sound'
+import { getSession } from '../../auth'
+import { apiPetMine } from '../../pet'
+import { pet3dConfig } from '../../pet3d/config.js'
 
 /** 全面调慢：速度、障碍密度、提速幅度都降下来 */
 const DIFFS = {
@@ -137,28 +130,16 @@ const DIFFS = {
 const DIFF_LIST = [DIFFS.easy, DIFFS.normal, DIFFS.hard]
 const DIFF_KEY = 'mlp_jump_diff'
 
-const MODEL_LIST = [
-  { key: 'cloud',   name: '云驰', emoji: '🌈', desc: '彩虹鬃毛 · 3D' },
-  { key: 'star',    name: '星澜', emoji: '💫', desc: '星翼小马 · 3D' },
-  { key: 'classic', name: '经典', emoji: '🦄', desc: '原版 emoji' }
-]
-const MODEL_KEY = 'mlp_jump_model'
 const TYPES = ['🌵', '🪵', '🍄', '🪨']
 const WARM = 8          // 热身 / 保护期（秒）
 
-let ponyMod = null      // three.js 只在第一次开局时动态加载
+let petSceneMod = null  // three.js 只在第一次开局时动态加载
 
 function readDiff() {
   try {
     const k = localStorage.getItem(DIFF_KEY)
     return DIFFS[k] ? k : 'normal'
   } catch (e) { return 'normal' }
-}
-function readModel() {
-  try {
-    const k = localStorage.getItem(MODEL_KEY)
-    return MODEL_LIST.some(m => m.key === k) ? k : 'cloud'
-  } catch (e) { return 'cloud' }
 }
 
 export default {
@@ -167,9 +148,9 @@ export default {
   data() {
     return {
       DIFF_LIST,
-      MODEL_LIST,
       diff: readDiff(),
-      model: readModel(),
+      myPet: null,            // 当前用户领养的宠物（异步加载）
+      myPetKind: '',          // 宠物种类 key，空=无宠物→用默认建模
       model3d: true,          // WebGL 是否可用
       stage: 'ready',         // ready | playing | over
       result: 'win',
@@ -195,13 +176,25 @@ export default {
   computed: {
     cfg() { return DIFFS[this.diff] },
     heartText() { return '❤️'.repeat(Math.max(0, this.hearts)) || '—' },
-    modelName() { return (MODEL_LIST.find(m => m.key === this.model) || MODEL_LIST[0]).name },
+    myPetName() {
+      if (!this.myPetKind) return '默认'
+      return (this.myPet && this.myPet.name) || pet3dConfig(this.myPetKind).name
+    },
+    petLabel() {
+      return this.myPetKind ? `${this.myPetName} · 3D 建模` : '默认建模 · 🦄 小马'
+    },
+    petDesc() {
+      return this.myPetKind
+        ? '主角已自动换上你领养的宠物，快带它去闯关吧～'
+        : '还没有领养宠物，用默认小马陪你玩；领养后主角会自动变成你的宠物'
+    },
     curScore() {
       return Math.round((this.dodged * 10 + this.starCount * 15 + Math.floor(this.dist / 40)) * this.cfg.mul)
     }
   },
   mounted() {
     window.addEventListener('keydown', this.onKey)
+    this.loadMyPet()
   },
   beforeUnmount() {
     this._gone = true
@@ -216,12 +209,17 @@ export default {
       try { localStorage.setItem(DIFF_KEY, k) } catch (e) {}
       sound.click()
     },
-    pickModel(k) {
-      if (this.stage === 'playing') return
-      this.model = k
-      try { localStorage.setItem(MODEL_KEY, k) } catch (e) {}
-      if (this.inst && k !== 'classic') { try { this.inst.setVariant(k) } catch (e) {} }
-      sound.click()
+    /* 主角建模自动跟随当前用户领养的宠物；未登录 / 无宠物则用默认建模 */
+    async loadMyPet() {
+      const s = getSession()
+      if (!s || !s.id) return
+      try {
+        const r = await apiPetMine(s.id)
+        if (r && r.code === 200 && r.data && r.data.kind) {
+          this.myPet = r.data
+          this.myPetKind = r.data.kind
+        }
+      } catch (e) { /* 网络异常静默回退默认建模 */ }
     },
     onKey(e) {
       if (e.code === 'Space' || e.code === 'ArrowUp' || e.key === 'w' || e.key === 'W') {
@@ -260,13 +258,13 @@ export default {
       if (this.py <= 0.01) { this.vy = 3.3; sound.pop() }
     },
 
-    // ---------- 3D 建模主角 ----------
+    // ---------- 3D 建模主角（跟随用户宠物） ----------
     async initPony() {
-      if (this.model === 'classic' || !this.model3d) return
+      if (!this.myPetKind || !this.model3d) return
       const cv = this.$refs.cv
       if (!cv) return
       try {
-        if (!ponyMod) ponyMod = await import('../../pet3d/pony.js')
+        if (!petSceneMod) petSceneMod = await import('../../pet3d/scene.js')
       } catch (e) {
         this.model3d = false
         return
@@ -274,11 +272,11 @@ export default {
       if (this._gone || !this.$refs.cv) return
       try {
         const r = cv.getBoundingClientRect()
-        this.inst = ponyMod.createPonyScene(cv, {
-          variant: this.model,
+        this.inst = petSceneMod.createPetScene(cv, this.myPetKind, {
+          state: 'walk',
+          interactive: false,
           width: Math.max(64, r.width || 92),
-          height: Math.max(64, r.height || 80),
-          state: 'run'
+          height: Math.max(64, r.height || 80)
         })
         if (typeof ResizeObserver !== 'undefined') {
           this.ro = new ResizeObserver(entries => {
@@ -295,7 +293,8 @@ export default {
     },
     syncPony() {
       if (!this.inst) return
-      const s = this.stage !== 'playing' ? 'idle' : (this.py > .5 ? 'jump' : 'run')
+      // 宠物场景支持 idle / walk / play / happy 等：跑=walk，跳=play，其余 idle
+      const s = this.stage !== 'playing' ? 'idle' : (this.py > .5 ? 'play' : 'walk')
       try { this.inst.setState(s) } catch (e) {}
     },
     disposePony() {
@@ -431,21 +430,14 @@ export default {
 .jp-diff b { font-size: 15px; }
 .jp-diff small { font-size: 10px; color: var(--muted); line-height: 1.4; }
 
-.jp-models { margin-bottom: 14px; padding: 12px; border-radius: 16px; background: var(--panel); border: 1px solid var(--border); }
-.jp-model-label { display: block; font-size: 12px; font-weight: 700; color: var(--primary); margin-bottom: 8px; }
-.jp-model-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.jp-model {
-  display: flex; flex-direction: column; align-items: center; gap: 3px;
-  padding: 9px 4px; border: 2px solid var(--border); border-radius: 12px;
-  background: var(--card); cursor: pointer; font-family: inherit; color: var(--text);
-  transition: transform .16s, border-color .16s;
+.jp-pet-hint {
+  display: flex; align-items: center; gap: 12px; text-align: left;
+  margin-bottom: 14px; padding: 12px 14px; border-radius: 16px;
+  background: var(--panel); border: 1px solid var(--border);
 }
-.jp-model:hover { transform: translateY(-2px); }
-.jp-model.on { border-color: var(--primary); background: color-mix(in srgb, var(--primary) 8%, #fff); }
-.jp-model span { font-size: 20px; }
-.jp-model b { font-size: 12px; }
-.jp-model small { font-size: 9px; color: var(--muted); }
-.jp-model-note { display: block; margin-top: 8px; font-size: 10px; color: var(--muted); font-style: normal; }
+.jp-pet-hint-icon { font-size: 26px; flex-shrink: 0; }
+.jp-pet-hint b { display: block; font-size: 13px; color: var(--primary); margin-bottom: 3px; }
+.jp-pet-hint small { display: block; font-size: 11px; color: var(--muted); line-height: 1.5; }
 
 .jp-how { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 14px; margin-bottom: 18px; font-size: 11px; color: var(--muted); }
 
@@ -560,6 +552,6 @@ export default {
 
 @media (prefers-reduced-motion: reduce) {
   .jp-cloud, .jp-star, .jp-field.shake { animation: none; }
-  .jp-pony-emoji, .jp-diff, .jp-model, .jp-btn { transition: none; }
+  .jp-pony-emoji, .jp-diff, .jp-btn { transition: none; }
 }
 </style>

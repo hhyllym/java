@@ -11,7 +11,7 @@
  Target Server Version : 80039 (8.0.39)
  File Encoding         : 65001
 
- Date: 16/11/2026 11:52:29
+ Date: 18/11/2026 09:56:38
 */
 
 SET NAMES utf8mb4;
@@ -104,7 +104,7 @@ CREATE TABLE `t_friend`  (
 -- ----------------------------
 -- Records of t_friend
 -- ----------------------------
-INSERT INTO `t_friend` VALUES (1, 1, 3, 0, '', '很高兴认识你！', '2026-11-04 08:56:09', '2026-11-04 08:56:09');
+INSERT INTO `t_friend` VALUES (1, 1, 3, 1, '', '很高兴认识你！', '2026-11-04 08:56:09', '2026-11-18 08:53:13');
 INSERT INTO `t_friend` VALUES (2, 1, 5, 1, 'partner', '很高兴认识你！', '2026-11-04 08:56:16', '2026-11-04 09:52:06');
 
 -- ----------------------------
@@ -137,7 +137,7 @@ CREATE TABLE `t_game_score`  (
   `create_time` datetime NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_game`(`game_id` ASC, `score` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 29 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 33 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_game_score
@@ -170,6 +170,10 @@ INSERT INTO `t_game_score` VALUES (25, 'jump', 5, 98, '2026-11-12 22:12:47');
 INSERT INTO `t_game_score` VALUES (26, 'glide', 5, 790, '2026-11-12 22:13:12');
 INSERT INTO `t_game_score` VALUES (27, 'jump', 5, 59, '2026-11-13 13:46:51');
 INSERT INTO `t_game_score` VALUES (28, 'mine', 5, 240, '2026-11-13 13:47:52');
+INSERT INTO `t_game_score` VALUES (29, 'sports', 5, 1470, '2026-11-18 09:01:09');
+INSERT INTO `t_game_score` VALUES (30, 'jump', 5, 39, '2026-11-18 09:21:11');
+INSERT INTO `t_game_score` VALUES (31, 'puzzle', 5, 242, '2026-11-18 09:23:05');
+INSERT INTO `t_game_score` VALUES (32, 'glide', 5, 485, '2026-11-18 09:23:32');
 
 -- ----------------------------
 -- Table structure for t_hall_message
@@ -186,7 +190,7 @@ CREATE TABLE `t_hall_message`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_t_hall_message_time`(`create_time` ASC) USING BTREE,
   INDEX `idx_t_hall_message_user`(`user_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 23 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '星糖谷大厅公共聊天' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 24 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '星糖谷大厅公共聊天' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_hall_message
@@ -241,7 +245,7 @@ INSERT INTO `t_message` VALUES (1, 'NOTIFY', NULL, '星糖谷', -1, NULL, '欢�
 INSERT INTO `t_message` VALUES (2, 'NOTIFY', NULL, '星糖谷', -1, NULL, '每天来首页抽一只「今日幸运小马」吧 🎲，看看今天谁陪你冒险！', 0, '2026-10-28 08:28:53');
 INSERT INTO `t_message` VALUES (3, 'NOTIFY', NULL, '星糖谷', 1, NULL, '欢迎来到星糖谷，巴啦啦！记得去首页抽你的「今日幸运小马」🎲', 1, '2026-10-28 08:34:08');
 INSERT INTO `t_message` VALUES (4, 'BOARD', 1, '巴啦啦', NULL, NULL, '11', 0, '2026-10-28 08:34:54');
-INSERT INTO `t_message` VALUES (5, 'NOTIFY', NULL, '星糖谷', 3, NULL, '欢迎来到星糖谷，哇哇哇！记得去首页抽你的「今日幸运小马」🎲', 0, '2026-10-30 16:07:54');
+INSERT INTO `t_message` VALUES (5, 'NOTIFY', NULL, '星糖谷', 3, NULL, '欢迎来到星糖谷，哇哇哇！记得去首页抽你的「今日幸运小马」🎲', 1, '2026-10-30 16:07:54');
 INSERT INTO `t_message` VALUES (6, 'NOTIFY', NULL, '星糖谷', 4, NULL, '欢迎来到星糖谷，啦啦啦！记得去首页抽你的「今日幸运小马」🎲', 0, '2026-10-30 16:26:34');
 INSERT INTO `t_message` VALUES (7, 'NOTIFY', NULL, '星糖谷', 5, NULL, '欢迎来到星糖谷，钱钱钱！记得去首页抽你的「今日幸运小马」🎲', 1, '2026-11-02 10:43:26');
 
@@ -262,13 +266,14 @@ CREATE TABLE `t_pet`  (
   `update_time` datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_user`(`user_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_pet
 -- ----------------------------
-INSERT INTO `t_pet` VALUES (1, 5, 'dog', '萨摩耶', 1, 30, 60, 100, '2026-11-02 10:52:50', '2026-11-08 21:45:13');
+INSERT INTO `t_pet` VALUES (1, 5, 'dog', '萨摩耶', 1, 40, 85, 100, '2026-11-02 10:52:50', '2026-11-18 09:06:23');
 INSERT INTO `t_pet` VALUES (2, 1, 'cat', '狸花猫', 1, 0, 60, 80, '2026-11-04 08:57:52', '2026-11-08 20:45:07');
+INSERT INTO `t_pet` VALUES (3, 3, 'hamster', 'yy', 1, 20, 85, 95, '2026-11-18 08:53:48', '2026-11-18 08:54:54');
 
 -- ----------------------------
 -- Table structure for t_pet_cosmetic
@@ -284,7 +289,7 @@ CREATE TABLE `t_pet_cosmetic`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_user_cosmetic`(`user_id` ASC, `cosmetic_id` ASC) USING BTREE,
   INDEX `idx_equipped`(`user_id` ASC, `equipped` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '宠物装扮' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 11 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '宠物装扮' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_pet_cosmetic
@@ -295,6 +300,10 @@ INSERT INTO `t_pet_cosmetic` VALUES (3, 5, 'cosmetic-glasses', 1, 1, '2026-11-13
 INSERT INTO `t_pet_cosmetic` VALUES (4, 5, 'cosmetic-bow', 1, 0, '2026-11-13 13:33:03');
 INSERT INTO `t_pet_cosmetic` VALUES (5, 5, 'cosmetic-hat', 1, 0, '2026-11-13 13:33:03');
 INSERT INTO `t_pet_cosmetic` VALUES (6, 5, 'cosmetic-crown', 1, 0, '2026-11-13 13:33:05');
+INSERT INTO `t_pet_cosmetic` VALUES (7, 3, 'cosmetic-crown', 1, 0, '2026-11-18 08:54:23');
+INSERT INTO `t_pet_cosmetic` VALUES (8, 3, 'cosmetic-hat', 1, 0, '2026-11-18 08:54:25');
+INSERT INTO `t_pet_cosmetic` VALUES (9, 3, 'cosmetic-bow', 2, 0, '2026-11-18 08:54:25');
+INSERT INTO `t_pet_cosmetic` VALUES (10, 3, 'cosmetic-glasses', 1, 0, '2026-11-18 08:54:26');
 
 -- ----------------------------
 -- Table structure for t_point_log
@@ -309,7 +318,7 @@ CREATE TABLE `t_point_log`  (
   `create_time` datetime NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_user`(`user_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 72 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 111 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_point_log
@@ -368,6 +377,45 @@ INSERT INTO `t_point_log` VALUES (68, 5, 0, 'shop', '兑换装扮：小草帽 -1
 INSERT INTO `t_point_log` VALUES (69, 5, 0, 'shop', '兑换装扮：小王冠 -400', '2026-11-13 13:33:05');
 INSERT INTO `t_point_log` VALUES (70, 5, 0, 'shop', '兑换：图鉴收藏家称号 -500', '2026-11-13 13:33:12');
 INSERT INTO `t_point_log` VALUES (71, 5, 146, 'game-reward', '游戏「星糖扫雷」破纪录奖励 +146', '2026-11-13 13:47:52');
+INSERT INTO `t_point_log` VALUES (72, 5, 5, 'task', '任务奖励：每日登录', '2026-11-18 08:47:14');
+INSERT INTO `t_point_log` VALUES (73, 3, 10000, 'newbie-10000', '新人大礼包', '2026-11-18 08:53:21');
+INSERT INTO `t_point_log` VALUES (74, 3, 20, 'pet', '领养宠物奖励', '2026-11-18 08:53:48');
+INSERT INTO `t_point_log` VALUES (75, 3, 2, 'pet', '陪宠物玩耍', '2026-11-18 08:53:54');
+INSERT INTO `t_point_log` VALUES (76, 3, 0, 'shop', '兑换：宠物蛋糕 -150', '2026-11-18 08:54:03');
+INSERT INTO `t_point_log` VALUES (77, 3, 0, 'shop', '兑换：宠物蛋糕 -150', '2026-11-18 08:54:04');
+INSERT INTO `t_point_log` VALUES (78, 3, 0, 'shop', '兑换：宠物蛋糕 -150', '2026-11-18 08:54:04');
+INSERT INTO `t_point_log` VALUES (79, 3, 0, 'shop', '兑换：宠物蛋糕 -150', '2026-11-18 08:54:05');
+INSERT INTO `t_point_log` VALUES (80, 3, 0, 'shop', '兑换：宠物蛋糕 -150', '2026-11-18 08:54:05');
+INSERT INTO `t_point_log` VALUES (81, 3, 0, 'shop', '兑换：宠物口粮 -60', '2026-11-18 08:54:06');
+INSERT INTO `t_point_log` VALUES (82, 3, 0, 'shop', '兑换：宠物口粮 -60', '2026-11-18 08:54:06');
+INSERT INTO `t_point_log` VALUES (83, 3, 0, 'shop', '兑换：宠物口粮 -60', '2026-11-18 08:54:07');
+INSERT INTO `t_point_log` VALUES (84, 3, 0, 'shop', '兑换：宠物口粮 -60', '2026-11-18 08:54:07');
+INSERT INTO `t_point_log` VALUES (85, 3, 0, 'shop', '兑换：宠物口粮 -60', '2026-11-18 08:54:07');
+INSERT INTO `t_point_log` VALUES (86, 3, 0, 'shop', '兑换：宠物口粮 -60', '2026-11-18 08:54:08');
+INSERT INTO `t_point_log` VALUES (87, 3, 0, 'shop', '兑换：温牛奶 -80', '2026-11-18 08:54:09');
+INSERT INTO `t_point_log` VALUES (88, 3, 0, 'shop', '兑换：温牛奶 -80', '2026-11-18 08:54:09');
+INSERT INTO `t_point_log` VALUES (89, 3, 0, 'shop', '兑换：温牛奶 -80', '2026-11-18 08:54:09');
+INSERT INTO `t_point_log` VALUES (90, 3, 0, 'shop', '兑换：温牛奶 -80', '2026-11-18 08:54:10');
+INSERT INTO `t_point_log` VALUES (91, 3, 0, 'shop', '兑换：温牛奶 -80', '2026-11-18 08:54:10');
+INSERT INTO `t_point_log` VALUES (92, 3, 0, 'shop', '兑换：温牛奶 -80', '2026-11-18 08:54:10');
+INSERT INTO `t_point_log` VALUES (93, 3, 0, 'shop', '兑换：温牛奶 -80', '2026-11-18 08:54:11');
+INSERT INTO `t_point_log` VALUES (94, 3, 0, 'shop', '兑换：温牛奶 -80', '2026-11-18 08:54:11');
+INSERT INTO `t_point_log` VALUES (95, 3, 0, 'shop', '兑换：温牛奶 -80', '2026-11-18 08:54:11');
+INSERT INTO `t_point_log` VALUES (96, 3, 0, 'shop', '兑换：温牛奶 -80', '2026-11-18 08:54:12');
+INSERT INTO `t_point_log` VALUES (97, 3, 0, 'shop', '兑换：温牛奶 -80', '2026-11-18 08:54:12');
+INSERT INTO `t_point_log` VALUES (98, 3, 0, 'shop', '兑换：宠物蛋糕 -150', '2026-11-18 08:54:13');
+INSERT INTO `t_point_log` VALUES (99, 3, 0, 'shop', '兑换：宠物口粮 -60', '2026-11-18 08:54:14');
+INSERT INTO `t_point_log` VALUES (100, 3, 0, 'shop', '兑换：图鉴收藏家称号 -500', '2026-11-18 08:54:22');
+INSERT INTO `t_point_log` VALUES (101, 3, 0, 'shop', '兑换装扮：小王冠 -400', '2026-11-18 08:54:23');
+INSERT INTO `t_point_log` VALUES (102, 3, 0, 'shop', '兑换装扮：小草帽 -100', '2026-11-18 08:54:25');
+INSERT INTO `t_point_log` VALUES (103, 3, 0, 'shop', '兑换装扮：蝴蝶结 -130', '2026-11-18 08:54:25');
+INSERT INTO `t_point_log` VALUES (104, 3, 0, 'shop', '兑换装扮：酷墨镜 -150', '2026-11-18 08:54:26');
+INSERT INTO `t_point_log` VALUES (105, 3, 0, 'shop', '兑换装扮：蝴蝶结 -130', '2026-11-18 08:54:27');
+INSERT INTO `t_point_log` VALUES (106, 3, 2, 'pet', '喂食宠物', '2026-11-18 08:54:54');
+INSERT INTO `t_point_log` VALUES (107, 5, 1470, 'game-reward', '游戏「糖豆消消乐」破纪录奖励 +1470', '2026-11-18 09:01:09');
+INSERT INTO `t_point_log` VALUES (108, 5, 15, 'task', '任务奖励：游戏时间', '2026-11-18 09:05:08');
+INSERT INTO `t_point_log` VALUES (109, 5, 2, 'pet', '喂食宠物', '2026-11-18 09:06:23');
+INSERT INTO `t_point_log` VALUES (110, 5, 51, 'game-reward', '游戏「心印拼拼乐」破纪录奖励 +51', '2026-11-18 09:23:05');
 
 -- ----------------------------
 -- Table structure for t_pony
@@ -392,28 +440,28 @@ CREATE TABLE `t_pony`  (
 -- ----------------------------
 -- Records of t_pony
 -- ----------------------------
-INSERT INTO `t_pony` VALUES (1, '星澜', 'Lumina Gleam', 'twilight', '📖', '#b79cf0', '传说', '星辉书阁的管理员，把复杂知识整理成清楚清单，六色心印就是她归纳出来的。', 1, 1, '2026-11-08 19:20:45');
-INSERT INTO `t_pony` VALUES (2, '泡芙', 'Puffette', 'pinkie', '🎈', '#f7a8c4', '稀有', '糖霜镇的甜点师，随身带着彩纸和糖霜，走到哪儿哪儿就开起小派对。', 0, 2, '2026-11-08 19:20:45');
-INSERT INTO `t_pony` VALUES (3, '云驰', 'Zephyr Cloud', 'dash', '⚡', '#8fc7f0', '稀有', '流云城的信使队长，一眨眼穿过整片云海，答应过的事从不迟到。', 0, 3, '2026-11-08 19:20:45');
-INSERT INTO `t_pony` VALUES (4, '金穗', 'Harvesta', 'applejack', '🍎', '#f0a06a', '稀有', '金穗果园的园主，戴一顶草帽，说话算数，最见不得账目含糊。', 0, 4, '2026-11-08 19:20:45');
-INSERT INTO `t_pony` VALUES (5, '茸茸', 'Mossy Fluff', 'fluttershy', '🦋', '#a7e3c9', '稀有', '住在林边小屋的照料员，听得懂小动物的心思，连胆小的松鼠都愿意靠近。', 0, 5, '2026-11-08 19:20:45');
-INSERT INTO `t_pony` VALUES (6, '绮罗', 'Silkara', 'rarity', '💎', '#f7e08a', '稀有', '缎带工坊的主理人，一匹缎带几颗玻璃珠就能让旧衣焕然一新，最舍得分给朋友。', 0, 6, '2026-11-08 19:20:45');
-INSERT INTO `t_pony` VALUES (7, '曦光院长', 'Matron Solia', 'star', '☀️', '#f7c94c', '传说', '星辉学院的创办人，掌管白昼与开学典礼，星澜的老师。', 0, 7, '2026-11-08 19:20:45');
-INSERT INTO `t_pony` VALUES (8, '月汐院长', 'Matron Moona', 'star', '🌙', '#8f7ae8', '传说', '守夜的导师，替大家看护梦境，曾一度迷失在暗夜里，后来回到学院。', 0, 8, '2026-11-08 19:20:45');
-INSERT INTO `t_pony` VALUES (9, '暖心导师', 'Mentor Aria', 'star', '💗', '#f7a8c4', '传说', '冰晶城的守护者，擅长调解争执，星澜小时候由她照看。', 0, 9, '2026-11-08 19:20:45');
-INSERT INTO `t_pony` VALUES (10, '亮盾卫长', 'Captain Brightshield', 'star', '🛡️', '#8fc7f0', '稀有', '云顶卫队队长、冰晶城的守门人，星澜的兄长。', 2, 10, '2026-11-08 19:20:45');
-INSERT INTO `t_pony` VALUES (11, '星屑', 'Stardust', 'star', '⭐', '#b79cf0', '稀有', '曾主张大家收起心印图案，后来成为星辉学院校长，学会尊重每个人的不同。', 0, 11, '2026-11-08 19:20:45');
-INSERT INTO `t_pony` VALUES (12, '小穗芽', 'Sprout', 'star', '🌼', '#f0a06a', '常见', '金穗的妹妹，心印小队的发起人，总在找自己的拿手本领。', 0, 12, '2026-11-08 19:20:45');
-INSERT INTO `t_pony` VALUES (13, '甜铃铛', 'Bellsy', 'star', '🎀', '#f7a8c4', '常见', '绮罗的妹妹，歌声最甜的小星角驹。', 0, 13, '2026-11-08 19:20:45');
-INSERT INTO `t_pony` VALUES (14, '小滑车', 'Rollie', 'star', '🛴', '#8fc7f0', '常见', '云驰的头号粉丝，踩着滑板车到处飞驰的小云翼驹。', 0, 14, '2026-11-08 19:20:45');
-INSERT INTO `t_pony` VALUES (15, '大麦叔', 'Uncle Barley', 'star', '🐴', '#f0a06a', '常见', '果园家的长子，高大沉默，口头禅是「嗯哼」和「不啦」。', 0, 15, '2026-11-08 19:20:45');
-INSERT INTO `t_pony` VALUES (16, '酪酪', 'Cheesie', 'star', '🥪', '#f7e08a', '常见', '四处旅行的派对搭档，泡芙的老朋友，最擅长手风琴。', 0, 16, '2026-11-08 19:20:45');
-INSERT INTO `t_pony` VALUES (17, '奶油夫人', 'Madame Cream', 'star', '🧁', '#f5c08a', '常见', '糖霜镇纸杯蛋糕店的老板，烤的杯糕连泡芙都抢着要。', 0, 17, '2026-11-08 19:20:45');
-INSERT INTO `t_pony` VALUES (18, '糖丝师傅', 'Sugarline', 'star', '🍬', '#c9a0e8', '稀有', '云顶城的糖果艺术家，能把糖丝拉成一件小礼服。', 0, 18, '2026-11-08 19:20:45');
-INSERT INTO `t_pony` VALUES (19, '糖豆', 'Jellybean', 'star', '🍭', '#f7a8c4', '常见', '手工糖果小贩，招牌酸角糖豆，嘴里总念叨「才不是爱吃糖」。', 0, 19, '2026-11-08 19:20:45');
-INSERT INTO `t_pony` VALUES (20, '薇拉·绸缎', 'Vela Silk', 'star', '🎩', '#b8a0d8', '稀有', '从云顶城来的面料设计师，绮罗的竞争对手，嘴甜心硬。', 0, 20, '2026-11-08 19:20:45');
-INSERT INTO `t_pony` VALUES (21, '托比先生', 'Mr. Toby', 'star', '👓', '#a8b8c8', '稀有', '时尚评论家，一句「太寻常了」能让设计师失眠一整周。', 0, 21, '2026-11-08 19:20:45');
-INSERT INTO `t_pony` VALUES (22, '缕缕', 'Threadie', 'star', '🧣', '#d8a8b8', '常见', '惜字如金的裁缝，缝制的外套走线精致，一针一线都讲究。', 0, 22, '2026-11-08 19:20:45');
+INSERT INTO `t_pony` VALUES (1, '星澜', 'Lumina Gleam', 'twilight', '📖', '#b79cf0', '传说', '星辉书阁的管理员，把复杂知识整理成清楚清单，六色心印就是她归纳出来的。', 0, 1, '2026-11-18 08:43:38');
+INSERT INTO `t_pony` VALUES (2, '泡芙', 'Puffette', 'pinkie', '🎈', '#f7a8c4', '稀有', '糖霜镇的甜点师，随身带着彩纸和糖霜，走到哪儿哪儿就开起小派对。', 0, 2, '2026-11-18 08:43:38');
+INSERT INTO `t_pony` VALUES (3, '云驰', 'Zephyr Cloud', 'dash', '⚡', '#8fc7f0', '稀有', '流云城的信使队长，一眨眼穿过整片云海，答应过的事从不迟到。', 0, 3, '2026-11-18 08:43:38');
+INSERT INTO `t_pony` VALUES (4, '金穗', 'Harvesta', 'applejack', '🍎', '#f0a06a', '稀有', '金穗果园的园主，戴一顶草帽，说话算数，最见不得账目含糊。', 0, 4, '2026-11-18 08:43:38');
+INSERT INTO `t_pony` VALUES (5, '茸茸', 'Mossy Fluff', 'fluttershy', '🦋', '#a7e3c9', '稀有', '住在林边小屋的照料员，听得懂小动物的心思，连胆小的松鼠都愿意靠近。', 0, 5, '2026-11-18 08:43:38');
+INSERT INTO `t_pony` VALUES (6, '绮罗', 'Silkara', 'rarity', '💎', '#f7e08a', '稀有', '缎带工坊的主理人，一匹缎带几颗玻璃珠就能让旧衣焕然一新，最舍得分给朋友。', 0, 6, '2026-11-18 08:43:38');
+INSERT INTO `t_pony` VALUES (7, '曦光院长', 'Matron Solia', 'star', '☀️', '#f7c94c', '传说', '星辉学院的创办人，掌管白昼与开学典礼，星澜的老师。', 0, 7, '2026-11-18 08:43:38');
+INSERT INTO `t_pony` VALUES (8, '月汐院长', 'Matron Moona', 'star', '🌙', '#8f7ae8', '传说', '守夜的导师，替大家看护梦境，曾一度迷失在暗夜里，后来回到学院。', 0, 8, '2026-11-18 08:43:38');
+INSERT INTO `t_pony` VALUES (9, '暖心导师', 'Mentor Aria', 'star', '💗', '#f7a8c4', '传说', '冰晶城的守护者，擅长调解争执，星澜小时候由她照看。', 0, 9, '2026-11-18 08:43:38');
+INSERT INTO `t_pony` VALUES (10, '亮盾卫长', 'Captain Brightshield', 'star', '🛡️', '#8fc7f0', '稀有', '云顶卫队队长、冰晶城的守门人，星澜的兄长。', 0, 10, '2026-11-18 08:43:38');
+INSERT INTO `t_pony` VALUES (11, '星屑', 'Stardust', 'star', '⭐', '#b79cf0', '稀有', '曾主张大家收起心印图案，后来成为星辉学院校长，学会尊重每个人的不同。', 0, 11, '2026-11-18 08:43:38');
+INSERT INTO `t_pony` VALUES (12, '小穗芽', 'Sprout', 'star', '🌼', '#f0a06a', '常见', '金穗的妹妹，心印小队的发起人，总在找自己的拿手本领。', 0, 12, '2026-11-18 08:43:38');
+INSERT INTO `t_pony` VALUES (13, '甜铃铛', 'Bellsy', 'star', '🎀', '#f7a8c4', '常见', '绮罗的妹妹，歌声最甜的小星角驹。', 0, 13, '2026-11-18 08:43:38');
+INSERT INTO `t_pony` VALUES (14, '小滑车', 'Rollie', 'star', '🛴', '#8fc7f0', '常见', '云驰的头号粉丝，踩着滑板车到处飞驰的小云翼驹。', 0, 14, '2026-11-18 08:43:38');
+INSERT INTO `t_pony` VALUES (15, '大麦叔', 'Uncle Barley', 'star', '🐴', '#f0a06a', '常见', '果园家的长子，高大沉默，口头禅是「嗯哼」和「不啦」。', 0, 15, '2026-11-18 08:43:38');
+INSERT INTO `t_pony` VALUES (16, '酪酪', 'Cheesie', 'star', '🥪', '#f7e08a', '常见', '四处旅行的派对搭档，泡芙的老朋友，最擅长手风琴。', 0, 16, '2026-11-18 08:43:38');
+INSERT INTO `t_pony` VALUES (17, '奶油夫人', 'Madame Cream', 'star', '🧁', '#f5c08a', '常见', '糖霜镇纸杯蛋糕店的老板，烤的杯糕连泡芙都抢着要。', 0, 17, '2026-11-18 08:43:38');
+INSERT INTO `t_pony` VALUES (18, '糖丝师傅', 'Sugarline', 'star', '🍬', '#c9a0e8', '稀有', '云顶城的糖果艺术家，能把糖丝拉成一件小礼服。', 0, 18, '2026-11-18 08:43:38');
+INSERT INTO `t_pony` VALUES (19, '糖豆', 'Jellybean', 'star', '🍭', '#f7a8c4', '常见', '手工糖果小贩，招牌酸角糖豆，嘴里总念叨「才不是爱吃糖」。', 0, 19, '2026-11-18 08:43:38');
+INSERT INTO `t_pony` VALUES (20, '薇拉·绸缎', 'Vela Silk', 'star', '🎩', '#b8a0d8', '稀有', '从云顶城来的面料设计师，绮罗的竞争对手，嘴甜心硬。', 0, 20, '2026-11-18 08:43:38');
+INSERT INTO `t_pony` VALUES (21, '托比先生', 'Mr. Toby', 'star', '👓', '#a8b8c8', '稀有', '时尚评论家，一句「太寻常了」能让设计师失眠一整周。', 0, 21, '2026-11-18 08:43:38');
+INSERT INTO `t_pony` VALUES (22, '缕缕', 'Threadie', 'star', '🧣', '#d8a8b8', '常见', '惜字如金的裁缝，缝制的外套走线精致，一针一线都讲究。', 0, 22, '2026-11-18 08:43:38');
 
 -- ----------------------------
 -- Table structure for t_pony_category
@@ -426,65 +474,65 @@ CREATE TABLE `t_pony_category`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_pony_category`(`pony_id` ASC, `category_id` ASC) USING BTREE,
   INDEX `idx_pc_category`(`category_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 109 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '小马条目与分类的关联表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 163 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '小马条目与分类的关联表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_pony_category
 -- ----------------------------
-INSERT INTO `t_pony_category` VALUES (55, 1, 13);
-INSERT INTO `t_pony_category` VALUES (56, 1, 14);
-INSERT INTO `t_pony_category` VALUES (57, 1, 26);
-INSERT INTO `t_pony_category` VALUES (58, 1, 32);
-INSERT INTO `t_pony_category` VALUES (59, 2, 11);
-INSERT INTO `t_pony_category` VALUES (60, 2, 21);
-INSERT INTO `t_pony_category` VALUES (61, 2, 31);
-INSERT INTO `t_pony_category` VALUES (62, 3, 12);
-INSERT INTO `t_pony_category` VALUES (63, 3, 22);
-INSERT INTO `t_pony_category` VALUES (64, 3, 33);
-INSERT INTO `t_pony_category` VALUES (65, 4, 11);
-INSERT INTO `t_pony_category` VALUES (66, 4, 25);
-INSERT INTO `t_pony_category` VALUES (67, 4, 31);
-INSERT INTO `t_pony_category` VALUES (68, 5, 12);
-INSERT INTO `t_pony_category` VALUES (69, 5, 23);
-INSERT INTO `t_pony_category` VALUES (70, 5, 31);
-INSERT INTO `t_pony_category` VALUES (71, 6, 13);
-INSERT INTO `t_pony_category` VALUES (72, 6, 24);
-INSERT INTO `t_pony_category` VALUES (73, 6, 32);
-INSERT INTO `t_pony_category` VALUES (74, 7, 14);
-INSERT INTO `t_pony_category` VALUES (75, 7, 32);
-INSERT INTO `t_pony_category` VALUES (76, 8, 14);
-INSERT INTO `t_pony_category` VALUES (77, 8, 32);
-INSERT INTO `t_pony_category` VALUES (78, 9, 14);
-INSERT INTO `t_pony_category` VALUES (79, 9, 34);
-INSERT INTO `t_pony_category` VALUES (80, 10, 13);
-INSERT INTO `t_pony_category` VALUES (81, 10, 34);
-INSERT INTO `t_pony_category` VALUES (82, 11, 13);
-INSERT INTO `t_pony_category` VALUES (83, 11, 31);
-INSERT INTO `t_pony_category` VALUES (84, 12, 11);
-INSERT INTO `t_pony_category` VALUES (85, 12, 31);
-INSERT INTO `t_pony_category` VALUES (86, 13, 13);
-INSERT INTO `t_pony_category` VALUES (87, 13, 31);
-INSERT INTO `t_pony_category` VALUES (88, 14, 12);
-INSERT INTO `t_pony_category` VALUES (89, 14, 31);
-INSERT INTO `t_pony_category` VALUES (90, 15, 11);
-INSERT INTO `t_pony_category` VALUES (91, 15, 31);
-INSERT INTO `t_pony_category` VALUES (92, 16, 11);
-INSERT INTO `t_pony_category` VALUES (93, 16, 21);
-INSERT INTO `t_pony_category` VALUES (94, 16, 31);
-INSERT INTO `t_pony_category` VALUES (95, 17, 11);
-INSERT INTO `t_pony_category` VALUES (96, 17, 21);
-INSERT INTO `t_pony_category` VALUES (97, 17, 31);
-INSERT INTO `t_pony_category` VALUES (98, 18, 11);
-INSERT INTO `t_pony_category` VALUES (99, 18, 24);
-INSERT INTO `t_pony_category` VALUES (100, 18, 32);
-INSERT INTO `t_pony_category` VALUES (101, 19, 11);
-INSERT INTO `t_pony_category` VALUES (102, 19, 31);
-INSERT INTO `t_pony_category` VALUES (103, 20, 11);
-INSERT INTO `t_pony_category` VALUES (104, 20, 32);
-INSERT INTO `t_pony_category` VALUES (105, 21, 11);
-INSERT INTO `t_pony_category` VALUES (106, 21, 32);
-INSERT INTO `t_pony_category` VALUES (107, 22, 11);
-INSERT INTO `t_pony_category` VALUES (108, 22, 31);
+INSERT INTO `t_pony_category` VALUES (109, 1, 13);
+INSERT INTO `t_pony_category` VALUES (110, 1, 14);
+INSERT INTO `t_pony_category` VALUES (111, 1, 26);
+INSERT INTO `t_pony_category` VALUES (112, 1, 32);
+INSERT INTO `t_pony_category` VALUES (113, 2, 11);
+INSERT INTO `t_pony_category` VALUES (114, 2, 21);
+INSERT INTO `t_pony_category` VALUES (115, 2, 31);
+INSERT INTO `t_pony_category` VALUES (116, 3, 12);
+INSERT INTO `t_pony_category` VALUES (117, 3, 22);
+INSERT INTO `t_pony_category` VALUES (118, 3, 33);
+INSERT INTO `t_pony_category` VALUES (119, 4, 11);
+INSERT INTO `t_pony_category` VALUES (120, 4, 25);
+INSERT INTO `t_pony_category` VALUES (121, 4, 31);
+INSERT INTO `t_pony_category` VALUES (122, 5, 12);
+INSERT INTO `t_pony_category` VALUES (123, 5, 23);
+INSERT INTO `t_pony_category` VALUES (124, 5, 31);
+INSERT INTO `t_pony_category` VALUES (125, 6, 13);
+INSERT INTO `t_pony_category` VALUES (126, 6, 24);
+INSERT INTO `t_pony_category` VALUES (127, 6, 32);
+INSERT INTO `t_pony_category` VALUES (128, 7, 14);
+INSERT INTO `t_pony_category` VALUES (129, 7, 32);
+INSERT INTO `t_pony_category` VALUES (130, 8, 14);
+INSERT INTO `t_pony_category` VALUES (131, 8, 32);
+INSERT INTO `t_pony_category` VALUES (132, 9, 14);
+INSERT INTO `t_pony_category` VALUES (133, 9, 34);
+INSERT INTO `t_pony_category` VALUES (134, 10, 13);
+INSERT INTO `t_pony_category` VALUES (135, 10, 34);
+INSERT INTO `t_pony_category` VALUES (136, 11, 13);
+INSERT INTO `t_pony_category` VALUES (137, 11, 31);
+INSERT INTO `t_pony_category` VALUES (138, 12, 11);
+INSERT INTO `t_pony_category` VALUES (139, 12, 31);
+INSERT INTO `t_pony_category` VALUES (140, 13, 13);
+INSERT INTO `t_pony_category` VALUES (141, 13, 31);
+INSERT INTO `t_pony_category` VALUES (142, 14, 12);
+INSERT INTO `t_pony_category` VALUES (143, 14, 31);
+INSERT INTO `t_pony_category` VALUES (144, 15, 11);
+INSERT INTO `t_pony_category` VALUES (145, 15, 31);
+INSERT INTO `t_pony_category` VALUES (146, 16, 11);
+INSERT INTO `t_pony_category` VALUES (147, 16, 21);
+INSERT INTO `t_pony_category` VALUES (148, 16, 31);
+INSERT INTO `t_pony_category` VALUES (149, 17, 11);
+INSERT INTO `t_pony_category` VALUES (150, 17, 21);
+INSERT INTO `t_pony_category` VALUES (151, 17, 31);
+INSERT INTO `t_pony_category` VALUES (152, 18, 11);
+INSERT INTO `t_pony_category` VALUES (153, 18, 24);
+INSERT INTO `t_pony_category` VALUES (154, 18, 32);
+INSERT INTO `t_pony_category` VALUES (155, 19, 11);
+INSERT INTO `t_pony_category` VALUES (156, 19, 31);
+INSERT INTO `t_pony_category` VALUES (157, 20, 11);
+INSERT INTO `t_pony_category` VALUES (158, 20, 32);
+INSERT INTO `t_pony_category` VALUES (159, 21, 11);
+INSERT INTO `t_pony_category` VALUES (160, 21, 32);
+INSERT INTO `t_pony_category` VALUES (161, 22, 11);
+INSERT INTO `t_pony_category` VALUES (162, 22, 31);
 
 -- ----------------------------
 -- Table structure for t_pony_tag
@@ -497,125 +545,125 @@ CREATE TABLE `t_pony_tag`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_pony_tag`(`pony_id` ASC, `tag` ASC) USING BTREE,
   INDEX `idx_tag`(`tag` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 229 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '小马条目关键词标签' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 343 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '小马条目关键词标签' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_pony_tag
 -- ----------------------------
-INSERT INTO `t_pony_tag` VALUES (117, 1, '学霸');
-INSERT INTO `t_pony_tag` VALUES (118, 1, '星光');
-INSERT INTO `t_pony_tag` VALUES (115, 1, '星辉');
-INSERT INTO `t_pony_tag` VALUES (116, 1, '读书');
-INSERT INTO `t_pony_tag` VALUES (119, 1, '院长');
-INSERT INTO `t_pony_tag` VALUES (125, 2, '搞怪');
-INSERT INTO `t_pony_tag` VALUES (121, 2, '欢悦');
-INSERT INTO `t_pony_tag` VALUES (120, 2, '派对');
-INSERT INTO `t_pony_tag` VALUES (123, 2, '甜品');
-INSERT INTO `t_pony_tag` VALUES (122, 2, '甜点');
-INSERT INTO `t_pony_tag` VALUES (124, 2, '糖霜杯糕');
-INSERT INTO `t_pony_tag` VALUES (130, 3, '守护');
-INSERT INTO `t_pony_tag` VALUES (128, 3, '彩虹');
-INSERT INTO `t_pony_tag` VALUES (127, 3, '竞速');
-INSERT INTO `t_pony_tag` VALUES (129, 3, '闪电');
-INSERT INTO `t_pony_tag` VALUES (126, 3, '飞行');
-INSERT INTO `t_pony_tag` VALUES (132, 4, '农场');
-INSERT INTO `t_pony_tag` VALUES (135, 4, '力气大');
-INSERT INTO `t_pony_tag` VALUES (134, 4, '牛仔');
-INSERT INTO `t_pony_tag` VALUES (133, 4, '真切');
-INSERT INTO `t_pony_tag` VALUES (131, 4, '苹果');
-INSERT INTO `t_pony_tag` VALUES (138, 5, '嫩叶绒球');
-INSERT INTO `t_pony_tag` VALUES (140, 5, '害羞');
-INSERT INTO `t_pony_tag` VALUES (137, 5, '小动物');
-INSERT INTO `t_pony_tag` VALUES (139, 5, '森林');
-INSERT INTO `t_pony_tag` VALUES (136, 5, '温柔');
-INSERT INTO `t_pony_tag` VALUES (144, 6, '优雅');
-INSERT INTO `t_pony_tag` VALUES (145, 6, '分享');
-INSERT INTO `t_pony_tag` VALUES (142, 6, '宝石');
-INSERT INTO `t_pony_tag` VALUES (141, 6, '时尚');
-INSERT INTO `t_pony_tag` VALUES (143, 6, '设计');
-INSERT INTO `t_pony_tag` VALUES (146, 7, '太阳');
-INSERT INTO `t_pony_tag` VALUES (150, 7, '温柔');
-INSERT INTO `t_pony_tag` VALUES (148, 7, '王族');
-INSERT INTO `t_pony_tag` VALUES (147, 7, '白昼');
-INSERT INTO `t_pony_tag` VALUES (149, 7, '老师');
-INSERT INTO `t_pony_tag` VALUES (152, 8, '夜晚');
-INSERT INTO `t_pony_tag` VALUES (155, 8, '暗夜之影');
-INSERT INTO `t_pony_tag` VALUES (151, 8, '月亮');
-INSERT INTO `t_pony_tag` VALUES (153, 8, '梦境');
-INSERT INTO `t_pony_tag` VALUES (154, 8, '王族');
-INSERT INTO `t_pony_tag` VALUES (159, 9, '守护');
-INSERT INTO `t_pony_tag` VALUES (157, 9, '水晶');
-INSERT INTO `t_pony_tag` VALUES (160, 9, '温柔');
-INSERT INTO `t_pony_tag` VALUES (156, 9, '爱情');
-INSERT INTO `t_pony_tag` VALUES (158, 9, '王族');
-INSERT INTO `t_pony_tag` VALUES (164, 10, '哥哥');
-INSERT INTO `t_pony_tag` VALUES (161, 10, '守卫');
-INSERT INTO `t_pony_tag` VALUES (163, 10, '王族');
-INSERT INTO `t_pony_tag` VALUES (162, 10, '盾牌');
-INSERT INTO `t_pony_tag` VALUES (165, 10, '队长');
-INSERT INTO `t_pony_tag` VALUES (167, 11, '学校');
-INSERT INTO `t_pony_tag` VALUES (168, 11, '平等');
-INSERT INTO `t_pony_tag` VALUES (170, 11, '星角驹');
-INSERT INTO `t_pony_tag` VALUES (166, 11, '星辉');
-INSERT INTO `t_pony_tag` VALUES (169, 11, '校长');
-INSERT INTO `t_pony_tag` VALUES (174, 12, '妹妹');
-INSERT INTO `t_pony_tag` VALUES (173, 12, '心印图案');
-INSERT INTO `t_pony_tag` VALUES (172, 12, '心印小队');
-INSERT INTO `t_pony_tag` VALUES (171, 12, '苹果');
-INSERT INTO `t_pony_tag` VALUES (175, 12, '蝴蝶结');
-INSERT INTO `t_pony_tag` VALUES (177, 13, '唱歌');
-INSERT INTO `t_pony_tag` VALUES (180, 13, '妹妹');
-INSERT INTO `t_pony_tag` VALUES (179, 13, '心印图案');
-INSERT INTO `t_pony_tag` VALUES (178, 13, '心印小队');
-INSERT INTO `t_pony_tag` VALUES (176, 13, '歌喉');
-INSERT INTO `t_pony_tag` VALUES (183, 14, '心印图案');
-INSERT INTO `t_pony_tag` VALUES (182, 14, '心印小队');
-INSERT INTO `t_pony_tag` VALUES (181, 14, '滑板车');
-INSERT INTO `t_pony_tag` VALUES (184, 14, '粉丝');
-INSERT INTO `t_pony_tag` VALUES (185, 14, '翅膀');
-INSERT INTO `t_pony_tag` VALUES (187, 15, '农场');
-INSERT INTO `t_pony_tag` VALUES (190, 15, '力气大');
-INSERT INTO `t_pony_tag` VALUES (189, 15, '哥哥');
-INSERT INTO `t_pony_tag` VALUES (188, 15, '沉默');
-INSERT INTO `t_pony_tag` VALUES (186, 15, '苹果');
-INSERT INTO `t_pony_tag` VALUES (192, 16, '手风琴');
-INSERT INTO `t_pony_tag` VALUES (193, 16, '旅行');
-INSERT INTO `t_pony_tag` VALUES (194, 16, '欢悦');
-INSERT INTO `t_pony_tag` VALUES (191, 16, '派对');
-INSERT INTO `t_pony_tag` VALUES (195, 16, '美食');
-INSERT INTO `t_pony_tag` VALUES (200, 17, '派对');
-INSERT INTO `t_pony_tag` VALUES (198, 17, '烘焙');
-INSERT INTO `t_pony_tag` VALUES (197, 17, '甜品');
-INSERT INTO `t_pony_tag` VALUES (196, 17, '甜点');
-INSERT INTO `t_pony_tag` VALUES (201, 17, '糖霜镇');
-INSERT INTO `t_pony_tag` VALUES (199, 17, '纸杯蛋糕');
-INSERT INTO `t_pony_tag` VALUES (207, 18, '云顶城');
-INSERT INTO `t_pony_tag` VALUES (203, 18, '甜品');
-INSERT INTO `t_pony_tag` VALUES (202, 18, '甜点');
-INSERT INTO `t_pony_tag` VALUES (206, 18, '精致');
-INSERT INTO `t_pony_tag` VALUES (204, 18, '糖果');
-INSERT INTO `t_pony_tag` VALUES (205, 18, '艺术');
-INSERT INTO `t_pony_tag` VALUES (213, 19, '手工');
-INSERT INTO `t_pony_tag` VALUES (211, 19, '甜品');
-INSERT INTO `t_pony_tag` VALUES (210, 19, '甜点');
-INSERT INTO `t_pony_tag` VALUES (208, 19, '糖果');
-INSERT INTO `t_pony_tag` VALUES (209, 19, '糖豆');
-INSERT INTO `t_pony_tag` VALUES (212, 19, '糖霜镇');
-INSERT INTO `t_pony_tag` VALUES (218, 20, '云顶城');
-INSERT INTO `t_pony_tag` VALUES (214, 20, '时尚');
-INSERT INTO `t_pony_tag` VALUES (215, 20, '皮草');
-INSERT INTO `t_pony_tag` VALUES (217, 20, '竞争对手');
-INSERT INTO `t_pony_tag` VALUES (216, 20, '设计');
-INSERT INTO `t_pony_tag` VALUES (222, 21, '云顶城');
-INSERT INTO `t_pony_tag` VALUES (221, 21, '墨镜');
-INSERT INTO `t_pony_tag` VALUES (223, 21, '挑剔');
-INSERT INTO `t_pony_tag` VALUES (219, 21, '时尚');
-INSERT INTO `t_pony_tag` VALUES (220, 21, '评论');
-INSERT INTO `t_pony_tag` VALUES (226, 22, '外套');
-INSERT INTO `t_pony_tag` VALUES (228, 22, '手巧');
-INSERT INTO `t_pony_tag` VALUES (224, 22, '时尚');
-INSERT INTO `t_pony_tag` VALUES (227, 22, '糖霜镇');
-INSERT INTO `t_pony_tag` VALUES (225, 22, '裁缝');
+INSERT INTO `t_pony_tag` VALUES (231, 1, '学霸');
+INSERT INTO `t_pony_tag` VALUES (232, 1, '星光');
+INSERT INTO `t_pony_tag` VALUES (229, 1, '星辉');
+INSERT INTO `t_pony_tag` VALUES (230, 1, '读书');
+INSERT INTO `t_pony_tag` VALUES (233, 1, '院长');
+INSERT INTO `t_pony_tag` VALUES (239, 2, '搞怪');
+INSERT INTO `t_pony_tag` VALUES (235, 2, '欢悦');
+INSERT INTO `t_pony_tag` VALUES (234, 2, '派对');
+INSERT INTO `t_pony_tag` VALUES (237, 2, '甜品');
+INSERT INTO `t_pony_tag` VALUES (236, 2, '甜点');
+INSERT INTO `t_pony_tag` VALUES (238, 2, '糖霜杯糕');
+INSERT INTO `t_pony_tag` VALUES (244, 3, '守护');
+INSERT INTO `t_pony_tag` VALUES (242, 3, '彩虹');
+INSERT INTO `t_pony_tag` VALUES (241, 3, '竞速');
+INSERT INTO `t_pony_tag` VALUES (243, 3, '闪电');
+INSERT INTO `t_pony_tag` VALUES (240, 3, '飞行');
+INSERT INTO `t_pony_tag` VALUES (246, 4, '农场');
+INSERT INTO `t_pony_tag` VALUES (249, 4, '力气大');
+INSERT INTO `t_pony_tag` VALUES (248, 4, '牛仔');
+INSERT INTO `t_pony_tag` VALUES (247, 4, '真切');
+INSERT INTO `t_pony_tag` VALUES (245, 4, '苹果');
+INSERT INTO `t_pony_tag` VALUES (252, 5, '嫩叶绒球');
+INSERT INTO `t_pony_tag` VALUES (254, 5, '害羞');
+INSERT INTO `t_pony_tag` VALUES (251, 5, '小动物');
+INSERT INTO `t_pony_tag` VALUES (253, 5, '森林');
+INSERT INTO `t_pony_tag` VALUES (250, 5, '温柔');
+INSERT INTO `t_pony_tag` VALUES (258, 6, '优雅');
+INSERT INTO `t_pony_tag` VALUES (259, 6, '分享');
+INSERT INTO `t_pony_tag` VALUES (256, 6, '宝石');
+INSERT INTO `t_pony_tag` VALUES (255, 6, '时尚');
+INSERT INTO `t_pony_tag` VALUES (257, 6, '设计');
+INSERT INTO `t_pony_tag` VALUES (260, 7, '太阳');
+INSERT INTO `t_pony_tag` VALUES (264, 7, '温柔');
+INSERT INTO `t_pony_tag` VALUES (262, 7, '王族');
+INSERT INTO `t_pony_tag` VALUES (261, 7, '白昼');
+INSERT INTO `t_pony_tag` VALUES (263, 7, '老师');
+INSERT INTO `t_pony_tag` VALUES (266, 8, '夜晚');
+INSERT INTO `t_pony_tag` VALUES (269, 8, '暗夜之影');
+INSERT INTO `t_pony_tag` VALUES (265, 8, '月亮');
+INSERT INTO `t_pony_tag` VALUES (267, 8, '梦境');
+INSERT INTO `t_pony_tag` VALUES (268, 8, '王族');
+INSERT INTO `t_pony_tag` VALUES (273, 9, '守护');
+INSERT INTO `t_pony_tag` VALUES (271, 9, '水晶');
+INSERT INTO `t_pony_tag` VALUES (274, 9, '温柔');
+INSERT INTO `t_pony_tag` VALUES (270, 9, '爱情');
+INSERT INTO `t_pony_tag` VALUES (272, 9, '王族');
+INSERT INTO `t_pony_tag` VALUES (278, 10, '哥哥');
+INSERT INTO `t_pony_tag` VALUES (275, 10, '守卫');
+INSERT INTO `t_pony_tag` VALUES (277, 10, '王族');
+INSERT INTO `t_pony_tag` VALUES (276, 10, '盾牌');
+INSERT INTO `t_pony_tag` VALUES (279, 10, '队长');
+INSERT INTO `t_pony_tag` VALUES (281, 11, '学校');
+INSERT INTO `t_pony_tag` VALUES (282, 11, '平等');
+INSERT INTO `t_pony_tag` VALUES (284, 11, '星角驹');
+INSERT INTO `t_pony_tag` VALUES (280, 11, '星辉');
+INSERT INTO `t_pony_tag` VALUES (283, 11, '校长');
+INSERT INTO `t_pony_tag` VALUES (288, 12, '妹妹');
+INSERT INTO `t_pony_tag` VALUES (287, 12, '心印图案');
+INSERT INTO `t_pony_tag` VALUES (286, 12, '心印小队');
+INSERT INTO `t_pony_tag` VALUES (285, 12, '苹果');
+INSERT INTO `t_pony_tag` VALUES (289, 12, '蝴蝶结');
+INSERT INTO `t_pony_tag` VALUES (291, 13, '唱歌');
+INSERT INTO `t_pony_tag` VALUES (294, 13, '妹妹');
+INSERT INTO `t_pony_tag` VALUES (293, 13, '心印图案');
+INSERT INTO `t_pony_tag` VALUES (292, 13, '心印小队');
+INSERT INTO `t_pony_tag` VALUES (290, 13, '歌喉');
+INSERT INTO `t_pony_tag` VALUES (297, 14, '心印图案');
+INSERT INTO `t_pony_tag` VALUES (296, 14, '心印小队');
+INSERT INTO `t_pony_tag` VALUES (295, 14, '滑板车');
+INSERT INTO `t_pony_tag` VALUES (298, 14, '粉丝');
+INSERT INTO `t_pony_tag` VALUES (299, 14, '翅膀');
+INSERT INTO `t_pony_tag` VALUES (301, 15, '农场');
+INSERT INTO `t_pony_tag` VALUES (304, 15, '力气大');
+INSERT INTO `t_pony_tag` VALUES (303, 15, '哥哥');
+INSERT INTO `t_pony_tag` VALUES (302, 15, '沉默');
+INSERT INTO `t_pony_tag` VALUES (300, 15, '苹果');
+INSERT INTO `t_pony_tag` VALUES (306, 16, '手风琴');
+INSERT INTO `t_pony_tag` VALUES (307, 16, '旅行');
+INSERT INTO `t_pony_tag` VALUES (308, 16, '欢悦');
+INSERT INTO `t_pony_tag` VALUES (305, 16, '派对');
+INSERT INTO `t_pony_tag` VALUES (309, 16, '美食');
+INSERT INTO `t_pony_tag` VALUES (314, 17, '派对');
+INSERT INTO `t_pony_tag` VALUES (312, 17, '烘焙');
+INSERT INTO `t_pony_tag` VALUES (311, 17, '甜品');
+INSERT INTO `t_pony_tag` VALUES (310, 17, '甜点');
+INSERT INTO `t_pony_tag` VALUES (315, 17, '糖霜镇');
+INSERT INTO `t_pony_tag` VALUES (313, 17, '纸杯蛋糕');
+INSERT INTO `t_pony_tag` VALUES (321, 18, '云顶城');
+INSERT INTO `t_pony_tag` VALUES (317, 18, '甜品');
+INSERT INTO `t_pony_tag` VALUES (316, 18, '甜点');
+INSERT INTO `t_pony_tag` VALUES (320, 18, '精致');
+INSERT INTO `t_pony_tag` VALUES (318, 18, '糖果');
+INSERT INTO `t_pony_tag` VALUES (319, 18, '艺术');
+INSERT INTO `t_pony_tag` VALUES (327, 19, '手工');
+INSERT INTO `t_pony_tag` VALUES (325, 19, '甜品');
+INSERT INTO `t_pony_tag` VALUES (324, 19, '甜点');
+INSERT INTO `t_pony_tag` VALUES (322, 19, '糖果');
+INSERT INTO `t_pony_tag` VALUES (323, 19, '糖豆');
+INSERT INTO `t_pony_tag` VALUES (326, 19, '糖霜镇');
+INSERT INTO `t_pony_tag` VALUES (332, 20, '云顶城');
+INSERT INTO `t_pony_tag` VALUES (328, 20, '时尚');
+INSERT INTO `t_pony_tag` VALUES (329, 20, '皮草');
+INSERT INTO `t_pony_tag` VALUES (331, 20, '竞争对手');
+INSERT INTO `t_pony_tag` VALUES (330, 20, '设计');
+INSERT INTO `t_pony_tag` VALUES (336, 21, '云顶城');
+INSERT INTO `t_pony_tag` VALUES (335, 21, '墨镜');
+INSERT INTO `t_pony_tag` VALUES (337, 21, '挑剔');
+INSERT INTO `t_pony_tag` VALUES (333, 21, '时尚');
+INSERT INTO `t_pony_tag` VALUES (334, 21, '评论');
+INSERT INTO `t_pony_tag` VALUES (340, 22, '外套');
+INSERT INTO `t_pony_tag` VALUES (342, 22, '手巧');
+INSERT INTO `t_pony_tag` VALUES (338, 22, '时尚');
+INSERT INTO `t_pony_tag` VALUES (341, 22, '糖霜镇');
+INSERT INTO `t_pony_tag` VALUES (339, 22, '裁缝');
 
 -- ----------------------------
 -- Table structure for t_search_word
@@ -628,7 +676,7 @@ CREATE TABLE `t_search_word`  (
   `sort_no` int NOT NULL DEFAULT 0 COMMENT '人工置顶权重',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_word`(`word` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 23 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '首页热搜词' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 51 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '首页热搜词' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_search_word
@@ -637,10 +685,10 @@ INSERT INTO `t_search_word` VALUES (2, '飞行', 22, 8);
 INSERT INTO `t_search_word` VALUES (3, '派对', 19, 7);
 INSERT INTO `t_search_word` VALUES (4, '苹果', 16, 6);
 INSERT INTO `t_search_word` VALUES (6, '宝石', 10, 4);
-INSERT INTO `t_search_word` VALUES (11, '星辉', 27, 9);
+INSERT INTO `t_search_word` VALUES (11, '星辉', 35, 9);
 INSERT INTO `t_search_word` VALUES (12, '院长', 14, 5);
-INSERT INTO `t_search_word` VALUES (13, '心印图案', 8, 3);
-INSERT INTO `t_search_word` VALUES (14, '流云城', 5, 2);
+INSERT INTO `t_search_word` VALUES (13, '心印图案', 13, 3);
+INSERT INTO `t_search_word` VALUES (14, '流云城', 10, 2);
 INSERT INTO `t_search_word` VALUES (15, '金穗', 3, 1);
 INSERT INTO `t_search_word` VALUES (16, '星翼驹', 1, 0);
 
@@ -657,7 +705,7 @@ CREATE TABLE `t_task_progress`  (
   `claimed` tinyint NULL DEFAULT 0,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_user_day_task`(`user_id` ASC, `day` ASC, `task_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 38 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 47 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_task_progress
@@ -686,6 +734,15 @@ INSERT INTO `t_task_progress` VALUES (34, 5, '2026-11-13', 'daily_shop', 1, 0);
 INSERT INTO `t_task_progress` VALUES (35, 5, '2026-11-13', 'daily_game', 1, 0);
 INSERT INTO `t_task_progress` VALUES (36, 1, '2026-11-13', 'daily_login', 1, 0);
 INSERT INTO `t_task_progress` VALUES (37, 3, '2026-11-13', 'daily_login', 1, 0);
+INSERT INTO `t_task_progress` VALUES (38, 5, '2026-11-18', 'daily_login', 1, 1);
+INSERT INTO `t_task_progress` VALUES (39, 3, '2026-11-18', 'daily_friend', 1, 0);
+INSERT INTO `t_task_progress` VALUES (40, 3, '2026-11-18', 'daily_gift', 1, 0);
+INSERT INTO `t_task_progress` VALUES (41, 3, '2026-11-18', 'daily_pet', 2, 0);
+INSERT INTO `t_task_progress` VALUES (42, 3, '2026-11-18', 'daily_shop', 1, 0);
+INSERT INTO `t_task_progress` VALUES (43, 3, '2026-11-18', 'daily_login', 1, 0);
+INSERT INTO `t_task_progress` VALUES (44, 5, '2026-11-18', 'daily_game', 1, 1);
+INSERT INTO `t_task_progress` VALUES (45, 5, '2026-11-18', 'daily_pet', 1, 0);
+INSERT INTO `t_task_progress` VALUES (46, 5, '2026-11-18', 'daily_checkin', 1, 0);
 
 -- ----------------------------
 -- Table structure for t_user
@@ -708,9 +765,9 @@ CREATE TABLE `t_user`  (
 -- ----------------------------
 INSERT INTO `t_user` VALUES (1, '巴啦啦', '🦄', 1760000, 'Bll123456', '2026-10-28 08:34:08', 0);
 INSERT INTO `t_user` VALUES (2, 'admin', '', 1661992960, 'Admin@1234yy', '2026-10-28 09:39:48', 2);
-INSERT INTO `t_user` VALUES (3, '哇哇哇', '🎀', 0, 'Www123456', '2026-10-30 16:07:54', 1);
+INSERT INTO `t_user` VALUES (3, '哇哇哇', '🎀', 6414, 'Www123456', '2026-10-30 16:07:54', 1);
 INSERT INTO `t_user` VALUES (4, '啦啦啦', '', 0, 'Lll123456', '2026-10-30 16:26:34', 1);
-INSERT INTO `t_user` VALUES (5, '钱钱钱', '', 519359634, 'Qqq123456', '2026-11-02 10:43:26', 1);
+INSERT INTO `t_user` VALUES (5, '钱钱钱', '', 519361177, 'Qqq123456', '2026-11-02 10:43:26', 1);
 
 -- ----------------------------
 -- Table structure for t_user_item
@@ -724,14 +781,18 @@ CREATE TABLE `t_user_item`  (
   `update_time` datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_user_item`(`user_id` ASC, `item_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 9 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_user_item
 -- ----------------------------
-INSERT INTO `t_user_item` VALUES (1, 5, 'pet-food', 6, '2026-11-08 21:48:48');
+INSERT INTO `t_user_item` VALUES (1, 5, 'pet-food', 5, '2026-11-08 21:48:48');
 INSERT INTO `t_user_item` VALUES (2, 5, 'pet-cake', 6, '2026-11-13 13:32:58');
 INSERT INTO `t_user_item` VALUES (3, 5, 'pet-milk', 5, '2026-11-13 13:33:00');
 INSERT INTO `t_user_item` VALUES (4, 5, 'title-collector', 0, '2026-11-13 13:33:12');
+INSERT INTO `t_user_item` VALUES (5, 3, 'pet-cake', 6, '2026-11-18 08:54:03');
+INSERT INTO `t_user_item` VALUES (6, 3, 'pet-food', 6, '2026-11-18 08:54:06');
+INSERT INTO `t_user_item` VALUES (7, 3, 'pet-milk', 11, '2026-11-18 08:54:09');
+INSERT INTO `t_user_item` VALUES (8, 3, 'title-collector', 1, '2026-11-18 08:54:22');
 
 SET FOREIGN_KEY_CHECKS = 1;

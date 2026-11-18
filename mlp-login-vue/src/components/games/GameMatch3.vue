@@ -1,26 +1,28 @@
 <template>
   <div class="m3-wrap">
-    <!-- HUD：剩余步数 + 提示按钮 + 当前得分 -->
+    <!-- HUD：步数 + 目标进度 + 提示 -->
     <div class="m3-hud">
       <span class="m3-moves">剩余步数 <b>{{ moves }}</b></span>
-      <button class="m3-auto-btn" :class="{ on: mode === 'pick' }" @click="toggleAuto">
-        {{ mode === 'pick' ? '👆 点击消除' : (mode === 'auto' ? '✨ 智能点消' : '✋ 手动交换') }}
-      </button>
+      <div class="m3-progress">
+        <div class="m3-progress-top">
+          <span>目标 {{ target }}</span>
+          <span>{{ score }} / {{ target }}</span>
+        </div>
+        <div class="m3-bar"><div class="m3-bar-fill" :style="{ width: barWidth }"></div></div>
+      </div>
       <button class="m3-hint-btn" :disabled="busy || stage !== 'play'" @click="showHint">💡 提示</button>
-      <span class="m3-total">得分 {{ score }}</span>
     </div>
 
     <!-- ===== 准备阶段 ===== -->
     <div v-if="stage === 'ready'" class="m3-stage m3-ready">
       <div class="m3-mascot">🍬</div>
       <h3>糖豆消消乐</h3>
-      <p>泡芙的糖果罐打翻啦！点 <b>2 颗以上相邻的同色糖豆</b> 就能消除，<br>步数内尽量刷高分，连锁消除还有翻倍奖励 ✨</p>
+      <p>泡芙的糖果罐打翻啦！<b>交换相邻两颗糖豆，连成 3 颗同色</b> 就能消除。<br>在 {{ movesMax }} 步内冲到 <b>{{ target }}</b> 分，还能拿三星 ✨</p>
       <ul class="m3-tip-list">
-        <li>👆 <b>点第一颗，再点相邻的同色糖豆</b> —— 凑够 <b>2 颗</b> 就消除，连成 <b>3 颗以上</b> 整条一起消！</li>
-        <li>✋ 想省事？点上面的按钮切到「✨ 智能点消」，点任意一颗泡芙就帮你消</li>
-        <li>🔁 想自己找？再点一次按钮切到「✋ 手动交换」，先点一颗再点相邻那颗交换</li>
-        <li>💡 点「提示」会<b>发光标出</b>能消的一组；全场没组合了会自动重排，不会卡死</li>
-        <li>🔥 一次消除引发连锁，每多消一轮得分翻倍</li>
+        <li>🔁 <b>交换相邻两颗</b>（点两下或拖动），连成 3 颗同色就消除；连不成会自动弹回，不扣步数</li>
+        <li>🍬 <b>4 连</b> 生成条纹糖（消整行/整列），<b>5 连</b> 生成彩虹糖（交换后消全场同色）</li>
+        <li>🔥 消除后糖豆下落，若又连成 3 颗会<b>连锁消除</b>，每多一轮得分翻倍</li>
+        <li>💡 点「提示」会发光标出一步可消的交换；实在没组合会自动重排，不会卡死</li>
       </ul>
       <button class="m3-btn big" @click="start">开始消除！</button>
     </div>
@@ -33,27 +35,34 @@
           :key="i"
           class="m3-cell"
           :class="{
-            sel: i === sel || picked.includes(i),
+            sel: i === sel,
             breaking: cell.breaking,
             hint: hintCells.includes(i),
-            autoPick: swapCells.includes(i),
-            shake: shakeCells.includes(i)
+            shake: shakeCells.includes(i),
+            special: !!cell.special,
+            'sp-h': cell.special === 'h',
+            'sp-v': cell.special === 'v',
+            'sp-rainbow': cell.special === 'rainbow'
           }"
           :style="{ background: cell.type == null ? 'transparent' : TYPES[cell.type].bg }"
           @click="tap(i)"
-        ><span v-if="cell.type != null">{{ TYPES[cell.type].e }}</span></button>
+          @pointerdown="onDragStart(i)"
+          @pointerenter="onDragEnter(i)"
+          @pointerup="onDragEnd"
+          @pointercancel="onDragEnd"
+        ><span class="m3-emoji">{{ cell.type != null ? TYPES[cell.type].e : '' }}</span><span v-if="cell.special" class="m3-spark">✨</span></button>
       </div>
-      <p class="m3-hint">{{ busy ? '消除中…' : bottomHint }}</p>
-      <p v-if="notice" class="m3-notice">{{ notice }}</p>
-      <button class="m3-btn ghost" @click="restart">重开一局</button>
+      <p class="m3-hint">{{ busy ? '消除中…' : (notice || bottomHint) }}</p>
+      <button class="m3-btn ghost" :disabled="busy" @click="restart">重开一局</button>
     </div>
 
     <!-- ===== 结算 ===== -->
     <div v-else-if="stage === 'done'" class="m3-stage m3-done">
-      <div class="m3-mascot">{{ score >= 600 ? '🏆' : score >= 350 ? '🥈' : '🍬' }}</div>
-      <h3>{{ score >= 600 ? '糖果大师！泡芙都想拜你为师' : score >= 350 ? '手感不错，糖豆都怕你' : '甜甜的一局，再来刷高点！' }}</h3>
+      <div class="m3-mascot">{{ stars >= 3 ? '🏆' : stars >= 2 ? '🥈' : stars >= 1 ? '🥉' : '🍬' }}</div>
+      <h3>{{ stars >= 3 ? '糖果大师！满分三星 🏆' : stars >= 2 ? '手感不错，两星到手！' : stars >= 1 ? '过关啦，再冲冲三星～' : '差一点点，再来一局！' }}</h3>
+      <div class="m3-stars"><span v-for="n in 3" :key="n" :class="{ on: n <= stars }">★</span></div>
       <div class="m3-final">本局得分 <b>{{ score }}</b></div>
-      <div class="m3-final sub">用了 {{ usedMoves }} 步 · 连锁最高 x{{ maxCascade }} · 提示 {{ hintsUsed }} 次</div>
+      <div class="m3-final sub">目标 {{ target }} · 用了 {{ usedMoves }} 步 · 连锁最高 x{{ maxCascade }} · 提示 {{ hintsUsed }} 次</div>
       <button class="m3-btn big" @click="restart">再来一局！</button>
     </div>
   </div>
@@ -77,51 +86,38 @@ export default {
         { e: '🍓', bg: 'linear-gradient(135deg,#c6f0c2,#7fd4a8)' }
       ],
       stage: 'ready',
-      cells: [],          // 长度 R*C，元素 { type:0..5|null, breaking:bool }
+      cells: [],          // { type:0..5|null, special:null|'h'|'v'|'rainbow', breaking:bool }
       sel: null,
-      // 点选模式下已选中的格子下标（相邻同色链）
-      picked: [],
-      moves: 20,
+      movesMax: 25,
+      moves: 25,
+      target: 1000,
       usedMoves: 0,
       score: 0,
       maxCascade: 1,
       busy: false,
-      // ↓ 本次新增：提示 / 无效交换反馈 / 死局洗牌
       hintCells: [],
-      swapCells: [],
-      // 玩法模式：'pick'=点击消除（默认） 'auto'=智能点消 'swap'=手动交换
-      mode: 'pick',
-      queuedTap: null,
       shakeCells: [],
       hintsUsed: 0,
       notice: '',
       noticeTimer: null,
       idleTimer: null,
+      dragFrom: null,
+      dragged: false,
       alive: true
     }
   },
-  created() {
-    // 默认「点选消除」；玩家切过模式就记在本地
-    // （兼容老版本存下来的 mlp_m3_auto：'0'=手动交换, '1'=智能点消）
-    try {
-      const saved = localStorage.getItem('mlp_m3_mode')
-      if (saved === 'pick' || saved === 'auto' || saved === 'swap') {
-        this.mode = saved
-      } else {
-        const old = localStorage.getItem('mlp_m3_auto')
-        this.mode = old === '0' ? 'swap' : 'pick'
-      }
-    } catch (e) { this.mode = 'pick' }
-  },
   computed: {
-    /** 底部提示文案：跟着当前模式走 */
+    barWidth() {
+      return Math.min(100, (this.score / this.target) * 100) + '%'
+    },
     bottomHint() {
-      if (this.mode === 'pick') {
-        if (this.picked.length === 0) return '点一颗糖豆，再点相邻的同色糖豆，凑够 2 颗就消除 👆'
-        return `已选 ${this.picked.length} 颗，再点相邻同色的就消除 ✨`
-      }
-      if (this.mode === 'auto') return '点任意一颗糖豆，泡芙自动帮你消 ✨'
-      return this.sel == null ? '点一颗糖豆开始' : '再点相邻的那颗交换'
+      return this.sel == null ? '点两颗相邻糖豆交换（也可以拖动），连成 3 颗同色就消除 ✨' : '再点相邻的那颗交换，或点自己取消'
+    },
+    stars() {
+      if (this.score >= this.target * 1.6) return 3
+      if (this.score >= this.target) return 2
+      if (this.score >= this.target * 0.5) return 1
+      return 0
     }
   },
   beforeUnmount() {
@@ -139,18 +135,16 @@ export default {
       this.stage = 'play'
       sound.click()
       this.score = 0
-      this.moves = 20
+      this.moves = this.movesMax
       this.usedMoves = 0
       this.maxCascade = 1
       this.hintsUsed = 0
       this.sel = null
-      this.picked = []
       this.busy = false
       this.hintCells = []
-      this.swapCells = []
-      this.queuedTap = null
       this.shakeCells = []
       this.notice = ''
+      this.dragFrom = null
       this.genBoard()
       this.resetIdle()
       this.$emit('score', 0)
@@ -159,143 +153,133 @@ export default {
       this.stage = 'ready'
       this.notice = ''
       this.hintCells = []
-      this.swapCells = []
-      this.picked = []
-      this.sel = null
-      this.queuedTap = null
       this.shakeCells = []
+      this.sel = null
+      this.dragFrom = null
       clearTimeout(this.noticeTimer)
       clearTimeout(this.idleTimer)
       this.$emit('score', 0)
     },
 
-    /* 生成无初始三连、且「保证有可行组合」的棋盘 */
+    /* 生成无初始三连、且保证存在可行交换的棋盘 */
     genBoard() {
-      for (let attempt = 0; attempt < 40; attempt++) {
+      for (let attempt = 0; attempt < 60; attempt++) {
         const arr = new Array(this.R * this.C)
         for (let r = 0; r < this.R; r++) {
           for (let c = 0; c < this.C; c++) {
-            let t
+            let t, guard = 0
             do {
-              t = this.randType()
+              t = this.randType(); guard++
             } while (
-              (c >= 2 && arr[this.idx(r, c - 1)].type === t && arr[this.idx(r, c - 2)].type === t) ||
-              (r >= 2 && arr[this.idx(r - 1, c)].type === t && arr[this.idx(r - 2, c)].type === t)
+              guard < 30 && (
+                (c >= 2 && arr[this.idx(r, c - 1)].type === t && arr[this.idx(r, c - 2)].type === t) ||
+                (r >= 2 && arr[this.idx(r - 1, c)].type === t && arr[this.idx(r - 2, c)].type === t)
+              )
             )
-            arr[this.idx(r, c)] = { type: t, breaking: false }
+            arr[this.idx(r, c)] = { type: t, special: null, breaking: false }
           }
         }
         this.cells = arr
-        // 点选模式：只要有相邻同色就能消；其它模式要能交换出三连
-        if (this.mode === 'pick') {
-          if (this.findClickablePair()) return
-        } else if (this.findHint()) {
-          return
-        }
+        if (this.findRuns().length === 0 && this.findSwapHint()) return
       }
-      // 极端兜底：直接重排现有糖豆，直到有解
       this.shuffleBoard()
     },
 
-    /* 找出所有处于 3+ 连线上的格子下标 */
-    findMatches() {
-      const set = new Set()
+    /* 找出所有 3+ 连线，按段返回（含方向、长度，用于生成特殊糖） */
+    findRuns() {
       const { R, C } = this
+      const runs = []
       for (let r = 0; r < R; r++) {
-        let run = 1
-        for (let c = 1; c <= C; c++) {
-          const a = c < C ? this.cellAt(r, c).type : null
-          const b = this.cellAt(r, c - 1).type
-          if (a != null && a === b) run++
-          else {
-            if (run >= 3) for (let k = c - run; k < c; k++) set.add(this.idx(r, k))
-            run = 1
+        let c = 0
+        while (c < C) {
+          const t = this.cellAt(r, c)?.type
+          if (t == null) { c++; continue }
+          let e = c + 1
+          while (e < C && this.cellAt(r, e)?.type === t) e++
+          if (e - c >= 3) {
+            const cells = []
+            for (let k = c; k < e; k++) cells.push(this.idx(r, k))
+            runs.push({ cells, dir: 'h', len: e - c, type: t })
           }
+          c = e
         }
       }
       for (let c = 0; c < C; c++) {
-        let run = 1
-        for (let r = 1; r <= R; r++) {
-          const a = r < R ? this.cellAt(r, c).type : null
-          const b = this.cellAt(r - 1, c).type
-          if (a != null && a === b) run++
-          else {
-            if (run >= 3) for (let k = r - run; k < r; k++) set.add(this.idx(k, c))
-            run = 1
+        let r = 0
+        while (r < R) {
+          const t = this.cellAt(r, c)?.type
+          if (t == null) { r++; continue }
+          let e = r + 1
+          while (e < R && this.cellAt(e, c)?.type === t) e++
+          if (e - r >= 3) {
+            const cells = []
+            for (let k = r; k < e; k++) cells.push(this.idx(k, c))
+            runs.push({ cells, dir: 'v', len: e - r, type: t })
           }
+          r = e
         }
       }
-      return [...set]
+      return runs
     },
 
-    /**
-     * 找一组「交换后能形成 3 连」的相邻格子，返回 [a, b] 或 null。
-     * 只在类型数组的副本上试，不动真实棋盘。
-     */
-    findHint() {
+    /* 找一个「交换后能形成三连」的相邻对（提示 / 死局检测） */
+    findSwapHint(anchor) {
       const { R, C } = this
       const types = this.cells.map(c => c.type)
-      const at = (r, c) => types[r * C + c]
-      const makes3 = (r, c) => {
-        const t = at(r, c)
-        if (t == null) return false
-        let n = 1
-        for (let k = c - 1; k >= 0 && at(r, k) === t; k--) n++
-        for (let k = c + 1; k < C && at(r, k) === t; k++) n++
-        if (n >= 3) return true
-        n = 1
-        for (let k = r - 1; k >= 0 && at(k, c) === t; k--) n++
-        for (let k = r + 1; k < R && at(k, c) === t; k++) n++
-        return n >= 3
+      const hasRun = () => {
+        for (let r = 0; r < R; r++) for (let c = 0; c + 2 < C; c++) {
+          const t = types[r * C + c]
+          if (t != null && types[r * C + c + 1] === t && types[r * C + c + 2] === t) return true
+        }
+        for (let c = 0; c < C; c++) for (let r = 0; r + 2 < R; r++) {
+          const t = types[r * C + c]
+          if (t != null && types[(r + 1) * C + c] === t && types[(r + 2) * C + c] === t) return true
+        }
+        return false
       }
-      const trySwap = (a, b, r1, c1, r2, c2) => {
+      const tryAt = (a, b) => {
         const t = types[a]; types[a] = types[b]; types[b] = t
-        const ok = makes3(r1, c1) || makes3(r2, c2)
+        const ok = hasRun()
         const t2 = types[a]; types[a] = types[b]; types[b] = t2
         return ok
       }
+      // 若指定锚点，优先找包含它的交换
+      if (anchor != null) {
+        const r = Math.floor(anchor / C), c = anchor % C
+        const near = []
+        if (c + 1 < C) near.push([anchor, anchor + 1])
+        if (c > 0) near.push([anchor, anchor - 1])
+        if (r + 1 < R) near.push([anchor, anchor + C])
+        if (r > 0) near.push([anchor, anchor - C])
+        for (const [a, b] of near) if (tryAt(a, b)) return [a, b]
+      }
       for (let r = 0; r < R; r++) {
         for (let c = 0; c < C; c++) {
-          if (c + 1 < C) {
-            const a = this.idx(r, c), b = this.idx(r, c + 1)
-            if (trySwap(a, b, r, c, r, c + 1)) return [a, b]
-          }
-          if (r + 1 < R) {
-            const a = this.idx(r, c), b = this.idx(r + 1, c)
-            if (trySwap(a, b, r, c, r + 1, c)) return [a, b]
-          }
+          if (c + 1 < C && tryAt(this.idx(r, c), this.idx(r, c + 1))) return [this.idx(r, c), this.idx(r, c + 1)]
+          if (r + 1 < R && tryAt(this.idx(r, c), this.idx(r + 1, c))) return [this.idx(r, c), this.idx(r + 1, c)]
         }
       }
       return null
     },
 
-    /** 洗牌：随机重排现有糖豆，直到「无自动三连」且「有可行组合」 */
+    /* 洗牌：重排现有糖豆，直到无三连且有解 */
     shuffleBoard() {
       const types = this.cells.map(c => c.type)
-      for (let attempt = 0; attempt < 80; attempt++) {
+      for (let attempt = 0; attempt < 120; attempt++) {
         for (let i = types.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1))
           const t = types[i]; types[i] = types[j]; types[j] = t
         }
-        this.cells = types.map(t => ({ type: t, breaking: false }))
-        // 点选模式：只要有相邻同色即可消
-        if (this.mode === 'pick') {
-          if (this.findClickablePair()) return
-        } else if (this.findMatches().length === 0 && this.findHint()) {
-          return
-        }
+        this.cells = types.map(t => ({ type: t, special: null, breaking: false }))
+        if (this.findRuns().length === 0 && this.findSwapHint()) return
       }
-      // 实在洗不出来就整盘重生成
-      this.cells = types.map(t => ({ type: t, breaking: false }))
     },
 
-    /** 每轮连锁结束后兜底：全场没组合就自动洗牌，不让玩家卡死 */
+    /* 每轮结束兜底：没有可交换的组合就自动重排 */
     async ensurePlayable() {
-      // 点选模式：只要有「相邻同色」就能消；其它模式需要「能交换出三连」
-      const hasCombo = this.mode === 'pick'
-        ? !!this.findClickablePair()
-        : !!this.findHint()
-      if (hasCombo) return
+      if (this.findRuns().length) return
+      const hasSpecial = this.cells.some(c => c.special)
+      if (hasSpecial || this.findSwapHint()) return
       this.notice = '🌀 没有能消的组合啦，糖豆自动重排一下～'
       sound.magic()
       await this.sleep(420)
@@ -303,61 +287,31 @@ export default {
       this.cells = this.cells.slice()
     },
 
-    /** 卡住 6 秒自动给个提示 */
     resetIdle() {
       clearTimeout(this.idleTimer)
       if (this.stage !== 'play' || this.busy) return
       this.idleTimer = setTimeout(() => {
         if (!this.alive || this.stage !== 'play' || this.busy || this.sel != null) return
-        // 点选模式下找「能直接点消的一对」，其它模式沿用原来的交换提示
-        const h = this.mode === 'pick' ? this.findClickablePair() : this.findHint()
+        const h = this.findSwapHint()
         if (h) {
           this.hintCells = h
-          this.notice = this.mode === 'pick'
-            ? '💡 卡住了？发光的这两颗点一下就能消～'
-            : (this.mode === 'auto'
-              ? '💡 点任意一颗糖豆，泡芙就会帮你消～'
-              : '💡 卡住了？发光的这两颗换一下就能消～')
+          this.notice = '💡 卡住了？发光的这两颗换一下就能消～'
+          clearTimeout(this.noticeTimer)
+          this.noticeTimer = setTimeout(() => { this.hintCells = []; this.notice = '' }, 2800)
         }
-      }, 6000)
-    },
-
-    /**
-     * 找一对「相邻且同色」的糖豆 —— 点选模式下这俩直接点就能消除。
-     * 顺带把整条同色连线都标出来（3 颗以上整条消）。
-     */
-    findClickablePair() {
-      const { R, C } = this
-      for (let r = 0; r < R; r++) {
-        for (let c = 0; c < C; c++) {
-          const a = this.idx(r, c)
-          const ta = this.cellAt(r, c).type
-          if (ta == null) continue
-          // 先看左右
-          if (c + 1 < C && this.cellAt(r, c + 1).type === ta) {
-            return this.expandLine([a, this.idx(r, c + 1)])
-          }
-          // 再看上下
-          if (r + 1 < R && this.cellAt(r + 1, c).type === ta) {
-            return this.expandLine([a, this.idx(r + 1, c)])
-          }
-        }
-      }
-      return null
+      }, 7000)
     },
 
     showHint() {
       if (this.busy || this.stage !== 'play') return
-      // 点选模式：直接点亮可以点消的一对（不需要交换）
-      const h = this.mode === 'pick' ? this.findClickablePair() : this.findHint()
-      if (!h) { this.ensurePlayable(); return }
-      this.hintCells = h
+      const special = this.cells.findIndex(c => c.special)
+      const h = special >= 0 ? null : this.findSwapHint()
+      if (special < 0 && !h) { this.ensurePlayable(); return }
+      this.hintCells = special >= 0 ? [special] : h
       this.hintsUsed += 1
-      this.notice = this.mode === 'pick'
-        ? '✨ 发光的这几颗点一下就能消啦（不扣步数）'
-        : (this.mode === 'auto'
-          ? '✨ 智能点消已开，直接点任意一颗就能消～'
-          : '✨ 发光的这两颗换一下就能消啦（不扣步数）')
+      this.notice = special >= 0
+        ? '✨ 发光的这颗是特殊糖，点它或跟相邻糖交换就能引爆～'
+        : '✨ 发光的这两颗换一下就能消（提示不扣步数）'
       sound.twinkle()
       clearTimeout(this.noticeTimer)
       this.noticeTimer = setTimeout(() => {
@@ -370,14 +324,12 @@ export default {
 
     clearFeedback() {
       this.hintCells = []
-      this.swapCells = []
       this.shakeCells = []
-      this.notice = ''
       clearTimeout(this.noticeTimer)
       clearTimeout(this.idleTimer)
     },
 
-    /* 下落 + 顶部补糖 */
+    /* 重力下落 + 顶部补充（特殊糖随糖一起移动） */
     gravityRefill() {
       const { R, C } = this
       const cells = this.cells
@@ -390,7 +342,7 @@ export default {
         for (let r = R - 1; r >= 0; r--) {
           cells[this.idx(r, c)] = col.length
             ? col.shift()
-            : { type: this.randType(), breaking: false }
+            : { type: this.randType(), special: null, breaking: false }
         }
       }
       this.cells = cells.slice()
@@ -403,363 +355,216 @@ export default {
       this.cells = this.cells.slice()
     },
 
-    tap(i) {
-      if (this.stage !== 'play' || !this.alive) return
-      // 消除动画期间的点击不丢：记下最后一次，动画结束自动补消
-      if (this.busy) { this.queuedTap = i; return }
-      clearTimeout(this.idleTimer)
-      // 三种玩法：pick=点击消除（默认） / auto=智能点消 / swap=手动交换
-      if (this.mode === 'pick') return this.tapPick(i)
-      if (this.mode === 'auto') return this.autoPlay(i)
-      return this.manualTap(i)
-    },
-
-    /* ---------- 点选消除模式 ---------- */
-    // 规则：点第一颗 → 再点相邻同色的糖豆把它们连起来，
-    //       凑够 2 颗就消除，连成 3 颗以上则整条一起消。
-    //       点非相邻的糖豆 = 重新开始选；再点已选的 = 取消选中。
-
-    /** 与格子 i 相邻的格子下标 */
-    neighborsOf(i) {
-      const r = Math.floor(i / this.C), c = i % this.C
-      const out = []
-      if (r > 0) out.push(this.idx(r - 1, c))
-      if (r < this.R - 1) out.push(this.idx(r + 1, c))
-      if (c > 0) out.push(this.idx(r, c - 1))
-      if (c < this.C - 1) out.push(this.idx(r, c + 1))
-      return out
-    },
-
-    /**
-     * 以已选链的最后一颗为端点，试着把 i 接上去。
-     * 只有「与链尾相邻」且「同色」才接得上。
-     */
-    canExtendChain(i) {
-      if (this.picked.length === 0) return true
-      if (this.picked.includes(i)) return false
-      const tail = this.picked[this.picked.length - 1]
-      const t1 = this.cellAt(Math.floor(tail / this.C), tail % this.C).type
-      const t2 = this.cellAt(Math.floor(i / this.C), i % this.C).type
-      if (t1 == null || t2 == null || t1 !== t2) return false
-      return this.neighborsOf(tail).includes(i)
-    },
-
-    /** 点选消除的主入口 */
-    async tapPick(i) {
-      const cell = this.cellAt(Math.floor(i / this.C), i % this.C)
-      if (!cell || cell.type == null) return
-
-      // 已经选中的 → 取消选中
-      if (this.picked.includes(i)) {
-        this.picked = this.picked.filter(x => x !== i)
-        sound.hover()
-        this.updatePickHint()
-        return
-      }
-
-      // 不能接到当前链尾 → 重新开始选
-      if (!this.canExtendChain(i)) {
-        this.picked = [i]
-        sound.hover()
-        this.updatePickHint()
-        return
-      }
-
-      this.picked = [...this.picked, i]
-      sound.click()
-
-      // 满 2 颗就消除
-      if (this.picked.length >= 2) {
-        await this.eliminatePicked()
-        return
-      }
-      this.updatePickHint()
-    },
-
-    /** 提示文字：告诉玩家现在选了几颗、还能怎么点 */
-    updatePickHint() {
-      if (this.picked.length === 0) {
-        this.notice = ''
-        return
-      }
-      this.notice = `已选 ${this.picked.length} 颗，再点一颗相邻同色的就消除 ✨`
-    },
-
-    /** 把选中的那几颗消掉，并结算连锁 */
-    async eliminatePicked() {
-      this.busy = true
-      const picked = [...this.picked]
-      this.picked = []
-      this.hintCells = []
-      this.swapCells = []
-      this.shakeCells = []
-
-      this.moves -= 1
-      this.usedMoves += 1
-
-      // 选中的是 2 颗时，再看看能不能顺带连成更长的线（3+ 整条消）
-      const line = this.expandLine(picked)
-      this.score += line.length * 10
-      this.$emit('score', this.score)
-      if (line.length >= 3) sound.magic(); else sound.pop()
-
-      for (const m of line) this.cells[m].breaking = true
-      this.cells = this.cells.slice()
-      await this.sleep(220)
-      for (const m of line) this.cells[m].type = null
-      this.cells = this.cells.slice()
-      this.gravityRefill()
-      await this.sleep(120)
-
-      // 消除后可能又自动连出新的一组，继续连锁
-      await this.cascade()
-
-      this.busy = false
-      this.afterAction()
-    },
-
-    /**
-     * 把选中的几颗往两端扩展，找出一条完整的同色连线。
-     * 例如选中 (2,2) 和 (2,3)，若 (2,1)(2,4) 也同色，则 4 颗整条消除。
-     */
-    expandLine(picked) {
-      const { R, C } = this
-      const type = this.cellAt(Math.floor(picked[0] / C), picked[0] % C).type
-      if (type == null) return picked
-
-      const inSet = new Set(picked)
-      const typeAt = (r, c) => {
-        if (r < 0 || r >= R || c < 0 || c >= C) return null
-        return this.cellAt(r, c).type
-      }
-
-      // 选中的是竖直相邻 → 找竖直连线；横向相邻 → 找横向连线
-      const r0 = Math.floor(picked[0] / C), c0 = picked[0] % C
-      const r1 = Math.floor(picked[picked.length - 1] / C), c1 = picked[picked.length - 1] % C
-      const vertical = r0 !== r1
-
-      const line = new Set(picked)
-      if (vertical) {
-        const col = c0
-        let up = r0
-        while (typeAt(up - 1, col) === type) { up--; line.add(this.idx(up, col)) }
-        let down = r1
-        while (typeAt(down + 1, col) === type) { down++; line.add(this.idx(down, col)) }
-      } else {
-        const row = r0
-        let left = c0
-        while (typeAt(row, left - 1) === type) { left--; line.add(this.idx(row, left)) }
-        let right = c1
-        while (typeAt(row, right + 1) === type) { right++; line.add(this.idx(row, right)) }
-      }
-      // 去掉选中的链里非同色的（理论上不会有，保险）
-      for (const p of [...line]) {
-        const r = Math.floor(p / C), c = p % C
-        if (typeAt(r, c) !== type) line.delete(p)
-      }
-      return [...line]
-    },
-
-    /* 一次操作结束：解锁 + 结算检查 + 补上动画期间排队的点击 */
-    afterAction() {
-      this.busy = false
-      if (this.moves <= 0 && this.alive) { this.finish(); return }
-      this.resetIdle()
-      if (this.queuedTap != null) {
-        const q = this.queuedTap
-        this.queuedTap = null
-        this.$nextTick(() => this.tap(q))
-      }
-    },
-
-    toggleAuto() {
-      // 三态循环：点击消除 → 智能点消 → 手动交换 → 点击消除
-      const order = ['pick', 'auto', 'swap']
-      const next = order[(order.indexOf(this.mode) + 1) % order.length]
-      this.mode = next
-      try { localStorage.setItem('mlp_m3_mode', next) } catch (e) { /* 隐私模式忽略 */ }
-      this.sel = null
-      this.picked = []
-      this.queuedTap = null
-      this.clearFeedback()
-      this.notice = next === 'pick'
-        ? '👆 点击消除：点一颗，再点相邻同色的，凑够 2 颗就消'
-        : (next === 'auto'
-          ? '✨ 智能点消已开：点任意一颗就能消～'
-          : '✋ 手动交换：先点一颗，再点上下左右相邻的那颗')
-      sound.click()
-      clearTimeout(this.noticeTimer)
-      this.noticeTimer = setTimeout(() => { this.notice = '' }, 2600)
-      this.resetIdle()
-    },
-
-    /* 纯函数：给一份类型数组，算出 3+ 连的格子数（不碰真实棋盘） */
-    countMatches(types) {
-      const { R, C } = this
-      const set = new Set()
-      for (let r = 0; r < R; r++) {
-        let run = 1
-        for (let c = 1; c <= C; c++) {
-          const a = c < C ? types[r * C + c] : null
-          const b = types[r * C + c - 1]
-          if (a != null && a === b) run++
-          else { if (run >= 3) for (let k = c - run; k < c; k++) set.add(r * C + k); run = 1 }
-        }
-      }
-      for (let c = 0; c < C; c++) {
-        let run = 1
-        for (let r = 1; r <= R; r++) {
-          const a = r < R ? types[r * C + c] : null
-          const b = types[(r - 1) * C + c]
-          if (a != null && a === b) run++
-          else { if (run >= 3) for (let k = r - run; k < r; k++) set.add(k * C + c); run = 1 }
-        }
-      }
-      return set.size
-    },
-
-    /* 找最优交换：优先「包含玩家点的那颗」，否则全场能消最多的一组 */
-    bestSwap(prefer) {
-      const { R, C } = this
-      const types = this.cells.map(c => c.type)
-      let best = null, bestN = 0, fallback = null, fallbackN = 0
-      const test = (a, b) => {
-        const t = types[a]; types[a] = types[b]; types[b] = t
-        const n = this.countMatches(types)
-        const t2 = types[a]; types[a] = types[b]; types[b] = t2
-        return n
-      }
-      for (let r = 0; r < R; r++) {
-        for (let c = 0; c < C; c++) {
-          const pairs = []
-          if (c + 1 < C) pairs.push([this.idx(r, c), this.idx(r, c + 1)])
-          if (r + 1 < R) pairs.push([this.idx(r, c), this.idx(r + 1, c)])
-          for (const [a, b] of pairs) {
-            const n = test(a, b)
-            if (n <= 0) continue
-            if (n > fallbackN) { fallback = [a, b]; fallbackN = n }
-            if ((a === prefer || b === prefer) && n > bestN) { best = [a, b]; bestN = n }
+    /* 把被消除的特殊糖效果展开进消除集合（条纹整行/整列、彩虹全场同色） */
+    expandClears(base) {
+      const cleared = new Set(base)
+      const queue = [...base]
+      const fired = new Set()
+      while (queue.length) {
+        const i = queue.shift()
+        const cell = this.cells[i]
+        if (!cell || !cell.special || fired.has(i)) continue
+        fired.add(i)
+        let extra = []
+        if (cell.special === 'h') {
+          const r = Math.floor(i / this.C)
+          for (let c = 0; c < this.C; c++) extra.push(this.idx(r, c))
+        } else if (cell.special === 'v') {
+          const c = i % this.C
+          for (let r = 0; r < this.R; r++) extra.push(this.idx(r, c))
+        } else if (cell.special === 'rainbow') {
+          const t = cell.type
+          for (let k = 0; k < this.R * this.C; k++) {
+            if (this.cells[k].type === t) extra.push(k)
           }
         }
+        for (const j of extra) {
+          if (!cleared.has(j)) { cleared.add(j); queue.push(j) }
+        }
       }
-      return best || fallback
+      return cleared
     },
 
-    /* 智能点消：点任意一颗 → 自动换到能消的位置 → 消除连锁 */
-    async autoPlay(i) {
-      this.busy = true
-      this.clearFeedback()
-      let pair = this.bestSwap(i)
-      if (!pair) {
-        this.notice = '🌀 没有能消的组合啦，糖豆自动重排一下～'
-        sound.magic()
-        await this.sleep(420)
-        this.shuffleBoard()
-        pair = this.bestSwap(i)
+    /* 点击交互：点两颗相邻糖交换 */
+    tap(i) {
+      if (this.stage !== 'play' || !this.alive || this.busy) return
+      if (this.dragged) { this.dragged = false; return }
+      // 点到特殊糖：直接点一下也能引爆（比交换更直观）
+      if (this.cells[i] && this.cells[i].special) {
+        this.sel = null
+        sound.click()
+        this.moves -= 1
+        this.usedMoves += 1
+        this.cascade([{ cells: [i], len: 1, dir: 'h' }], null, null, null, true)
+        return
       }
-      if (!pair) { this.afterAction(); return }
-
-      const [a, b] = pair
-      const elsewhere = a !== i && b !== i
-      this.swapCells = [a, b]
-      this.swapData(a, b)
-      this.notice = elsewhere ? '✨ 这颗暂时换不出，泡芙帮你换了另一组～' : '✨ 泡芙帮你换好啦，消！'
-      await this.sleep(200)
-      this.swapCells = []
-      this.moves -= 1
-      this.usedMoves += 1
-      await this.cascade()
-      this.afterAction()
-    },
-
-    /* 手动模式：先点一颗，再点相邻那颗交换（保留原玩法） */
-    async manualTap(i) {
-      if (this.sel == null) { this.sel = i; sound.hover(); return }
-      if (this.sel === i) { this.sel = null; this.resetIdle(); return }
+      if (this.sel == null) { this.sel = i; sound.hover(); this.resetIdle(); return }
+      if (this.sel === i) { this.sel = null; sound.hover(); return }
       const r1 = Math.floor(this.sel / this.C), c1 = this.sel % this.C
       const r2 = Math.floor(i / this.C), c2 = i % this.C
       const adjacent = Math.abs(r1 - r2) + Math.abs(c1 - c2) === 1
       if (!adjacent) { this.sel = i; sound.hover(); return }
-
-      this.busy = true
       const a = this.sel, b = i
       this.sel = null
-      this.swapData(a, b)
-      if (this.findMatches().length === 0) {
-        await this.sleep(160)
-        this.swapData(a, b)          // 换不动，换回来，不扣步数
-        this.clearFeedback()
-        this.shakeCells = [a, b]
-        this.notice = '🤔 这两颗换不出 3 连，不扣步数～点「💡 提示」看看'
-        sound.fail()
-        this.noticeTimer = setTimeout(() => {
-          this.shakeCells = []
-          this.notice = ''
-          this.resetIdle()
-        }, 2000)
-        this.afterAction()
-        return
-      }
+      this.trySwap(a, b)
+    },
+
+    /* 拖拽交互：按住一颗，拖到相邻格松开即交换（开心消消乐手感） */
+    onDragStart(i) {
+      if (this.stage !== 'play' || this.busy) return
+      this.dragFrom = i
+      this.dragged = false
+    },
+    onDragEnter(i) {
+      if (this.dragFrom == null || this.busy || this.dragged) return
+      const a = this.dragFrom
+      if (a === i) return
+      const r1 = Math.floor(a / this.C), c1 = a % this.C
+      const r2 = Math.floor(i / this.C), c2 = i % this.C
+      if (Math.abs(r1 - r2) + Math.abs(c1 - c2) !== 1) return
+      this.dragged = true
+      this.dragFrom = null
+      this.sel = null
+      this.trySwap(a, i)
+    },
+    onDragEnd() {
+      this.dragFrom = null
+    },
+
+    /* 交换两颗：能形成三连（或涉及特殊糖）就消除，否则弹回不扣步 */
+    async trySwap(a, b) {
+      if (this.busy || this.stage !== 'play') return
+      this.busy = true
       this.clearFeedback()
+      const ca = this.cells[a], cb = this.cells[b]
+      // 彩虹糖与相邻糖交换 → 消全场对方颜色；双彩虹 → 全场清除
+      let rainbowType = null, bothRainbow = false
+      if (ca.special === 'rainbow' && cb.special === 'rainbow') bothRainbow = true
+      else if (ca.special === 'rainbow') rainbowType = cb.type
+      else if (cb.special === 'rainbow') rainbowType = ca.type
+
+      this.shakeCells = []
+      this.cells[a].breaking = false
+      this.cells[b].breaking = false
+      this.swapData(a, b)
+      await this.sleep(170)
+
+      let runs = this.findRuns()
+      const isStripe = (c) => c && (c.special === 'h' || c.special === 'v')
+      if (!runs.length && rainbowType == null && !bothRainbow) {
+        // 条纹糖跟任意糖交换都能引爆（开心消消乐规则）
+        const trig = []
+        if (isStripe(this.cells[a])) trig.push(a)
+        if (isStripe(this.cells[b])) trig.push(b)
+        if (trig.length) {
+          runs = [{ cells: trig, len: 1, dir: 'h' }]
+        } else {
+          this.swapData(a, b)             // 换不消，弹回，不扣步
+          await this.sleep(150)
+          this.shakeCells = [a, b]
+          sound.fail()
+          this.notice = '这样换消不掉，换个方向试试～'
+          this.busy = false
+          clearTimeout(this.noticeTimer)
+          this.noticeTimer = setTimeout(() => { this.shakeCells = []; this.notice = ''; this.resetIdle() }, 1500)
+          return
+        }
+      }
+
       this.moves -= 1
       this.usedMoves += 1
-      await this.cascade()
+      await this.cascade(runs, rainbowType, a, b, false, bothRainbow)
       this.afterAction()
     },
 
-    /**
-     * 找出当前模式下应该被消除的格子。
-     * - pick 模式：相邻 2 颗同色就算一组（点一下就能消）
-     * - 其它模式：3 颗以上连成一线
-     */
-    findEliminations() {
-      if (this.mode !== 'pick') return this.findMatches()
-      const { R, C } = this
-      const set = new Set()
-      for (let r = 0; r < R; r++) {
-        for (let c = 0; c < C; c++) {
-          const t = this.cellAt(r, c).type
-          if (t == null) continue
-          const right = c + 1 < C ? this.cellAt(r, c + 1).type : null
-          const down = r + 1 < R ? this.cellAt(r + 1, c).type : null
-          if (right === t || down === t) {
-            set.add(this.idx(r, c))
-            if (right === t) set.add(this.idx(r, c + 1))
-            if (down === t) set.add(this.idx(r + 1, c))
-          }
-        }
-      }
-      return [...set]
-    },
-
-    /* 连锁消除，每多一轮得分翻倍 */
-    async cascade() {
+    /* 连锁消除主循环 */
+    async cascade(firstRuns, rainbowType, anchorA, anchorB, directBlast, bothRainbow) {
       let chain = 0
+      let runs = firstRuns
+      let rt = rainbowType
+      let clearAll = bothRainbow
+      let first = true
+
       while (this.alive) {
-        const matches = this.findEliminations()
-        if (matches.length === 0) break
+        const base = new Set()
+        if (clearAll) {
+          for (let k = 0; k < this.R * this.C; k++) base.add(k)
+          clearAll = false
+        } else if (rt != null) {
+          for (let k = 0; k < this.R * this.C; k++) {
+            const c = this.cells[k]
+            if (c.type === rt || c.special === 'rainbow') base.add(k)
+          }
+          rt = null
+        } else {
+          for (const run of runs) for (const i of run.cells) base.add(i)
+        }
+        if (base.size === 0) break
         chain += 1
         this.maxCascade = Math.max(this.maxCascade, chain)
-        this.score += matches.length * 10 * chain
+
+        // 只在玩家主动的第一次消除里生成特殊糖
+        const spawns = new Map()
+        if (first && !directBlast) {
+          for (const run of runs) {
+            const anchor = [anchorA, anchorB].find(x => x != null && run.cells.includes(x))
+            const at = anchor != null ? anchor : run.cells[Math.floor(run.cells.length / 2)]
+            let sp = null
+            if (run.len >= 5) sp = 'rainbow'
+            else if (run.len === 4) sp = run.dir === 'h' ? 'h' : 'v'
+            if (sp && !spawns.has(at)) spawns.set(at, sp)
+          }
+        }
+
+        // 展开被消除的特殊糖（含对方引爆、彩虹波及）
+        const cleared = this.expandClears(base)
+        for (const at of spawns.keys()) cleared.delete(at)   // 生成位置保留下来
+        if (cleared.size === 0 && spawns.size === 0) break
+
+        const gain = cleared.size * 10 * chain
+        this.score += gain
         this.$emit('score', this.score)
         if (chain >= 2) sound.magic(); else sound.pop()
-        for (const m of matches) this.cells[m].breaking = true
+
+        for (const i of cleared) this.cells[i].breaking = true
         this.cells = this.cells.slice()
         await this.sleep(220)
-        for (const m of matches) this.cells[m].type = null
+
+        for (const i of cleared) { this.cells[i] = { type: null, special: null, breaking: false } }
+        for (const [at, sp] of spawns) {
+          if (this.cells[at].type == null) this.cells[at].type = this.randType()
+          this.cells[at].special = sp
+          this.cells[at].breaking = false
+        }
         this.cells = this.cells.slice()
         this.gravityRefill()
-        await this.sleep(120)
+        await this.sleep(140)
+
+        first = false
+        directBlast = false
+        runs = this.findRuns()
       }
       await this.ensurePlayable()
+    },
+
+    /* 一次操作结束：解锁 + 检查结算 + 空闲提示 */
+    afterAction() {
+      this.busy = false
+      this.sel = null
+      if (this.moves <= 0 && this.alive) { this.finish(); return }
+      this.resetIdle()
     },
 
     finish() {
       this.stage = 'done'
       clearTimeout(this.idleTimer)
+      clearTimeout(this.noticeTimer)
+      this.hintCells = []
+      this.shakeCells = []
+      this.notice = ''
       this.$emit('score', this.score)
       this.$emit('over', this.score)
-      if (this.score >= 350) sound.success(); else sound.fail()
+      if (this.stars >= 2) sound.success(); else sound.fail()
     }
   }
 }
@@ -772,27 +577,19 @@ export default {
   padding: 10px 14px; border-radius: 12px;
   background: var(--panel); font-size: 12.5px;
 }
-.m3-moves { color: var(--muted); }
+.m3-moves { color: var(--muted); white-space: nowrap; }
 .m3-moves b { color: var(--danger); font-size: 15px; }
-.m3-total { flex: 1; text-align: right; font-weight: 800; color: var(--primary); }
+.m3-progress { flex: 1; min-width: 130px; }
+.m3-progress-top { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+.m3-bar { height: 7px; border-radius: 999px; background: var(--track); overflow: hidden; }
+.m3-bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--pink), var(--purple)); transition: width .3s ease; }
 .m3-hint-btn {
   border: 1px solid var(--border); border-radius: 999px; cursor: pointer;
   background: var(--card); color: var(--primary); font-weight: 800; font-size: 11.5px;
-  padding: 5px 12px; transition: filter .15s, transform .12s;
+  padding: 5px 12px; transition: filter .15s, transform .12s; white-space: nowrap;
 }
 .m3-hint-btn:hover:not(:disabled) { filter: brightness(1.05); transform: translateY(-1px); }
 .m3-hint-btn:disabled { opacity: .5; cursor: default; }
-.m3-auto-btn {
-  border: 1px solid var(--border); border-radius: 999px; cursor: pointer;
-  background: var(--card); color: var(--muted); font-weight: 800; font-size: 11.5px;
-  padding: 5px 12px; transition: filter .15s, transform .12s, box-shadow .15s;
-}
-.m3-auto-btn.on {
-  color: #fff; border-color: transparent;
-  background: linear-gradient(135deg, var(--pink), var(--purple));
-  box-shadow: 0 4px 10px rgba(160, 108, 213, .25);
-}
-.m3-auto-btn:hover { filter: brightness(1.06); transform: translateY(-1px); }
 
 .m3-stage {
   display: flex; flex-direction: column; align-items: center; gap: 14px;
@@ -803,11 +600,10 @@ export default {
 .m3-mascot { font-size: 52px; }
 .m3-stage h3 { margin: 0; font-size: 18px; }
 .m3-stage p { margin: 0; font-size: 12.5px; color: var(--muted); line-height: 1.7; }
-
 .m3-tip-list {
   margin: 4px 0 8px; padding: 0; list-style: none;
   display: flex; flex-direction: column; gap: 8px; text-align: left;
-  font-size: 12.5px; color: var(--text);
+  font-size: 12.5px; color: var(--text); max-width: 420px;
 }
 .m3-tip-list li {
   padding: 9px 12px; border-radius: 10px;
@@ -818,39 +614,50 @@ export default {
   display: grid;
   grid-template-columns: repeat(var(--cols), 1fr);
   gap: 6px;
-  width: min(320px, 86vw);
+  width: min(360px, 88vw);
   padding: 10px;
   border-radius: 16px;
   background: var(--track);
   border: 1px solid var(--border);
+  touch-action: none;
 }
 .m3-cell {
+  position: relative;
   aspect-ratio: 1 / 1;
   border: none; border-radius: 12px;
   font-size: clamp(18px, 6vw, 26px);
   cursor: pointer; display: flex; align-items: center; justify-content: center;
   transition: transform .12s ease, box-shadow .12s ease, opacity .18s ease;
   box-shadow: inset 0 -3px 0 rgba(0,0,0,.12);
+  user-select: none;
 }
 .m3-cell:hover { transform: translateY(-1px); }
 .m3-cell.sel {
   box-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--primary);
-  transform: scale(1.06);
+  transform: scale(1.06); z-index: 2;
 }
 .m3-cell.hint {
   z-index: 2;
   box-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--yellow), 0 0 14px rgba(247,224,138,.9);
   animation: m3Hint .75s ease-in-out infinite alternate;
 }
-.m3-cell.autoPick {
-  z-index: 3;
-  box-shadow: 0 0 0 3px #fff, 0 0 0 6px #7fd4a8, 0 0 16px rgba(126,212,168,.95);
-  animation: m3Hint .5s ease-in-out infinite alternate;
-}
 .m3-cell.shake { animation: m3Shake .34s ease; }
-.m3-cell.breaking {
-  transform: scale(.2) rotate(20deg);
-  opacity: 0;
+.m3-cell.breaking { transform: scale(.2) rotate(20deg); opacity: 0; }
+.m3-cell.sp-h .m3-emoji { filter: drop-shadow(0 0 5px #fff); }
+.m3-cell.sp-v .m3-emoji { filter: drop-shadow(0 0 5px #fff); }
+.m3-cell.sp-h::after, .m3-cell.sp-v::after {
+  content: ''; position: absolute; border-radius: 3px; pointer-events: none;
+  background: rgba(255,255,255,.85);
+}
+.m3-cell.sp-h::after { left: 12%; right: 12%; top: 48%; height: 3px; }
+.m3-cell.sp-v::after { top: 12%; bottom: 12%; left: 48%; width: 3px; }
+.m3-cell.sp-rainbow {
+  background: conic-gradient(#ff9ec4,#ffd166,#8be08b,#6ec6e6,#b079ff,#ff9ec4) !important;
+  animation: m3Rainbow 2.2s linear infinite;
+}
+.m3-spark {
+  position: absolute; top: -4px; right: -4px; font-size: 12px;
+  text-shadow: 0 1px 3px rgba(0,0,0,.3);
 }
 .m3-board.busy .m3-cell { cursor: default; }
 
@@ -860,6 +667,8 @@ export default {
   background: var(--card); border: 1px solid var(--border);
   border-radius: 999px; padding: 6px 14px; text-align: center;
 }
+.m3-stars { font-size: 34px; letter-spacing: 4px; color: var(--border); }
+.m3-stars .on { color: #ffcf4a; text-shadow: 0 2px 6px rgba(255,207,74,.5); }
 .m3-final { font-size: 13px; color: var(--muted); }
 .m3-final b { font-size: 26px; color: var(--primary); }
 .m3-final.sub { font-size: 11.5px; }
@@ -871,7 +680,7 @@ export default {
   box-shadow: 0 6px 14px rgba(160, 108, 213, .3);
   transition: transform .12s ease, filter .12s ease;
 }
-.m3-btn:hover { filter: brightness(1.07); transform: translateY(-1px); }
+.m3-btn:hover:not(:disabled) { filter: brightness(1.07); transform: translateY(-1px); }
 .m3-btn:active { transform: scale(.96); }
 .m3-btn.big { padding: 13px 34px; font-size: 15px; }
 .m3-btn.ghost {
@@ -886,8 +695,9 @@ export default {
   25% { transform: translateX(-4px); }
   75% { transform: translateX(4px); }
 }
+@keyframes m3Rainbow { to { filter: hue-rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) {
-  .m3-cell.hint, .m3-cell.autoPick, .m3-cell.shake { animation: none; }
-  .m3-cell.hint, .m3-cell.autoPick { transform: scale(1.08); }
+  .m3-cell.hint, .m3-cell.shake, .m3-cell.sp-rainbow { animation: none; }
+  .m3-cell.hint { transform: scale(1.08); }
 }
 </style>

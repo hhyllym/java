@@ -11,7 +11,7 @@
  Target Server Version : 80039 (8.0.39)
  File Encoding         : 65001
 
- Date: 18/11/2026 09:56:38
+ Date: 20/11/2026 16:57:53
 */
 
 SET NAMES utf8mb4;
@@ -104,7 +104,7 @@ CREATE TABLE `t_friend`  (
 -- ----------------------------
 -- Records of t_friend
 -- ----------------------------
-INSERT INTO `t_friend` VALUES (1, 1, 3, 1, '', '很高兴认识你！', '2026-11-04 08:56:09', '2026-11-18 08:53:13');
+INSERT INTO `t_friend` VALUES (1, 1, 3, 0, '', '很高兴认识你！', '2026-11-04 08:56:09', '2026-11-04 08:56:09');
 INSERT INTO `t_friend` VALUES (2, 1, 5, 1, 'partner', '很高兴认识你！', '2026-11-04 08:56:16', '2026-11-04 09:52:06');
 
 -- ----------------------------
@@ -137,7 +137,7 @@ CREATE TABLE `t_game_score`  (
   `create_time` datetime NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_game`(`game_id` ASC, `score` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 33 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 12 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_game_score
@@ -153,70 +153,6 @@ INSERT INTO `t_game_score` VALUES (8, 'snake', 5, 10, '2026-11-08 21:47:26');
 INSERT INTO `t_game_score` VALUES (9, 'rps', 5, 25, '2026-11-08 22:12:43');
 INSERT INTO `t_game_score` VALUES (10, 'snake', 1, 1, '2026-11-08 22:47:33');
 INSERT INTO `t_game_score` VALUES (11, 'snake', 1, 0, '2026-11-08 22:49:36');
-INSERT INTO `t_game_score` VALUES (12, 'race', 5, 0, '2026-11-12 20:14:33');
-INSERT INTO `t_game_score` VALUES (13, 'race', 5, 0, '2026-11-12 20:15:12');
-INSERT INTO `t_game_score` VALUES (14, 'puzzle', 5, 191, '2026-11-12 20:53:12');
-INSERT INTO `t_game_score` VALUES (15, 'glide', 5, 195, '2026-11-12 20:54:00');
-INSERT INTO `t_game_score` VALUES (16, 'glide', 5, 90, '2026-11-12 20:54:10');
-INSERT INTO `t_game_score` VALUES (17, 'snake', 5, 10, '2026-11-12 20:55:27');
-INSERT INTO `t_game_score` VALUES (18, 'petbattle', 5, 0, '2026-11-12 20:56:42');
-INSERT INTO `t_game_score` VALUES (19, 'jump', 5, 20, '2026-11-12 22:05:32');
-INSERT INTO `t_game_score` VALUES (20, 'snake', 5, 0, '2026-11-12 22:05:48');
-INSERT INTO `t_game_score` VALUES (21, 'snake', 5, 0, '2026-11-12 22:07:17');
-INSERT INTO `t_game_score` VALUES (22, 'mine', 5, 72, '2026-11-12 22:08:52');
-INSERT INTO `t_game_score` VALUES (23, 'monopoly', 5, 42, '2026-11-12 22:11:41');
-INSERT INTO `t_game_score` VALUES (24, 'mine', 5, 94, '2026-11-12 22:12:31');
-INSERT INTO `t_game_score` VALUES (25, 'jump', 5, 98, '2026-11-12 22:12:47');
-INSERT INTO `t_game_score` VALUES (26, 'glide', 5, 790, '2026-11-12 22:13:12');
-INSERT INTO `t_game_score` VALUES (27, 'jump', 5, 59, '2026-11-13 13:46:51');
-INSERT INTO `t_game_score` VALUES (28, 'mine', 5, 240, '2026-11-13 13:47:52');
-INSERT INTO `t_game_score` VALUES (29, 'sports', 5, 1470, '2026-11-18 09:01:09');
-INSERT INTO `t_game_score` VALUES (30, 'jump', 5, 39, '2026-11-18 09:21:11');
-INSERT INTO `t_game_score` VALUES (31, 'puzzle', 5, 242, '2026-11-18 09:23:05');
-INSERT INTO `t_game_score` VALUES (32, 'glide', 5, 485, '2026-11-18 09:23:32');
-
--- ----------------------------
--- Table structure for t_hall_message
--- ----------------------------
-DROP TABLE IF EXISTS `t_hall_message`;
-CREATE TABLE `t_hall_message`  (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `user_id` bigint NULL DEFAULT NULL COMMENT '发送者 id（系统公告可为空）',
-  `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '发送者名字（展示用）',
-  `avatar` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
-  `content` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '消息内容',
-  `msg_type` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'text' COMMENT 'text 文本 / system 系统提示',
-  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '发送时间',
-  PRIMARY KEY (`id`) USING BTREE,
-  INDEX `idx_t_hall_message_time`(`create_time` ASC) USING BTREE,
-  INDEX `idx_t_hall_message_user`(`user_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 24 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '星糖谷大厅公共聊天' ROW_FORMAT = DYNAMIC;
-
--- ----------------------------
--- Records of t_hall_message
--- ----------------------------
-INSERT INTO `t_hall_message` VALUES (1, NULL, '星糖谷', '🏠', '欢迎来到星糖大厅！这里所有小马都能聊天，也可以发起游戏邀请，喊上朋友一起玩～', 'system', '2026-11-13 20:20:55');
-INSERT INTO `t_hall_message` VALUES (2, 1, '巴啦啦', '', '大厅验收测试消息 1794572676765', 'text', '2026-11-13 20:24:37');
-INSERT INTO `t_hall_message` VALUES (3, 1, '巴啦啦', '', '大厅验收测试消息 1794572796414', 'text', '2026-11-13 20:26:36');
-INSERT INTO `t_hall_message` VALUES (4, NULL, '星糖谷', '🏠', '🏠 巴啦啦 发起了一个「验收房间」邀请，等小马们来一起玩～', 'system', '2026-11-13 20:26:36');
-INSERT INTO `t_hall_message` VALUES (5, NULL, '星糖谷', '🏠', '🏠 巴啦啦 发起了一个「再来一个」邀请，等小马们来一起玩～', 'system', '2026-11-13 20:26:36');
-INSERT INTO `t_hall_message` VALUES (6, 1, '巴啦啦', '', '大厅验收测试消息 1794572823946', 'text', '2026-11-13 20:27:04');
-INSERT INTO `t_hall_message` VALUES (7, NULL, '星糖谷', '🏠', '🏠 巴啦啦 发起了一个「验收房间」邀请，等小马们来一起玩～', 'system', '2026-11-13 20:27:04');
-INSERT INTO `t_hall_message` VALUES (8, NULL, '星糖谷', '🏠', '🏠 巴啦啦 发起了一个「再来一个」邀请，等小马们来一起玩～', 'system', '2026-11-13 20:27:04');
-INSERT INTO `t_hall_message` VALUES (9, NULL, '星糖谷', '🏠', '🎉 哇哇哇 加入了「再来一个」', 'system', '2026-11-13 20:27:04');
-INSERT INTO `t_hall_message` VALUES (10, NULL, '星糖谷', '🏠', '👋 巴啦啦 关闭了「再来一个」邀请', 'system', '2026-11-13 20:27:04');
-INSERT INTO `t_hall_message` VALUES (11, 1, '巴啦啦', '', '大厅页面验收消息 1794572926975', 'text', '2026-11-13 20:28:47');
-INSERT INTO `t_hall_message` VALUES (12, NULL, '星糖谷', '🏠', '🏠 巴啦啦 发起了一个「页面验收房间 964552」邀请，等小马们来一起玩～', 'system', '2026-11-13 20:29:25');
-INSERT INTO `t_hall_message` VALUES (13, 5, '钱钱钱', '', '11', 'text', '2026-11-13 20:33:11');
-INSERT INTO `t_hall_message` VALUES (14, 3, '哇哇哇', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAF0lEQVR42mP8z8Dwn4EIwDiqkL4hRSBoIDQ0FAB4m1EKAAAAAElFTkSuQmCC', '图片头像验收消息 1794574232984', 'text', '2026-11-13 20:50:33');
-INSERT INTO `t_hall_message` VALUES (15, 3, '哇哇哇', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAF0lEQVR42mP8z8Dwn4EIwDiqkL4hRSBoIDQ0FAB4m1EKAAAAAElFTkSuQmCC', '图片头像验收消息 1794574272632', 'text', '2026-11-13 20:51:13');
-INSERT INTO `t_hall_message` VALUES (16, 3, '哇哇哇', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAF0lEQVR42mP8z8Dwn4EIwDiqkL4hRSBoIDQ0FAB4m1EKAAAAAElFTkSuQmCC', '图片头像验收消息 1794574303682', 'text', '2026-11-13 20:51:44');
-INSERT INTO `t_hall_message` VALUES (17, 3, '哇哇哇', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAF0lEQVR42mP8z8Dwn4EIwDiqkL4hRSBoIDQ0FAB4m1EKAAAAAElFTkSuQmCC', '图片头像验收消息 1794574357290', 'text', '2026-11-13 20:52:37');
-INSERT INTO `t_hall_message` VALUES (18, 1, '巴啦啦', '🦄', '大厅验收测试消息 1794574398714', 'text', '2026-11-13 20:53:19');
-INSERT INTO `t_hall_message` VALUES (19, NULL, '星糖谷', '🏠', '🏠 巴啦啦 发起了一个「验收房间」邀请，等小马们来一起玩～', 'system', '2026-11-13 20:53:19');
-INSERT INTO `t_hall_message` VALUES (20, NULL, '星糖谷', '🏠', '🏠 巴啦啦 发起了一个「再来一个」邀请，等小马们来一起玩～', 'system', '2026-11-13 20:53:19');
-INSERT INTO `t_hall_message` VALUES (21, NULL, '星糖谷', '🏠', '🎉 哇哇哇 加入了「再来一个」', 'system', '2026-11-13 20:53:19');
-INSERT INTO `t_hall_message` VALUES (22, NULL, '星糖谷', '🏠', '👋 巴啦啦 关闭了「再来一个」邀请', 'system', '2026-11-13 20:53:19');
 
 -- ----------------------------
 -- Table structure for t_message
@@ -236,7 +172,7 @@ CREATE TABLE `t_message`  (
   INDEX `idx_t_message_type`(`type` ASC) USING BTREE,
   INDEX `idx_t_message_to`(`to_id` ASC) USING BTREE,
   INDEX `idx_t_message_from`(`from_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '小马王国消息中心（留言板 / 私信 / 系统通知）' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 10 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '小马王国消息中心（留言板 / 私信 / 系统通知）' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_message
@@ -245,9 +181,11 @@ INSERT INTO `t_message` VALUES (1, 'NOTIFY', NULL, '星糖谷', -1, NULL, '欢�
 INSERT INTO `t_message` VALUES (2, 'NOTIFY', NULL, '星糖谷', -1, NULL, '每天来首页抽一只「今日幸运小马」吧 🎲，看看今天谁陪你冒险！', 0, '2026-10-28 08:28:53');
 INSERT INTO `t_message` VALUES (3, 'NOTIFY', NULL, '星糖谷', 1, NULL, '欢迎来到星糖谷，巴啦啦！记得去首页抽你的「今日幸运小马」🎲', 1, '2026-10-28 08:34:08');
 INSERT INTO `t_message` VALUES (4, 'BOARD', 1, '巴啦啦', NULL, NULL, '11', 0, '2026-10-28 08:34:54');
-INSERT INTO `t_message` VALUES (5, 'NOTIFY', NULL, '星糖谷', 3, NULL, '欢迎来到星糖谷，哇哇哇！记得去首页抽你的「今日幸运小马」🎲', 1, '2026-10-30 16:07:54');
+INSERT INTO `t_message` VALUES (5, 'NOTIFY', NULL, '星糖谷', 3, NULL, '欢迎来到星糖谷，哇哇哇！记得去首页抽你的「今日幸运小马」🎲', 0, '2026-10-30 16:07:54');
 INSERT INTO `t_message` VALUES (6, 'NOTIFY', NULL, '星糖谷', 4, NULL, '欢迎来到星糖谷，啦啦啦！记得去首页抽你的「今日幸运小马」🎲', 0, '2026-10-30 16:26:34');
 INSERT INTO `t_message` VALUES (7, 'NOTIFY', NULL, '星糖谷', 5, NULL, '欢迎来到星糖谷，钱钱钱！记得去首页抽你的「今日幸运小马」🎲', 1, '2026-11-02 10:43:26');
+INSERT INTO `t_message` VALUES (8, 'NOTIFY', NULL, '小马乐园', 6, NULL, '欢迎来到小马乐园，qqq！记得去首页抽你的「今日幸运小马」🎲', 1, '2026-11-20 16:52:29');
+INSERT INTO `t_message` VALUES (9, 'NOTIFY', 2, 'admin', -1, NULL, '你好', 1, '2026-11-20 16:53:45');
 
 -- ----------------------------
 -- Table structure for t_pet
@@ -271,9 +209,9 @@ CREATE TABLE `t_pet`  (
 -- ----------------------------
 -- Records of t_pet
 -- ----------------------------
-INSERT INTO `t_pet` VALUES (1, 5, 'dog', '萨摩耶', 1, 40, 85, 100, '2026-11-02 10:52:50', '2026-11-18 09:06:23');
+INSERT INTO `t_pet` VALUES (1, 5, 'dog', '萨摩耶', 1, 40, 85, 100, '2026-11-02 10:52:50', '2026-11-20 15:57:13');
 INSERT INTO `t_pet` VALUES (2, 1, 'cat', '狸花猫', 1, 0, 60, 80, '2026-11-04 08:57:52', '2026-11-08 20:45:07');
-INSERT INTO `t_pet` VALUES (3, 3, 'hamster', 'yy', 1, 20, 85, 95, '2026-11-18 08:53:48', '2026-11-18 08:54:54');
+INSERT INTO `t_pet` VALUES (3, 6, 'cat', 'qq', 1, 40, 100, 100, '2026-11-20 16:52:55', '2026-11-20 16:54:05');
 
 -- ----------------------------
 -- Table structure for t_pet_cosmetic
@@ -289,21 +227,14 @@ CREATE TABLE `t_pet_cosmetic`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_user_cosmetic`(`user_id` ASC, `cosmetic_id` ASC) USING BTREE,
   INDEX `idx_equipped`(`user_id` ASC, `equipped` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 11 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '宠物装扮' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '宠物装扮' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_pet_cosmetic
 -- ----------------------------
 INSERT INTO `t_pet_cosmetic` VALUES (1, 1, 'cosmetic-hat', 2, 0, '2026-10-17 21:44:06');
 INSERT INTO `t_pet_cosmetic` VALUES (2, 1, 'cosmetic-bow', 1, 0, '2026-10-17 21:44:06');
-INSERT INTO `t_pet_cosmetic` VALUES (3, 5, 'cosmetic-glasses', 1, 1, '2026-11-13 13:33:02');
-INSERT INTO `t_pet_cosmetic` VALUES (4, 5, 'cosmetic-bow', 1, 0, '2026-11-13 13:33:03');
-INSERT INTO `t_pet_cosmetic` VALUES (5, 5, 'cosmetic-hat', 1, 0, '2026-11-13 13:33:03');
-INSERT INTO `t_pet_cosmetic` VALUES (6, 5, 'cosmetic-crown', 1, 0, '2026-11-13 13:33:05');
-INSERT INTO `t_pet_cosmetic` VALUES (7, 3, 'cosmetic-crown', 1, 0, '2026-11-18 08:54:23');
-INSERT INTO `t_pet_cosmetic` VALUES (8, 3, 'cosmetic-hat', 1, 0, '2026-11-18 08:54:25');
-INSERT INTO `t_pet_cosmetic` VALUES (9, 3, 'cosmetic-bow', 2, 0, '2026-11-18 08:54:25');
-INSERT INTO `t_pet_cosmetic` VALUES (10, 3, 'cosmetic-glasses', 1, 0, '2026-11-18 08:54:26');
+INSERT INTO `t_pet_cosmetic` VALUES (3, 6, 'cosmetic-bow', 5, 1, '2026-11-20 16:53:51');
 
 -- ----------------------------
 -- Table structure for t_point_log
@@ -318,7 +249,7 @@ CREATE TABLE `t_point_log`  (
   `create_time` datetime NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_user`(`user_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 111 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 66 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_point_log
@@ -342,80 +273,35 @@ INSERT INTO `t_point_log` VALUES (33, 1, 50, 'gift-in', '收到 钱钱钱 的积
 INSERT INTO `t_point_log` VALUES (34, 1, 1, 'game-reward', '游戏「贪吃蛇」破纪录奖励 +1', '2026-11-08 22:47:33');
 INSERT INTO `t_point_log` VALUES (35, 5, 10000, 'newbie-10000', '新人大礼包', '2026-11-09 09:19:57');
 INSERT INTO `t_point_log` VALUES (36, 5, 5, 'task', '任务奖励：每日登录', '2026-11-09 09:20:12');
-INSERT INTO `t_point_log` VALUES (37, 5, 191, 'game-reward', '游戏「心印拼拼乐」破纪录奖励 +191', '2026-11-12 20:53:12');
-INSERT INTO `t_point_log` VALUES (38, 5, 195, 'game-reward', '游戏「流光穿越」破纪录奖励 +195', '2026-11-12 20:54:00');
-INSERT INTO `t_point_log` VALUES (39, 5, 5, 'task', '任务奖励：每日登录', '2026-11-12 20:56:04');
-INSERT INTO `t_point_log` VALUES (40, 5, 15, 'task', '任务奖励：游戏时间', '2026-11-12 21:08:44');
-INSERT INTO `t_point_log` VALUES (41, 5, -50, 'gift-out', '送给 巴啦啦 的积分红包', '2026-11-12 21:08:55');
-INSERT INTO `t_point_log` VALUES (42, 1, 50, 'gift-in', '收到 钱钱钱 的积分红包', '2026-11-12 21:08:55');
-INSERT INTO `t_point_log` VALUES (43, 5, 15, 'task', '任务奖励：友谊红包', '2026-11-12 21:09:02');
-INSERT INTO `t_point_log` VALUES (44, 5, 20, 'game-reward', '游戏「小马跳跳跑」破纪录奖励 +20', '2026-11-12 22:05:32');
-INSERT INTO `t_point_log` VALUES (45, 5, 72, 'game-reward', '游戏「星糖扫雷」破纪录奖励 +72', '2026-11-12 22:08:52');
-INSERT INTO `t_point_log` VALUES (46, 5, 42, 'game-reward', '游戏「糖霜镇大富翁」破纪录奖励 +42', '2026-11-12 22:11:41');
-INSERT INTO `t_point_log` VALUES (47, 5, 22, 'game-reward', '游戏「星糖扫雷」破纪录奖励 +22', '2026-11-12 22:12:31');
-INSERT INTO `t_point_log` VALUES (48, 5, 78, 'game-reward', '游戏「小马跳跳跑」破纪录奖励 +78', '2026-11-12 22:12:47');
-INSERT INTO `t_point_log` VALUES (49, 5, 595, 'game-reward', '游戏「流光穿越」破纪录奖励 +595', '2026-11-12 22:13:12');
-INSERT INTO `t_point_log` VALUES (50, 5, 0, 'shop', '兑换：宠物口粮 -60', '2026-11-13 13:32:56');
-INSERT INTO `t_point_log` VALUES (51, 5, 0, 'shop', '兑换：宠物口粮 -60', '2026-11-13 13:32:56');
-INSERT INTO `t_point_log` VALUES (52, 5, 0, 'shop', '兑换：宠物口粮 -60', '2026-11-13 13:32:56');
-INSERT INTO `t_point_log` VALUES (53, 5, 0, 'shop', '兑换：宠物口粮 -60', '2026-11-13 13:32:57');
-INSERT INTO `t_point_log` VALUES (54, 5, 0, 'shop', '兑换：宠物口粮 -60', '2026-11-13 13:32:57');
-INSERT INTO `t_point_log` VALUES (55, 5, 0, 'shop', '兑换：宠物蛋糕 -150', '2026-11-13 13:32:58');
-INSERT INTO `t_point_log` VALUES (56, 5, 0, 'shop', '兑换：宠物蛋糕 -150', '2026-11-13 13:32:58');
-INSERT INTO `t_point_log` VALUES (57, 5, 0, 'shop', '兑换：宠物蛋糕 -150', '2026-11-13 13:32:58');
-INSERT INTO `t_point_log` VALUES (58, 5, 0, 'shop', '兑换：宠物蛋糕 -150', '2026-11-13 13:32:59');
-INSERT INTO `t_point_log` VALUES (59, 5, 0, 'shop', '兑换：宠物蛋糕 -150', '2026-11-13 13:32:59');
-INSERT INTO `t_point_log` VALUES (60, 5, 0, 'shop', '兑换：宠物蛋糕 -150', '2026-11-13 13:32:59');
-INSERT INTO `t_point_log` VALUES (61, 5, 0, 'shop', '兑换：温牛奶 -80', '2026-11-13 13:33:00');
-INSERT INTO `t_point_log` VALUES (62, 5, 0, 'shop', '兑换：温牛奶 -80', '2026-11-13 13:33:00');
-INSERT INTO `t_point_log` VALUES (63, 5, 0, 'shop', '兑换：温牛奶 -80', '2026-11-13 13:33:00');
-INSERT INTO `t_point_log` VALUES (64, 5, 0, 'shop', '兑换：温牛奶 -80', '2026-11-13 13:33:00');
-INSERT INTO `t_point_log` VALUES (65, 5, 0, 'shop', '兑换：温牛奶 -80', '2026-11-13 13:33:01');
-INSERT INTO `t_point_log` VALUES (66, 5, 0, 'shop', '兑换装扮：酷墨镜 -150', '2026-11-13 13:33:02');
-INSERT INTO `t_point_log` VALUES (67, 5, 0, 'shop', '兑换装扮：蝴蝶结 -130', '2026-11-13 13:33:03');
-INSERT INTO `t_point_log` VALUES (68, 5, 0, 'shop', '兑换装扮：小草帽 -100', '2026-11-13 13:33:03');
-INSERT INTO `t_point_log` VALUES (69, 5, 0, 'shop', '兑换装扮：小王冠 -400', '2026-11-13 13:33:05');
-INSERT INTO `t_point_log` VALUES (70, 5, 0, 'shop', '兑换：图鉴收藏家称号 -500', '2026-11-13 13:33:12');
-INSERT INTO `t_point_log` VALUES (71, 5, 146, 'game-reward', '游戏「星糖扫雷」破纪录奖励 +146', '2026-11-13 13:47:52');
-INSERT INTO `t_point_log` VALUES (72, 5, 5, 'task', '任务奖励：每日登录', '2026-11-18 08:47:14');
-INSERT INTO `t_point_log` VALUES (73, 3, 10000, 'newbie-10000', '新人大礼包', '2026-11-18 08:53:21');
-INSERT INTO `t_point_log` VALUES (74, 3, 20, 'pet', '领养宠物奖励', '2026-11-18 08:53:48');
-INSERT INTO `t_point_log` VALUES (75, 3, 2, 'pet', '陪宠物玩耍', '2026-11-18 08:53:54');
-INSERT INTO `t_point_log` VALUES (76, 3, 0, 'shop', '兑换：宠物蛋糕 -150', '2026-11-18 08:54:03');
-INSERT INTO `t_point_log` VALUES (77, 3, 0, 'shop', '兑换：宠物蛋糕 -150', '2026-11-18 08:54:04');
-INSERT INTO `t_point_log` VALUES (78, 3, 0, 'shop', '兑换：宠物蛋糕 -150', '2026-11-18 08:54:04');
-INSERT INTO `t_point_log` VALUES (79, 3, 0, 'shop', '兑换：宠物蛋糕 -150', '2026-11-18 08:54:05');
-INSERT INTO `t_point_log` VALUES (80, 3, 0, 'shop', '兑换：宠物蛋糕 -150', '2026-11-18 08:54:05');
-INSERT INTO `t_point_log` VALUES (81, 3, 0, 'shop', '兑换：宠物口粮 -60', '2026-11-18 08:54:06');
-INSERT INTO `t_point_log` VALUES (82, 3, 0, 'shop', '兑换：宠物口粮 -60', '2026-11-18 08:54:06');
-INSERT INTO `t_point_log` VALUES (83, 3, 0, 'shop', '兑换：宠物口粮 -60', '2026-11-18 08:54:07');
-INSERT INTO `t_point_log` VALUES (84, 3, 0, 'shop', '兑换：宠物口粮 -60', '2026-11-18 08:54:07');
-INSERT INTO `t_point_log` VALUES (85, 3, 0, 'shop', '兑换：宠物口粮 -60', '2026-11-18 08:54:07');
-INSERT INTO `t_point_log` VALUES (86, 3, 0, 'shop', '兑换：宠物口粮 -60', '2026-11-18 08:54:08');
-INSERT INTO `t_point_log` VALUES (87, 3, 0, 'shop', '兑换：温牛奶 -80', '2026-11-18 08:54:09');
-INSERT INTO `t_point_log` VALUES (88, 3, 0, 'shop', '兑换：温牛奶 -80', '2026-11-18 08:54:09');
-INSERT INTO `t_point_log` VALUES (89, 3, 0, 'shop', '兑换：温牛奶 -80', '2026-11-18 08:54:09');
-INSERT INTO `t_point_log` VALUES (90, 3, 0, 'shop', '兑换：温牛奶 -80', '2026-11-18 08:54:10');
-INSERT INTO `t_point_log` VALUES (91, 3, 0, 'shop', '兑换：温牛奶 -80', '2026-11-18 08:54:10');
-INSERT INTO `t_point_log` VALUES (92, 3, 0, 'shop', '兑换：温牛奶 -80', '2026-11-18 08:54:10');
-INSERT INTO `t_point_log` VALUES (93, 3, 0, 'shop', '兑换：温牛奶 -80', '2026-11-18 08:54:11');
-INSERT INTO `t_point_log` VALUES (94, 3, 0, 'shop', '兑换：温牛奶 -80', '2026-11-18 08:54:11');
-INSERT INTO `t_point_log` VALUES (95, 3, 0, 'shop', '兑换：温牛奶 -80', '2026-11-18 08:54:11');
-INSERT INTO `t_point_log` VALUES (96, 3, 0, 'shop', '兑换：温牛奶 -80', '2026-11-18 08:54:12');
-INSERT INTO `t_point_log` VALUES (97, 3, 0, 'shop', '兑换：温牛奶 -80', '2026-11-18 08:54:12');
-INSERT INTO `t_point_log` VALUES (98, 3, 0, 'shop', '兑换：宠物蛋糕 -150', '2026-11-18 08:54:13');
-INSERT INTO `t_point_log` VALUES (99, 3, 0, 'shop', '兑换：宠物口粮 -60', '2026-11-18 08:54:14');
-INSERT INTO `t_point_log` VALUES (100, 3, 0, 'shop', '兑换：图鉴收藏家称号 -500', '2026-11-18 08:54:22');
-INSERT INTO `t_point_log` VALUES (101, 3, 0, 'shop', '兑换装扮：小王冠 -400', '2026-11-18 08:54:23');
-INSERT INTO `t_point_log` VALUES (102, 3, 0, 'shop', '兑换装扮：小草帽 -100', '2026-11-18 08:54:25');
-INSERT INTO `t_point_log` VALUES (103, 3, 0, 'shop', '兑换装扮：蝴蝶结 -130', '2026-11-18 08:54:25');
-INSERT INTO `t_point_log` VALUES (104, 3, 0, 'shop', '兑换装扮：酷墨镜 -150', '2026-11-18 08:54:26');
-INSERT INTO `t_point_log` VALUES (105, 3, 0, 'shop', '兑换装扮：蝴蝶结 -130', '2026-11-18 08:54:27');
-INSERT INTO `t_point_log` VALUES (106, 3, 2, 'pet', '喂食宠物', '2026-11-18 08:54:54');
-INSERT INTO `t_point_log` VALUES (107, 5, 1470, 'game-reward', '游戏「糖豆消消乐」破纪录奖励 +1470', '2026-11-18 09:01:09');
-INSERT INTO `t_point_log` VALUES (108, 5, 15, 'task', '任务奖励：游戏时间', '2026-11-18 09:05:08');
-INSERT INTO `t_point_log` VALUES (109, 5, 2, 'pet', '喂食宠物', '2026-11-18 09:06:23');
-INSERT INTO `t_point_log` VALUES (110, 5, 51, 'game-reward', '游戏「心印拼拼乐」破纪录奖励 +51', '2026-11-18 09:23:05');
+INSERT INTO `t_point_log` VALUES (37, 5, 5, 'task', '任务奖励：每日登录', '2026-11-20 15:43:23');
+INSERT INTO `t_point_log` VALUES (38, 5, 2, 'pet', '喂食宠物', '2026-11-20 15:57:13');
+INSERT INTO `t_point_log` VALUES (39, 6, 10000, 'newbie-10000', '新人大礼包', '2026-11-20 16:52:39');
+INSERT INTO `t_point_log` VALUES (40, 6, 20, 'pet', '领养宠物奖励', '2026-11-20 16:52:55');
+INSERT INTO `t_point_log` VALUES (41, 6, 2, 'pet', '陪宠物玩耍', '2026-11-20 16:53:14');
+INSERT INTO `t_point_log` VALUES (42, 6, 2, 'pet', '陪宠物玩耍', '2026-11-20 16:53:15');
+INSERT INTO `t_point_log` VALUES (43, 6, 0, 'shop', '兑换：布偶猫蛋 -200', '2026-11-20 16:53:43');
+INSERT INTO `t_point_log` VALUES (44, 6, 0, 'shop', '兑换：虎皮鹦鹉蛋 -200', '2026-11-20 16:53:46');
+INSERT INTO `t_point_log` VALUES (45, 6, 0, 'shop', '兑换：宠物口粮 -60', '2026-11-20 16:53:47');
+INSERT INTO `t_point_log` VALUES (46, 6, 0, 'shop', '兑换：宠物口粮 -60', '2026-11-20 16:53:48');
+INSERT INTO `t_point_log` VALUES (47, 6, 0, 'shop', '兑换：宠物口粮 -60', '2026-11-20 16:53:48');
+INSERT INTO `t_point_log` VALUES (48, 6, 0, 'shop', '兑换：宠物口粮 -60', '2026-11-20 16:53:48');
+INSERT INTO `t_point_log` VALUES (49, 6, 0, 'shop', '兑换：宠物口粮 -60', '2026-11-20 16:53:48');
+INSERT INTO `t_point_log` VALUES (50, 6, 0, 'shop', '兑换：宠物蛋糕 -150', '2026-11-20 16:53:49');
+INSERT INTO `t_point_log` VALUES (51, 6, 0, 'shop', '兑换：宠物蛋糕 -150', '2026-11-20 16:53:49');
+INSERT INTO `t_point_log` VALUES (52, 6, 0, 'shop', '兑换：宠物蛋糕 -150', '2026-11-20 16:53:50');
+INSERT INTO `t_point_log` VALUES (53, 6, 0, 'shop', '兑换：宠物蛋糕 -150', '2026-11-20 16:53:50');
+INSERT INTO `t_point_log` VALUES (54, 6, 0, 'shop', '兑换装扮：蝴蝶结 -130', '2026-11-20 16:53:51');
+INSERT INTO `t_point_log` VALUES (55, 6, 0, 'shop', '兑换装扮：蝴蝶结 -130', '2026-11-20 16:53:51');
+INSERT INTO `t_point_log` VALUES (56, 6, 0, 'shop', '兑换装扮：蝴蝶结 -130', '2026-11-20 16:53:51');
+INSERT INTO `t_point_log` VALUES (57, 6, 0, 'shop', '兑换装扮：蝴蝶结 -130', '2026-11-20 16:53:51');
+INSERT INTO `t_point_log` VALUES (58, 6, 0, 'shop', '兑换装扮：蝴蝶结 -130', '2026-11-20 16:53:51');
+INSERT INTO `t_point_log` VALUES (59, 6, 0, 'shop', '兑换：图鉴收藏家称号 -500', '2026-11-20 16:53:54');
+INSERT INTO `t_point_log` VALUES (60, 6, 0, 'shop', '兑换：图鉴收藏家称号 -500', '2026-11-20 16:53:54');
+INSERT INTO `t_point_log` VALUES (61, 6, 0, 'shop', '兑换：图鉴收藏家称号 -500', '2026-11-20 16:53:54');
+INSERT INTO `t_point_log` VALUES (62, 6, 0, 'shop', '兑换：图鉴收藏家称号 -500', '2026-11-20 16:53:54');
+INSERT INTO `t_point_log` VALUES (63, 6, 0, 'shop', '兑换：图鉴收藏家称号 -500', '2026-11-20 16:53:55');
+INSERT INTO `t_point_log` VALUES (64, 6, 2, 'pet', '喂食宠物', '2026-11-20 16:54:02');
+INSERT INTO `t_point_log` VALUES (65, 6, 2, 'pet', '喂食宠物', '2026-11-20 16:54:05');
 
 -- ----------------------------
 -- Table structure for t_pony
@@ -440,28 +326,28 @@ CREATE TABLE `t_pony`  (
 -- ----------------------------
 -- Records of t_pony
 -- ----------------------------
-INSERT INTO `t_pony` VALUES (1, '星澜', 'Lumina Gleam', 'twilight', '📖', '#b79cf0', '传说', '星辉书阁的管理员，把复杂知识整理成清楚清单，六色心印就是她归纳出来的。', 0, 1, '2026-11-18 08:43:38');
-INSERT INTO `t_pony` VALUES (2, '泡芙', 'Puffette', 'pinkie', '🎈', '#f7a8c4', '稀有', '糖霜镇的甜点师，随身带着彩纸和糖霜，走到哪儿哪儿就开起小派对。', 0, 2, '2026-11-18 08:43:38');
-INSERT INTO `t_pony` VALUES (3, '云驰', 'Zephyr Cloud', 'dash', '⚡', '#8fc7f0', '稀有', '流云城的信使队长，一眨眼穿过整片云海，答应过的事从不迟到。', 0, 3, '2026-11-18 08:43:38');
-INSERT INTO `t_pony` VALUES (4, '金穗', 'Harvesta', 'applejack', '🍎', '#f0a06a', '稀有', '金穗果园的园主，戴一顶草帽，说话算数，最见不得账目含糊。', 0, 4, '2026-11-18 08:43:38');
-INSERT INTO `t_pony` VALUES (5, '茸茸', 'Mossy Fluff', 'fluttershy', '🦋', '#a7e3c9', '稀有', '住在林边小屋的照料员，听得懂小动物的心思，连胆小的松鼠都愿意靠近。', 0, 5, '2026-11-18 08:43:38');
-INSERT INTO `t_pony` VALUES (6, '绮罗', 'Silkara', 'rarity', '💎', '#f7e08a', '稀有', '缎带工坊的主理人，一匹缎带几颗玻璃珠就能让旧衣焕然一新，最舍得分给朋友。', 0, 6, '2026-11-18 08:43:38');
-INSERT INTO `t_pony` VALUES (7, '曦光院长', 'Matron Solia', 'star', '☀️', '#f7c94c', '传说', '星辉学院的创办人，掌管白昼与开学典礼，星澜的老师。', 0, 7, '2026-11-18 08:43:38');
-INSERT INTO `t_pony` VALUES (8, '月汐院长', 'Matron Moona', 'star', '🌙', '#8f7ae8', '传说', '守夜的导师，替大家看护梦境，曾一度迷失在暗夜里，后来回到学院。', 0, 8, '2026-11-18 08:43:38');
-INSERT INTO `t_pony` VALUES (9, '暖心导师', 'Mentor Aria', 'star', '💗', '#f7a8c4', '传说', '冰晶城的守护者，擅长调解争执，星澜小时候由她照看。', 0, 9, '2026-11-18 08:43:38');
-INSERT INTO `t_pony` VALUES (10, '亮盾卫长', 'Captain Brightshield', 'star', '🛡️', '#8fc7f0', '稀有', '云顶卫队队长、冰晶城的守门人，星澜的兄长。', 0, 10, '2026-11-18 08:43:38');
-INSERT INTO `t_pony` VALUES (11, '星屑', 'Stardust', 'star', '⭐', '#b79cf0', '稀有', '曾主张大家收起心印图案，后来成为星辉学院校长，学会尊重每个人的不同。', 0, 11, '2026-11-18 08:43:38');
-INSERT INTO `t_pony` VALUES (12, '小穗芽', 'Sprout', 'star', '🌼', '#f0a06a', '常见', '金穗的妹妹，心印小队的发起人，总在找自己的拿手本领。', 0, 12, '2026-11-18 08:43:38');
-INSERT INTO `t_pony` VALUES (13, '甜铃铛', 'Bellsy', 'star', '🎀', '#f7a8c4', '常见', '绮罗的妹妹，歌声最甜的小星角驹。', 0, 13, '2026-11-18 08:43:38');
-INSERT INTO `t_pony` VALUES (14, '小滑车', 'Rollie', 'star', '🛴', '#8fc7f0', '常见', '云驰的头号粉丝，踩着滑板车到处飞驰的小云翼驹。', 0, 14, '2026-11-18 08:43:38');
-INSERT INTO `t_pony` VALUES (15, '大麦叔', 'Uncle Barley', 'star', '🐴', '#f0a06a', '常见', '果园家的长子，高大沉默，口头禅是「嗯哼」和「不啦」。', 0, 15, '2026-11-18 08:43:38');
-INSERT INTO `t_pony` VALUES (16, '酪酪', 'Cheesie', 'star', '🥪', '#f7e08a', '常见', '四处旅行的派对搭档，泡芙的老朋友，最擅长手风琴。', 0, 16, '2026-11-18 08:43:38');
-INSERT INTO `t_pony` VALUES (17, '奶油夫人', 'Madame Cream', 'star', '🧁', '#f5c08a', '常见', '糖霜镇纸杯蛋糕店的老板，烤的杯糕连泡芙都抢着要。', 0, 17, '2026-11-18 08:43:38');
-INSERT INTO `t_pony` VALUES (18, '糖丝师傅', 'Sugarline', 'star', '🍬', '#c9a0e8', '稀有', '云顶城的糖果艺术家，能把糖丝拉成一件小礼服。', 0, 18, '2026-11-18 08:43:38');
-INSERT INTO `t_pony` VALUES (19, '糖豆', 'Jellybean', 'star', '🍭', '#f7a8c4', '常见', '手工糖果小贩，招牌酸角糖豆，嘴里总念叨「才不是爱吃糖」。', 0, 19, '2026-11-18 08:43:38');
-INSERT INTO `t_pony` VALUES (20, '薇拉·绸缎', 'Vela Silk', 'star', '🎩', '#b8a0d8', '稀有', '从云顶城来的面料设计师，绮罗的竞争对手，嘴甜心硬。', 0, 20, '2026-11-18 08:43:38');
-INSERT INTO `t_pony` VALUES (21, '托比先生', 'Mr. Toby', 'star', '👓', '#a8b8c8', '稀有', '时尚评论家，一句「太寻常了」能让设计师失眠一整周。', 0, 21, '2026-11-18 08:43:38');
-INSERT INTO `t_pony` VALUES (22, '缕缕', 'Threadie', 'star', '🧣', '#d8a8b8', '常见', '惜字如金的裁缝，缝制的外套走线精致，一针一线都讲究。', 0, 22, '2026-11-18 08:43:38');
+INSERT INTO `t_pony` VALUES (1, '星澜', 'Lumina Gleam', 'twilight', '📖', '#b79cf0', '传说', '星辉书阁的管理员，把复杂知识整理成清楚清单，六色心印就是她归纳出来的。', 0, 1, '2026-11-11 09:07:49');
+INSERT INTO `t_pony` VALUES (2, '泡芙', 'Puffette', 'pinkie', '🎈', '#f7a8c4', '稀有', '糖霜镇的甜点师，随身带着彩纸和糖霜，走到哪儿哪儿就开起小派对。', 0, 2, '2026-11-11 09:07:49');
+INSERT INTO `t_pony` VALUES (3, '云驰', 'Zephyr Cloud', 'dash', '⚡', '#8fc7f0', '稀有', '流云城的信使队长，一眨眼穿过整片云海，答应过的事从不迟到。', 0, 3, '2026-11-11 09:07:49');
+INSERT INTO `t_pony` VALUES (4, '金穗', 'Harvesta', 'applejack', '🍎', '#f0a06a', '稀有', '金穗果园的园主，戴一顶草帽，说话算数，最见不得账目含糊。', 0, 4, '2026-11-11 09:07:49');
+INSERT INTO `t_pony` VALUES (5, '茸茸', 'Mossy Fluff', 'fluttershy', '🦋', '#a7e3c9', '稀有', '住在林边小屋的照料员，听得懂小动物的心思，连胆小的松鼠都愿意靠近。', 0, 5, '2026-11-11 09:07:49');
+INSERT INTO `t_pony` VALUES (6, '绮罗', 'Silkara', 'rarity', '💎', '#f7e08a', '稀有', '缎带工坊的主理人，一匹缎带几颗玻璃珠就能让旧衣焕然一新，最舍得分给朋友。', 0, 6, '2026-11-11 09:07:49');
+INSERT INTO `t_pony` VALUES (7, '曦光院长', 'Matron Solia', 'star', '☀️', '#f7c94c', '传说', '星辉学院的创办人，掌管白昼与开学典礼，星澜的老师。', 0, 7, '2026-11-11 09:07:49');
+INSERT INTO `t_pony` VALUES (8, '月汐院长', 'Matron Moona', 'star', '🌙', '#8f7ae8', '传说', '守夜的导师，替大家看护梦境，曾一度迷失在暗夜里，后来回到学院。', 0, 8, '2026-11-11 09:07:49');
+INSERT INTO `t_pony` VALUES (9, '暖心导师', 'Mentor Aria', 'star', '💗', '#f7a8c4', '传说', '冰晶城的守护者，擅长调解争执，星澜小时候由她照看。', 0, 9, '2026-11-11 09:07:49');
+INSERT INTO `t_pony` VALUES (10, '亮盾卫长', 'Captain Brightshield', 'star', '🛡️', '#8fc7f0', '稀有', '云顶卫队队长、冰晶城的守门人，星澜的兄长。', 0, 10, '2026-11-11 09:07:49');
+INSERT INTO `t_pony` VALUES (11, '星屑', 'Stardust', 'star', '⭐', '#b79cf0', '稀有', '曾主张大家收起心印图案，后来成为星辉学院校长，学会尊重每个人的不同。', 0, 11, '2026-11-11 09:07:49');
+INSERT INTO `t_pony` VALUES (12, '小穗芽', 'Sprout', 'star', '🌼', '#f0a06a', '常见', '金穗的妹妹，心印小队的发起人，总在找自己的拿手本领。', 0, 12, '2026-11-11 09:07:49');
+INSERT INTO `t_pony` VALUES (13, '甜铃铛', 'Bellsy', 'star', '🎀', '#f7a8c4', '常见', '绮罗的妹妹，歌声最甜的小星角驹。', 0, 13, '2026-11-11 09:07:49');
+INSERT INTO `t_pony` VALUES (14, '小滑车', 'Rollie', 'star', '🛴', '#8fc7f0', '常见', '云驰的头号粉丝，踩着滑板车到处飞驰的小云翼驹。', 0, 14, '2026-11-11 09:07:49');
+INSERT INTO `t_pony` VALUES (15, '大麦叔', 'Uncle Barley', 'star', '🐴', '#f0a06a', '常见', '果园家的长子，高大沉默，口头禅是「嗯哼」和「不啦」。', 0, 15, '2026-11-11 09:07:49');
+INSERT INTO `t_pony` VALUES (16, '酪酪', 'Cheesie', 'star', '🥪', '#f7e08a', '常见', '四处旅行的派对搭档，泡芙的老朋友，最擅长手风琴。', 0, 16, '2026-11-11 09:07:49');
+INSERT INTO `t_pony` VALUES (17, '奶油夫人', 'Madame Cream', 'star', '🧁', '#f5c08a', '常见', '糖霜镇纸杯蛋糕店的老板，烤的杯糕连泡芙都抢着要。', 0, 17, '2026-11-11 09:07:49');
+INSERT INTO `t_pony` VALUES (18, '糖丝师傅', 'Sugarline', 'star', '🍬', '#c9a0e8', '稀有', '云顶城的糖果艺术家，能把糖丝拉成一件小礼服。', 0, 18, '2026-11-11 09:07:49');
+INSERT INTO `t_pony` VALUES (19, '糖豆', 'Jellybean', 'star', '🍭', '#f7a8c4', '常见', '手工糖果小贩，招牌酸角糖豆，嘴里总念叨「才不是爱吃糖」。', 0, 19, '2026-11-11 09:07:49');
+INSERT INTO `t_pony` VALUES (20, '薇拉·绸缎', 'Vela Silk', 'star', '🎩', '#b8a0d8', '稀有', '从云顶城来的面料设计师，绮罗的竞争对手，嘴甜心硬。', 0, 20, '2026-11-11 09:07:49');
+INSERT INTO `t_pony` VALUES (21, '托比先生', 'Mr. Toby', 'star', '👓', '#a8b8c8', '稀有', '时尚评论家，一句「太寻常了」能让设计师失眠一整周。', 0, 21, '2026-11-11 09:07:49');
+INSERT INTO `t_pony` VALUES (22, '缕缕', 'Threadie', 'star', '🧣', '#d8a8b8', '常见', '惜字如金的裁缝，缝制的外套走线精致，一针一线都讲究。', 0, 22, '2026-11-11 09:07:49');
 
 -- ----------------------------
 -- Table structure for t_pony_category
@@ -676,7 +562,7 @@ CREATE TABLE `t_search_word`  (
   `sort_no` int NOT NULL DEFAULT 0 COMMENT '人工置顶权重',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_word`(`word` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 51 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '首页热搜词' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 33 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '首页热搜词' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_search_word
@@ -685,10 +571,10 @@ INSERT INTO `t_search_word` VALUES (2, '飞行', 22, 8);
 INSERT INTO `t_search_word` VALUES (3, '派对', 19, 7);
 INSERT INTO `t_search_word` VALUES (4, '苹果', 16, 6);
 INSERT INTO `t_search_word` VALUES (6, '宝石', 10, 4);
-INSERT INTO `t_search_word` VALUES (11, '星辉', 35, 9);
+INSERT INTO `t_search_word` VALUES (11, '星辉', 27, 9);
 INSERT INTO `t_search_word` VALUES (12, '院长', 14, 5);
-INSERT INTO `t_search_word` VALUES (13, '心印图案', 13, 3);
-INSERT INTO `t_search_word` VALUES (14, '流云城', 10, 2);
+INSERT INTO `t_search_word` VALUES (13, '心印图案', 8, 3);
+INSERT INTO `t_search_word` VALUES (14, '流云城', 5, 2);
 INSERT INTO `t_search_word` VALUES (15, '金穗', 3, 1);
 INSERT INTO `t_search_word` VALUES (16, '星翼驹', 1, 0);
 
@@ -705,7 +591,7 @@ CREATE TABLE `t_task_progress`  (
   `claimed` tinyint NULL DEFAULT 0,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_user_day_task`(`user_id` ASC, `day` ASC, `task_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 47 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 37 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_task_progress
@@ -726,23 +612,13 @@ INSERT INTO `t_task_progress` VALUES (26, 5, '2026-11-08', 'daily_msg', 3, 0);
 INSERT INTO `t_task_progress` VALUES (27, 5, '2026-11-08', 'daily_gift', 1, 0);
 INSERT INTO `t_task_progress` VALUES (28, 5, '2026-11-09', 'daily_gift', 1, 0);
 INSERT INTO `t_task_progress` VALUES (29, 5, '2026-11-09', 'daily_login', 1, 1);
-INSERT INTO `t_task_progress` VALUES (30, 5, '2026-11-12', 'daily_game', 1, 1);
-INSERT INTO `t_task_progress` VALUES (31, 5, '2026-11-12', 'daily_login', 1, 1);
-INSERT INTO `t_task_progress` VALUES (32, 5, '2026-11-12', 'daily_gift', 1, 1);
-INSERT INTO `t_task_progress` VALUES (33, 5, '2026-11-13', 'daily_login', 1, 0);
-INSERT INTO `t_task_progress` VALUES (34, 5, '2026-11-13', 'daily_shop', 1, 0);
-INSERT INTO `t_task_progress` VALUES (35, 5, '2026-11-13', 'daily_game', 1, 0);
-INSERT INTO `t_task_progress` VALUES (36, 1, '2026-11-13', 'daily_login', 1, 0);
-INSERT INTO `t_task_progress` VALUES (37, 3, '2026-11-13', 'daily_login', 1, 0);
-INSERT INTO `t_task_progress` VALUES (38, 5, '2026-11-18', 'daily_login', 1, 1);
-INSERT INTO `t_task_progress` VALUES (39, 3, '2026-11-18', 'daily_friend', 1, 0);
-INSERT INTO `t_task_progress` VALUES (40, 3, '2026-11-18', 'daily_gift', 1, 0);
-INSERT INTO `t_task_progress` VALUES (41, 3, '2026-11-18', 'daily_pet', 2, 0);
-INSERT INTO `t_task_progress` VALUES (42, 3, '2026-11-18', 'daily_shop', 1, 0);
-INSERT INTO `t_task_progress` VALUES (43, 3, '2026-11-18', 'daily_login', 1, 0);
-INSERT INTO `t_task_progress` VALUES (44, 5, '2026-11-18', 'daily_game', 1, 1);
-INSERT INTO `t_task_progress` VALUES (45, 5, '2026-11-18', 'daily_pet', 1, 0);
-INSERT INTO `t_task_progress` VALUES (46, 5, '2026-11-18', 'daily_checkin', 1, 0);
+INSERT INTO `t_task_progress` VALUES (30, 5, '2026-11-20', 'daily_login', 1, 1);
+INSERT INTO `t_task_progress` VALUES (31, 5, '2026-11-20', 'daily_pet', 1, 0);
+INSERT INTO `t_task_progress` VALUES (32, 5, '2026-11-20', 'daily_checkin', 1, 0);
+INSERT INTO `t_task_progress` VALUES (33, 6, '2026-11-20', 'daily_gift', 1, 0);
+INSERT INTO `t_task_progress` VALUES (34, 6, '2026-11-20', 'daily_pet', 2, 0);
+INSERT INTO `t_task_progress` VALUES (35, 6, '2026-11-20', 'daily_shop', 1, 0);
+INSERT INTO `t_task_progress` VALUES (36, 6, '2026-11-20', 'daily_login', 1, 0);
 
 -- ----------------------------
 -- Table structure for t_user
@@ -751,23 +627,24 @@ DROP TABLE IF EXISTS `t_user`;
 CREATE TABLE `t_user`  (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
   `name` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '小马名字，登录账号',
-  `avatar` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
+  `avatar` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT '',
   `points` int NULL DEFAULT 0,
   `password` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT 'SHA-256(salt + 明文) 的小写 hex',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '注册时间',
   `permission` tinyint NOT NULL DEFAULT 1 COMMENT '1=鏅??鐢ㄦ埛 0=鏅??绠＄悊鍛?2=瓒呯骇绠＄悊鍛',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_t_user_name`(`name` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '小马王国用户表（没有邮箱、没有手机号）' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '小马王国用户表（没有邮箱、没有手机号）' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_user
 -- ----------------------------
-INSERT INTO `t_user` VALUES (1, '巴啦啦', '🦄', 1760000, 'Bll123456', '2026-10-28 08:34:08', 0);
-INSERT INTO `t_user` VALUES (2, 'admin', '', 1661992960, 'Admin@1234yy', '2026-10-28 09:39:48', 2);
-INSERT INTO `t_user` VALUES (3, '哇哇哇', '🎀', 6414, 'Www123456', '2026-10-30 16:07:54', 1);
+INSERT INTO `t_user` VALUES (1, '巴啦啦', '', 126, 'Bll123456', '2026-10-28 08:34:08', 1);
+INSERT INTO `t_user` VALUES (2, 'admin', '', 2147483647, 'Admin@1234yy', '2026-10-28 09:39:48', 2);
+INSERT INTO `t_user` VALUES (3, '哇哇哇', '', 0, 'Www123456', '2026-10-30 16:07:54', 1);
 INSERT INTO `t_user` VALUES (4, '啦啦啦', '', 0, 'Lll123456', '2026-10-30 16:26:34', 1);
-INSERT INTO `t_user` VALUES (5, '钱钱钱', '', 519361177, 'Qqq123456', '2026-11-02 10:43:26', 1);
+INSERT INTO `t_user` VALUES (5, '钱钱钱', '', 10018, 'Qqq123456', '2026-11-02 10:43:26', 1);
+INSERT INTO `t_user` VALUES (6, 'qqq', '', 1272615590, 'qqq123456', '2026-11-20 16:52:29', 1);
 
 -- ----------------------------
 -- Table structure for t_user_item
@@ -781,18 +658,16 @@ CREATE TABLE `t_user_item`  (
   `update_time` datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_user_item`(`user_id` ASC, `item_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 9 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_user_item
 -- ----------------------------
-INSERT INTO `t_user_item` VALUES (1, 5, 'pet-food', 5, '2026-11-08 21:48:48');
-INSERT INTO `t_user_item` VALUES (2, 5, 'pet-cake', 6, '2026-11-13 13:32:58');
-INSERT INTO `t_user_item` VALUES (3, 5, 'pet-milk', 5, '2026-11-13 13:33:00');
-INSERT INTO `t_user_item` VALUES (4, 5, 'title-collector', 0, '2026-11-13 13:33:12');
-INSERT INTO `t_user_item` VALUES (5, 3, 'pet-cake', 6, '2026-11-18 08:54:03');
-INSERT INTO `t_user_item` VALUES (6, 3, 'pet-food', 6, '2026-11-18 08:54:06');
-INSERT INTO `t_user_item` VALUES (7, 3, 'pet-milk', 11, '2026-11-18 08:54:09');
-INSERT INTO `t_user_item` VALUES (8, 3, 'title-collector', 1, '2026-11-18 08:54:22');
+INSERT INTO `t_user_item` VALUES (1, 5, 'pet-food', 0, '2026-11-08 21:48:48');
+INSERT INTO `t_user_item` VALUES (2, 6, 'pet-egg-ragdoll', 1, '2026-11-20 16:53:43');
+INSERT INTO `t_user_item` VALUES (3, 6, 'pet-egg-budgie', 1, '2026-11-20 16:53:46');
+INSERT INTO `t_user_item` VALUES (4, 6, 'pet-food', 3, '2026-11-20 16:53:47');
+INSERT INTO `t_user_item` VALUES (5, 6, 'pet-cake', 4, '2026-11-20 16:53:49');
+INSERT INTO `t_user_item` VALUES (6, 6, 'title-collector', 5, '2026-11-20 16:53:54');
 
 SET FOREIGN_KEY_CHECKS = 1;

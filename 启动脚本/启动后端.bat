@@ -49,11 +49,30 @@ for %%D in (
 :dir_ok
 if not defined BACKEND_DIR (
     echo [X] 找不到后端项目（需要有 pom.xml）。
-    echo     默认会去找 D:\workSpace\springBootTest
+    echo     默认会去找 D:\workSpace\java\backend-src.bak
     echo     找不到就用记事本打开本脚本，把 BACKEND_DIR 那一行改成你的真实路径。
     goto :bye
 )
 echo [1/4] 后端目录 : %BACKEND_DIR%
+
+rem ---------- 1.05) 检查数据库，缺库或缺表就自动从备份恢复 ----------
+set "MYSQL_EXE="
+if exist "C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe" set "MYSQL_EXE=C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe"
+if not defined MYSQL_EXE for /d %%D in ("C:\Program Files\MySQL\*") do if not defined MYSQL_EXE if exist "%%~D\bin\mysql.exe" set "MYSQL_EXE=%%~D\bin\mysql.exe"
+if not defined MYSQL_EXE for /d %%D in ("D:\Program Files\MySQL\*") do if not defined MYSQL_EXE if exist "%%~D\bin\mysql.exe" set "MYSQL_EXE=%%~D\bin\mysql.exe"
+if defined MYSQL_EXE (
+    "%MYSQL_EXE%" -uroot -p123456 -e "SELECT 1 FROM mlp_login.t_user LIMIT 1;" >nul 2>nul
+    if errorlevel 1 (
+        echo.
+        echo [注意] 数据库 mlp_login 不存在或 t_user 表缺失，自动恢复数据库 ...
+        if exist "%~dp0恢复后端.bat" (
+            call "%~dp0恢复后端.bat" auto
+        ) else (
+            echo [X] 找不到 恢复后端.bat，请手工双击一次。
+        )
+        echo.
+    )
+)
 
 rem ---------- 1.1) 检查登录注册代码在不在（这台机器会重置 D 盘，代码可能被还原掉） ----------
 rem 空壳就自动调 恢复后端.bat 装回代码，不再要求手动双击

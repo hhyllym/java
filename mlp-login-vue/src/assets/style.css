@@ -735,8 +735,10 @@ button.submit:active { transform: translateY(1px); }
 .night-planet { display: none; }
 body[data-theme="night"] .night-star { display: block; }
 body[data-theme="night"] .night-planet { display: block; }
-/* 深色主题：气球太扎眼，改用流星点缀夜空 */
-body[data-theme="night"] .balloon { display: none; }
+/* 深色主题：原气球和白云本来就不显示，新泡泡/彩带也不显示 */
+body[data-theme="night"] .balloon,
+body[data-theme="night"] .bg-bubble,
+body[data-theme="night"] .bg-ribbon { display: none; }
 /* 深色主题：云朵与彩虹是白天的元素，深空里换成星球更贴切
    —— 既包括 emoji 云朵 ☁️🌈，也包括 CSS 绘制的白色云朵 .cloud */
 body[data-theme="night"] .float-cloud { display: none; }
@@ -811,7 +813,152 @@ body[data-theme="night"] .sparkle {
 /* 注：背景里的 SVG 彩虹弧已移除（原 .rainbow 规则会与卡片顶部彩虹条同名冲突，
    现已把卡片彩虹条独立为 .card-rainbow） */
 
-/* 气球：整体匀速升空，内层左右摇摆 */
+/* ===== 默认粉色主题专用：粉红泡泡 + 彩带；其它主题沿用原气球/白云 ===== */
+.bg-bubble {
+  position: absolute; bottom: -90px;
+  animation-name: bubbleRise;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+@keyframes bubbleRise {
+  from { transform: translateY(0) scale(.85); opacity: 0; }
+  12%  { opacity: .72; }
+  88%  { opacity: .72; }
+  to   { transform: translateY(-130vh) scale(1.1); opacity: 0; }
+}
+.bg-bubble-bob { animation: bubbleSway 6.5s ease-in-out infinite; }
+@keyframes bubbleSway {
+  0%,100% { transform: translateX(-9px) rotate(-3deg); }
+  50%     { transform: translateX(9px) rotate(3deg); }
+}
+.bg-bubble-core {
+  display: block;
+  width: var(--bs, 26px); height: var(--bs, 26px);
+  border-radius: 50%;
+  border: 1px solid rgba(255, 160, 200, .38);
+  background:
+    radial-gradient(circle at 30% 26%, rgba(255,255,255,.95) 0 8%, rgba(255,255,255,.26) 16%, transparent 40%),
+    radial-gradient(circle at 70% 76%, var(--bc, #ffd3e4), transparent 68%),
+    linear-gradient(145deg, rgba(255,255,255,.70), var(--bc, #ffd3e4));
+  box-shadow:
+    inset -3px -4px 7px rgba(240, 130, 180, .10),
+    inset 3px 3px 6px rgba(255,255,255,.78),
+    0 0 10px rgba(255, 175, 210, .20);
+  opacity: .66;
+}
+
+/* 彩带：细弧形纸带，从上方轻轻飘落 */
+.bg-ribbon {
+  position: absolute; top: -12%;
+  animation-name: ribbonDrift;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+@keyframes ribbonDrift {
+  0%   { transform: translate3d(0, -6vh, 0) rotate(-8deg); opacity: 0; }
+  14%  { opacity: .9; }
+  86%  { opacity: .9; }
+  100% { transform: translate3d(26px, 116vh, 0) rotate(14deg); opacity: 0; }
+}
+.bg-ribbon-piece {
+  position: relative;
+  display: block;
+  width: calc(var(--rs, 32px) * 1.4); height: 16px;
+  border-top: 4px solid var(--rc, #f7a8c4);
+  border-right: 3px solid rgba(255,255,255,.65);
+  border-radius: 70% 12% 70% 12%;
+  transform: rotate(var(--rr, 0deg));
+  filter: drop-shadow(0 2px 3px rgba(150,100,180,.18));
+  opacity: .95;
+}
+.bg-ribbon-piece::after {
+  content: "";
+  position: absolute;
+  left: 14%; top: 11px;
+  width: 72%; height: 9px;
+  border-bottom: 3px solid var(--rc, #f7a8c4);
+  border-radius: 0 0 70% 12%;
+  opacity: .65;
+}
+
+/* 金黄落叶：只在橙色主题出现，银杏叶与枫叶轻轻飘落 */
+.bg-leaf {
+  display: none;
+  position: absolute; top: -10%;
+  animation-name: leafFall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+@keyframes leafFall {
+  0%   { transform: translate3d(0, -8vh, 0) rotate(-18deg); opacity: 0; }
+  14%  { opacity: .72; }
+  86%  { opacity: .72; }
+  100% { transform: translate3d(38px, 116vh, 0) rotate(22deg); opacity: 0; }
+}
+.bg-leaf-shape {
+  display: block;
+  font-size: var(--ls, 24px);
+  line-height: 1;
+  transform: rotate(var(--lr, 0deg));
+  /* 把 emoji 统一染成暖金黄色，保留一点橙色脉络 */
+  filter: sepia(1) saturate(2.4) hue-rotate(18deg) brightness(1.22) drop-shadow(0 2px 3px rgba(150,90,20,.12));
+  opacity: .82;
+}
+body[data-theme="applejack"] .balloon { display: none; }
+body[data-theme="applejack"] .bg-leaf { display: block; }
+
+/* 纸鸢：只在蓝色主题出现，从左下角斜着飞向右上，尾巴带线 */
+.bg-kite {
+  display: none;
+  position: absolute; bottom: -8%;
+  animation-name: kiteFly;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+@keyframes kiteFly {
+  0%   { transform: translate3d(-8vw, 10vh, 0) rotate(-12deg); opacity: 0; }
+  12%  { opacity: .95; }
+  88%  { opacity: .95; }
+  100% { transform: translate3d(82vw, -112vh, 0) rotate(14deg); opacity: 0; }
+}
+.bg-kite-body {
+  display: block;
+  width: 40px; height: 48px;
+  margin: 0 auto;
+  background: linear-gradient(150deg, var(--kc, #ffd166), rgba(255,255,255,.6));
+  clip-path: polygon(50% 0, 100% 46%, 50% 100%, 0 46%);
+  filter: drop-shadow(0 4px 7px rgba(60,110,170,.24));
+  transform: rotate(var(--kr, 0deg));
+}
+.bg-kite-body::after {
+  content: "";
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(90deg, transparent 49%, rgba(255,255,255,.7) 50%, transparent 51%),
+    linear-gradient(0deg, transparent 48%, rgba(255,255,255,.7) 49%, transparent 50%);
+}
+.bg-kite-string {
+  display: block;
+  width: 26px; height: 70px;
+  margin: -4px auto 0;
+  border-left: 1.5px solid rgba(255,255,255,.9);
+  border-bottom: 1.5px solid rgba(255,255,255,.6);
+  border-radius: 0 0 0 70%;
+  transform: rotate(10deg);
+  opacity: .9;
+}
+.bg-kite-string::after {
+  content: "";
+  position: absolute; right: -8px; top: 30px;
+  width: 12px; height: 9px;
+  border-top: 1.5px solid rgba(255,255,255,.75);
+  border-right: 1.5px solid rgba(255,255,255,.75);
+  transform: rotate(35deg);
+}
+body[data-theme="dash"] .balloon { display: none; }
+body[data-theme="dash"] .bg-kite { display: block; }
+
+/* 其它主题原来的气球：保持原样，粉色主题隐藏 */
 .balloon {
   position: absolute; bottom: -140px;
   animation-name: balloonRise;
@@ -837,6 +984,27 @@ body[data-theme="night"] .sparkle {
   display: block; width: 1px; height: 36px; margin: 0 auto;
   background: linear-gradient(rgba(120,100,150,.4), rgba(120,100,150,.05));
 }
+
+/* 只有默认粉色主题用新装饰；其它主题原样显示气球和白云 */
+body:not([data-theme]) .balloon,
+body:not([data-theme]) .cloud,
+body:not([data-theme]) .float-cloud { display: none; }
+body[data-theme] .bg-bubble,
+body[data-theme] .bg-ribbon { display: none; }
+
+/* 默认粉色主题：页面和背景更融，其它主题完全不受影响 */
+body:not([data-theme]) .card {
+  background: linear-gradient(180deg, rgba(255,255,255,.94), rgba(255,255,255,.86));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,.85);
+  box-shadow: 0 18px 46px rgba(160,108,213,.14);
+}
+body:not([data-theme]) .card-rainbow { opacity: .82; }
+body:not([data-theme]) .bg-bubble-core { opacity: .56; }
+body:not([data-theme]) .bg-ribbon-piece { opacity: .88; }
+body:not([data-theme]) .pony { opacity: .30; }
+body:not([data-theme]) .float-dessert { opacity: .26; }
 
 /* 甜品漂浮物：复用 float-item 的浮动动画，整体更淡更小，不抢内容 */
 .float-dessert {

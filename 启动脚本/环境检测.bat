@@ -38,8 +38,9 @@ echo.
 echo --- 4. 目录 ---
 if exist "node_modules\vite\bin\vite.js" (echo   node_modules : 在，前端可直接启动) else (echo   node_modules : 不在，前端启动时要先 npm install)
 if exist "dist\index.html" (echo   dist         : 在，前端装不上依赖时可以静态预览兜底) else (echo   dist         : 不在)
-if exist "D:\workSpace\springBootTest\pom.xml" (echo   后端项目     : D:\workSpace\springBootTest) else (echo   [X] 后端项目     : 不在 D:\workSpace\springBootTest)
-if exist "D:\workSpace\springBootTest\target" (echo   target       : 在) else (echo   target       : 不在，后端启动时要重新编译)
+if exist "D:\workSpace\java\backend-src.bak\pom.xml" (echo   后端项目     : D:\workSpace\java\backend-src.bak) else (echo   [X] 后端项目     : 不在 D:\workSpace\java\backend-src.bak)
+if exist "D:\workSpace\java\backend-src.bak\src\main\java\com\fenglin\springboottest\controller\AuthController.java" (echo   登录注册代码 : 在) else (echo   [X] 登录注册代码 : 不在，双击 恢复后端.bat)
+if exist "D:\workSpace\java\backend-src.bak\target" (echo   target       : 在) else (echo   target       : 不在，后端启动时要重新编译)
 if exist "%USERPROFILE%\.m2\repository" (echo   maven 本地库 : %USERPROFILE%\.m2\repository) else (echo   [注意] maven 本地库不存在，第一次拉依赖会比较慢)
 echo.
 echo --- 5. 端口 / 服务 ---

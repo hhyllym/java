@@ -1,5 +1,5 @@
 <template>
-  <!-- 背景装饰：柔光斑、彩虹、云朵、气球、流星、星光与小马剪影 -->
+  <!-- 背景装饰：柔光斑、彩虹、粉红泡泡/彩带（仅默认粉色主题）、流星、星光与小马剪影 -->
   <div class="sky">
     <!-- 柔光斑：大色块缓慢漂移，增加层次感 -->
     <div class="glow g1"></div>
@@ -8,14 +8,40 @@
 
     <!-- 彩虹弧已移除：SVG 弧线在背景里会呈现矩形边框感，与整体氛围不符 -->
 
+    <!-- 白云：其它主题保留原样，粉色主题在 CSS 里隐藏 -->
     <div class="cloud c1"></div>
     <div class="cloud c2"></div>
     <div class="cloud c3"></div>
 
-    <!-- 气球：从底部缓缓升空，左右摇摆 -->
+    <!-- 粉红泡泡：从底部缓缓升起，内层轻轻左右摇晃 -->
     <div
       v-for="(b, i) in balloons"
       :key="'b' + i"
+      class="bg-bubble"
+      :style="{ left: b.x, animationDuration: b.dur, animationDelay: b.delay }"
+    >
+      <div class="bg-bubble-bob">
+        <span class="bg-bubble-core" :style="{ '--bc': b.c, '--bs': b.s + 'px' }"></span>
+      </div>
+    </div>
+
+    <!-- 彩带：细细的弧形纸带，轻轻飘落 -->
+    <i
+      v-for="(r, i) in ribbons"
+      :key="'r' + i"
+      class="bg-ribbon"
+      :style="{ left: r.left, animationDuration: r.dur, animationDelay: r.delay }"
+    >
+      <span
+        class="bg-ribbon-piece"
+        :style="{ '--rc': r.c, '--rr': r.rot + 'deg', '--rs': r.s }"
+      ></span>
+    </i>
+
+    <!-- 原气球：其它主题保持原样，粉色主题在 CSS 里隐藏 -->
+    <div
+      v-for="(b, i) in legacyBalloons"
+      :key="'lb' + i"
       class="balloon"
       :style="{ left: b.x, animationDuration: b.dur, animationDelay: b.delay }"
     >
@@ -25,7 +51,37 @@
       </div>
     </div>
 
-    <!-- 夜色流星：仅在深色主题（云顶城之夜）出现，深色背景上气球太扎眼，改用流星点缀 -->
+    <!-- 金黄落叶：只在橙色主题出现，取代原来的气球 -->
+    <i
+      v-for="(l, i) in leaves"
+      :key="'leaf' + i"
+      class="bg-leaf"
+      :style="{ left: l.x, animationDuration: l.dur, animationDelay: l.delay }"
+    >
+      <span
+        class="bg-leaf-shape"
+        :class="l.type"
+        :style="{ '--ls': l.s, '--lr': l.rot + 'deg' }"
+      >{{ l.type === 'ginkgo' ? '🍂' : '🍁' }}</span>
+    </i>
+
+    <!-- 纸鸢：只在蓝色主题出现，从左下角斜着往上飞，尾巴带线 -->
+    <div
+      v-for="(k, i) in kites"
+      :key="'kite' + i"
+      class="bg-kite"
+      :style="{
+        left: k.x,
+        animationDuration: k.dur,
+        animationDelay: k.delay,
+        '--kr': k.rot + 'deg'
+      }"
+    >
+      <span class="bg-kite-body" :style="{ '--kc': k.c }"></span>
+      <span class="bg-kite-string"></span>
+    </div>
+
+    <!-- 夜色流星：其它主题沿用原夜空装饰，粉色主题不显示 -->
     <span
       v-for="(ns, i) in nightStars"
       :key="'ns' + i"
@@ -170,38 +226,116 @@ export default {
         { top: '86%', left: '26%', size: '13px', delay: '1.75s', char: '✧' },
         { top: '14%', left: '41%', size: '12px', delay: '2.45s', char: '✦' }
       ],
-      // 气球：delay 用负值，让首屏就有气球在半空中
+      // 粉红泡泡：柔和半透明，delay 用负值让首屏就有泡泡飘着
       balloons: [
-        { c: '#f7a8c4', x: '6%',  dur: '26s', delay: '-2s'  },
-        { c: '#b79cf0', x: '13%', dur: '34s', delay: '-15s' },
-        { c: '#8fc7f0', x: '92%', dur: '29s', delay: '-25s' },
-        { c: '#f3c969', x: '80%', dur: '37s', delay: '-8s'  },
-        { c: '#a9d6a8', x: '88%', dur: '31s', delay: '-21s' },
-        { c: '#ffb3c8', x: '20%', dur: '33s', delay: '-30s' },
-        { c: '#a5d8f0', x: '27%', dur: '28s', delay: '-11s' },
-        { c: '#c9a8f0', x: '72%', dur: '35s', delay: '-19s' },
-        { c: '#ffd9a0', x: '45%', dur: '30s', delay: '-27s' },
-        { c: '#b8e6c9', x: '54%', dur: '32s', delay: '-6s'  },
-        { c: '#f7a8c4', x: '3%',  dur: '29s', delay: '-24s' },
-        { c: '#b79cf0', x: '9%',  dur: '36s', delay: '-33s' },
-        { c: '#8fc7f0', x: '96%', dur: '27s', delay: '-13s' },
-        { c: '#f3c969', x: '84%', dur: '34s', delay: '-4s'  },
-        { c: '#a9d6a8', x: '78%', dur: '30s', delay: '-36s' },
-        { c: '#ffb3c8', x: '34%', dur: '38s', delay: '-22s' },
-        { c: '#a5d8f0', x: '38%', dur: '26s', delay: '-16s' },
-        { c: '#c9a8f0', x: '64%', dur: '31s', delay: '-29s' },
-        { c: '#ffd9a0', x: '58%', dur: '35s', delay: '-9s'  },
-        { c: '#b8e6c9', x: '48%', dur: '28s', delay: '-18s' },
-        { c: '#f7a8c4', x: '24%', dur: '31s', delay: '-26s' },
-        { c: '#b79cf0', x: '36%', dur: '29s', delay: '-12s' },
-        { c: '#8fc7f0', x: '86%', dur: '33s', delay: '-28s' },
-        { c: '#f3c969', x: '42%', dur: '36s', delay: '-20s' },
-        { c: '#a9d6a8', x: '68%', dur: '27s', delay: '-10s' },
-        { c: '#ffb3c8', x: '16%', dur: '34s', delay: '-31s' },
-        { c: '#a5d8f0', x: '52%', dur: '30s', delay: '-23s' },
-        { c: '#c9a8f0', x: '76%', dur: '32s', delay: '-14s' },
-        { c: '#ffd9a0', x: '10%', dur: '28s', delay: '-17s' },
-        { c: '#b8e6c9', x: '60%', dur: '35s', delay: '-32s' }
+        ['#ffd3e4', '6%',  '26s', '-2s'],
+        ['#ffe0ec', '13%', '34s', '-15s'],
+        ['#ffe8f2', '92%', '29s', '-25s'],
+        ['#ffc9de', '80%', '37s', '-8s'],
+        ['#ffd9e8', '88%', '31s', '-21s'],
+        ['#ffedf4', '20%', '33s', '-30s'],
+        ['#ffdcea', '27%', '28s', '-11s'],
+        ['#ffcfe2', '72%', '35s', '-19s'],
+        ['#ffd3e4', '45%', '30s', '-27s'],
+        ['#ffe0ec', '54%', '32s', '-6s'],
+        ['#ffe8f2', '3%',  '29s', '-24s'],
+        ['#ffc9de', '9%',  '36s', '-33s'],
+        ['#ffd9e8', '96%', '27s', '-13s'],
+        ['#ffedf4', '84%', '34s', '-4s'],
+        ['#ffdcea', '78%', '30s', '-36s'],
+        ['#ffcfe2', '34%', '38s', '-22s'],
+        ['#ffd3e4', '38%', '26s', '-16s'],
+        ['#ffe0ec', '64%', '31s', '-29s'],
+        ['#ffe8f2', '58%', '35s', '-9s'],
+        ['#ffc9de', '48%', '28s', '-18s'],
+        ['#ffd9e8', '24%', '31s', '-26s'],
+        ['#ffedf4', '36%', '29s', '-12s'],
+        ['#ffdcea', '86%', '33s', '-28s'],
+        ['#ffcfe2', '42%', '36s', '-20s'],
+        ['#ffd3e4', '68%', '27s', '-10s'],
+        ['#ffe0ec', '16%', '34s', '-31s'],
+        ['#ffe8f2', '52%', '30s', '-23s'],
+        ['#ffc9de', '76%', '32s', '-14s'],
+        ['#ffd9e8', '10%', '28s', '-17s'],
+        ['#ffedf4', '60%', '35s', '-32s']
+      ].map(([c, x, dur, delay], i) => ({ c, x, dur, delay, s: 30 + (i % 6) * 7 })),
+      // 其它主题沿用原来的气球，完全不动
+      legacyBalloons: [
+        ['#f7a8c4', '6%',  '26s', '-2s'],  ['#b79cf0', '13%', '34s', '-15s'],
+        ['#8fc7f0', '92%', '29s', '-25s'], ['#f3c969', '80%', '37s', '-8s'],
+        ['#a9d6a8', '88%', '31s', '-21s'], ['#ffb3c8', '20%', '33s', '-30s'],
+        ['#a5d8f0', '27%', '28s', '-11s'], ['#c9a8f0', '72%', '35s', '-19s'],
+        ['#ffd9a0', '45%', '30s', '-27s'], ['#b8e6c9', '54%', '32s', '-6s'],
+        ['#f7a8c4', '3%',  '29s', '-24s'], ['#b79cf0', '9%',  '36s', '-33s'],
+        ['#8fc7f0', '96%', '27s', '-13s'], ['#f3c969', '84%', '34s', '-4s'],
+        ['#a9d6a8', '78%', '30s', '-36s'], ['#ffb3c8', '34%', '38s', '-22s'],
+        ['#a5d8f0', '38%', '26s', '-16s'], ['#c9a8f0', '64%', '31s', '-29s'],
+        ['#ffd9a0', '58%', '35s', '-9s'],  ['#b8e6c9', '48%', '28s', '-18s'],
+        ['#f7a8c4', '24%', '31s', '-26s'], ['#b79cf0', '36%', '29s', '-12s'],
+        ['#8fc7f0', '86%', '33s', '-28s'], ['#f3c969', '42%', '36s', '-20s'],
+        ['#a9d6a8', '68%', '27s', '-10s'], ['#ffb3c8', '16%', '34s', '-31s'],
+        ['#a5d8f0', '52%', '30s', '-23s'], ['#c9a8f0', '76%', '32s', '-14s'],
+        ['#ffd9a0', '10%', '28s', '-17s'], ['#b8e6c9', '60%', '35s', '-32s']
+      ].map(([c, x, dur, delay]) => ({ c, x, dur, delay })),
+      // 粉色彩带：只在默认粉色主题出现，数量克制
+      ribbons: [
+        { left: '7%',  c: '#f7a8c4', rot: -22, s: '34px', dur: '24s', delay: '-5s'  },
+        { left: '16%', c: '#c9a8f0', rot:  18, s: '28px', dur: '29s', delay: '-17s' },
+        { left: '25%', c: '#ffd9a0', rot: -12, s: '36px', dur: '26s', delay: '-9s'  },
+        { left: '34%', c: '#ffb3c8', rot:  26, s: '30px', dur: '31s', delay: '-22s' },
+        { left: '44%', c: '#a8d8f7', rot: -28, s: '32px', dur: '27s', delay: '-3s'  },
+        { left: '55%', c: '#f7a8c4', rot:  14, s: '26px', dur: '33s', delay: '-14s' },
+        { left: '64%', c: '#c9a8f0', rot: -18, s: '38px', dur: '25s', delay: '-20s' },
+        { left: '73%', c: '#b8e6c9', rot:  22, s: '30px', dur: '30s', delay: '-7s'  },
+        { left: '82%', c: '#ffd9a0', rot: -25, s: '34px', dur: '28s', delay: '-12s' },
+        { left: '91%', c: '#ffb3c8', rot:  16, s: '28px', dur: '34s', delay: '-25s' },
+        { left: '11%', c: '#a8d8f7', rot:  20, s: '32px', dur: '30s', delay: '-27s' },
+        { left: '20%', c: '#ffd9a0', rot: -16, s: '28px', dur: '26s', delay: '-8s'  },
+        { left: '29%', c: '#f7a8c4', rot:  24, s: '36px', dur: '32s', delay: '-19s' },
+        { left: '38%', c: '#b8e6c9', rot: -22, s: '30px', dur: '28s', delay: '-2s'  },
+        { left: '48%', c: '#c9a8f0', rot:  12, s: '34px', dur: '35s', delay: '-23s' },
+        { left: '59%', c: '#ffb3c8', rot: -26, s: '26px', dur: '27s', delay: '-11s' },
+        { left: '69%', c: '#ffd9a0', rot:  18, s: '32px', dur: '31s', delay: '-16s' },
+        { left: '79%', c: '#a8d8f7', rot: -14, s: '28px', dur: '29s', delay: '-6s'  }
+      ],
+      // 金黄落叶：只在橙色主题出现，银杏叶与枫叶交替
+      leaves: [
+        { x: '5%',  type: 'ginkgo', s: '22px', rot: -26, dur: '20s', delay: '-4s'  },
+        { x: '13%', type: 'maple',  s: '26px', rot:  18, dur: '24s', delay: '-15s' },
+        { x: '22%', type: 'ginkgo', s: '20px', rot: -12, dur: '22s', delay: '-9s'  },
+        { x: '31%', type: 'maple',  s: '24px', rot:  30, dur: '26s', delay: '-20s' },
+        { x: '40%', type: 'ginkgo', s: '23px', rot: -20, dur: '19s', delay: '-2s'  },
+        { x: '49%', type: 'maple',  s: '27px', rot:  14, dur: '27s', delay: '-12s' },
+        { x: '58%', type: 'ginkgo', s: '21px', rot: -32, dur: '23s', delay: '-17s' },
+        { x: '67%', type: 'maple',  s: '25px', rot:  22, dur: '21s', delay: '-6s'  },
+        { x: '76%', type: 'ginkgo', s: '22px', rot: -16, dur: '25s', delay: '-22s' },
+        { x: '85%', type: 'maple',  s: '28px', rot:  28, dur: '20s', delay: '-11s' },
+        { x: '94%', type: 'ginkgo', s: '20px', rot: -24, dur: '24s', delay: '-18s' },
+        { x: '9%',  type: 'maple',  s: '24px', rot:  16, dur: '28s', delay: '-25s' },
+        { x: '27%', type: 'ginkgo', s: '21px', rot: -18, dur: '26s', delay: '-7s'  },
+        { x: '45%', type: 'maple',  s: '26px', rot:  24, dur: '22s', delay: '-14s' },
+        { x: '63%', type: 'ginkgo', s: '22px', rot: -28, dur: '29s', delay: '-3s'  },
+        { x: '81%', type: 'maple',  s: '25px', rot:  20, dur: '23s', delay: '-19s' },
+        { x: '18%', type: 'ginkgo', s: '20px', rot: -14, dur: '27s', delay: '-23s' },
+        { x: '72%', type: 'maple',  s: '27px', rot:  26, dur: '25s', delay: '-8s'  }
+      ],
+      // 纸鸢：只在蓝色主题出现，从左下飞向右上，带飘线
+      kites: [
+        { c: '#ffd166', x: '2%',  rot: -14, dur: '28s', delay: '-4s'  },
+        { c: '#ff9eb5', x: '8%',  rot:  10, dur: '32s', delay: '-18s' },
+        { c: '#b79cf0', x: '14%', rot: -8,  dur: '30s', delay: '-25s' },
+        { c: '#8fc7f0', x: '20%', rot:  16, dur: '34s', delay: '-10s' },
+        { c: '#a7e3c9', x: '5%',  rot: -18, dur: '31s', delay: '-29s' },
+        { c: '#ffd166', x: '17%', rot:  12, dur: '27s', delay: '-14s' },
+        { c: '#ff9eb5', x: '11%', rot: -10, dur: '35s', delay: '-22s' },
+        { c: '#b79cf0', x: '24%', rot:  14, dur: '29s', delay: '-7s'  },
+        { c: '#8fc7f0', x: '1%',  rot: -16, dur: '33s', delay: '-31s' },
+        { c: '#a7e3c9', x: '10%', rot:  12, dur: '26s', delay: '-12s' },
+        { c: '#ffd166', x: '19%', rot: -6,  dur: '36s', delay: '-2s'  },
+        { c: '#ff9eb5', x: '27%', rot:  18, dur: '30s', delay: '-27s' },
+        { c: '#b79cf0', x: '4%',  rot: -12, dur: '28s', delay: '-16s' },
+        { c: '#8fc7f0', x: '15%', rot:  8,  dur: '34s', delay: '-20s' },
+        { c: '#a7e3c9', x: '22%', rot: -20, dur: '31s', delay: '-5s'  }
       ],
       // 甜品漂浮物：呼应「星糖谷」主题，数量克制，左右位置互为镜像
       desserts: [
@@ -260,7 +394,7 @@ export default {
         { c: '#c39bf0', glow: 'rgba(195,155,240,.5)',  top: '20%', left: '13%', s: 18, ring: false, dur: '14s', delay: '-1s' },
         { c: '#c39bf0', glow: 'rgba(195,155,240,.5)',  top: '20%', left: '80%', s: 18, ring: false, dur: '14s', delay: '-8s' }
       ],
-      // 白云与彩虹粒子：缓慢漂浮
+      // 白云与彩虹粒子：其它主题保留原样，粉色主题在 CSS 里隐藏白云
       floaties: [
         { char: '☁️', top: '8%',  left: '18%', size: '30px', delay: '0s',    dur: '11s' },
         { char: '☁️', top: '22%', left: '68%', size: '24px', delay: '-3s',   dur: '12s' },

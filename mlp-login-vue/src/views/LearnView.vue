@@ -313,6 +313,7 @@ export default {
 }
 .learn-more:hover { text-decoration: underline; }
 .game-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+@media (min-width: 768px) { .game-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); } }
 .game-card {
   border: none; cursor: pointer; text-align: center;
   background: var(--panel); border-radius: 14px; padding: 14px 6px 12px;
@@ -372,6 +373,7 @@ export default {
 
 /* 徽章墙 */
 .badge-wall { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+@media (min-width: 768px) { .badge-wall { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); } }
 .badge {
   text-align: center; padding: 12px 4px 10px;
   border-radius: 14px; background: var(--panel);

@@ -296,6 +296,12 @@ export default {
   45% { transform: scale(1.04); }
   100% { transform: scale(1); }
 }
+/* 网页版宽屏：表单区限宽居中，避免输入框被拉到 1000px+（手机端保持原样） */
+@media (min-width: 768px) {
+  .head, form, .admin-entry, .switch-hint { max-width: 500px; margin-left: auto; margin-right: auto; }
+  .tabs { max-width: 500px; margin-left: auto; margin-right: auto; }
+  .head { padding-top: 40px; }
+}
 </style>
 
 <style>

@@ -291,6 +291,7 @@ export default {
 
 .earn-sec h4 { margin: 2px 0 9px; font-size: 13.5px; color: var(--primary); }
 .extra-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+@media (min-width: 768px) { .extra-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); } }
 .extra-card {
   display: flex; flex-direction: column; align-items: center; gap: 3px; text-decoration: none;
   padding: 11px 6px; border-radius: 14px; background: var(--card); border: 1.5px solid var(--border);

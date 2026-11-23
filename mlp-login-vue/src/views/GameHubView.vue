@@ -245,4 +245,8 @@ export default {
 @media (max-width: 480px) {
   .hub-grid { grid-template-columns: 1fr; }
 }
+/* 网页版宽屏：游戏卡片自动多列铺开 */
+@media (min-width: 768px) {
+  .hub-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+}
 </style>

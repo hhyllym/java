@@ -355,6 +355,7 @@ export default {
 .shop-grid {
   display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
 }
+@media (min-width: 768px) { .shop-grid { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); } }
 .shop-item {
   display: flex; flex-direction: column; gap: 3px;
   padding: 10px 8px 8px; border-radius: 14px;

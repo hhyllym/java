@@ -130,6 +130,15 @@ if not defined MYSQL_EXE (
                 echo       [注意] 完整备份导入失败，检查备份文件是否完整。
             ) else (
                 echo       完整备份导入 -^> OK
+                rem 完整备份是「大厅表」加入之前做的，里面不含 t_hall_message。
+                rem 这里补跑幂等的大厅建表脚本，避免恢复后大厅发不了消息。
+                if exist "%TARGET%\sql\mlp_hall.sql" (
+                    echo       补建大厅表 mlp_hall.sql ...
+                    "%MYSQL_EXE%" -uroot -p123456 --default-character-set=utf8mb4 mlp_login < "%TARGET%\sql\mlp_hall.sql"
+                    if errorlevel 1 (echo         [注意] 大厅表补建失败。) else (echo         大厅表 -^> OK)
+                ) else (
+                    echo       [注意] 找不到 %TARGET%\sql\mlp_hall.sql，大厅表可能缺失。
+                )
             )
         ) else (
             echo       未找到完整备份，改用建表脚本 ...

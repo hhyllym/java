@@ -666,6 +666,7 @@ export default {
 .friend-stats {
   display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 14px;
 }
+@media (min-width: 768px) { .friend-stats { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); } }
 .fs-item {
   background: var(--panel); border-radius: 13px; padding: 10px 4px;
   text-align: center; border: 1.5px solid transparent;

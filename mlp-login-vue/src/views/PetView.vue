@@ -481,6 +481,7 @@ export default {
 
 /* 领养中心 */
 .adopt-kinds { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 12px; }
+@media (min-width: 768px) { .adopt-kinds { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); } }
 .adopt-kinds button {
   display: flex; flex-direction: column; align-items: center; gap: 2px;
   border: 1.5px solid var(--border); border-radius: 12px;
@@ -508,6 +509,7 @@ export default {
   font-size: 11px; color: var(--muted);
 }
 .wardrobe-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+@media (min-width: 768px) { .wardrobe-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); } }
 .wardrobe-grid button {
   display: flex; flex-direction: row; align-items: center; gap: 7px;
   border: 1.5px solid var(--border); border-radius: 14px;

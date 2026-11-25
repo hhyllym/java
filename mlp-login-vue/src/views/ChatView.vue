@@ -674,7 +674,7 @@ export default {
 
 /* 消息区：加宽加高，气泡最大 85% */
 .msg-box {
-  flex: 1; min-height: 340px; max-height: 58vh;
+  flex: 1; min-height: 420px; max-height: 72vh;
   overflow-y: auto; padding: 16px 10px;
   background: var(--panel); border-radius: 16px;
   margin: 14px 0 12px;

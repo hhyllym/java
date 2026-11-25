@@ -239,10 +239,8 @@ export default {
   font-size: 11.5px;
   color: #a08a4d;
 }
-/* 网页版宽屏：表单区限宽居中，避免输入框被拉到 1000px+（手机端保持原样） */
+/* 网页版宽屏：与首页一致，表单区铺满卡片，不再限宽成窄条 */
 @media (min-width: 768px) {
-  .head, form, .admin-entry, .switch-hint { max-width: 460px; margin-left: auto; margin-right: auto; }
-  .tabs { max-width: 460px; margin-left: auto; margin-right: auto; }
   .head { padding-top: 40px; }
 }
 </style>

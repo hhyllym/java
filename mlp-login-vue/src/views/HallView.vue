@@ -357,8 +357,8 @@ export default {
   gap: 8px;
 }
 .hall-msg-list {
-  height: 46vh;
-  min-height: 240px;
+  height: 60vh;
+  min-height: 320px;
   overflow-y: auto;
   background: var(--panel);
   border: 1px solid var(--border);

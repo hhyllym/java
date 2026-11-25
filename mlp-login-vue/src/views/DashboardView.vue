@@ -555,8 +555,5 @@ export default {
 }
 .task-claim:disabled { background: var(--track); color: var(--muted); cursor: not-allowed; }
 
-/* 网页版宽屏：个人中心是单列表单式内容，限宽居中避免整列被拉到 1100px+（手机端原样） */
-@media (min-width: 768px) {
-  .dash { max-width: 760px; margin-left: auto; margin-right: auto; }
-}
+/* 网页版宽屏：与首页一致，个人中心铺满卡片，不再限宽成 760px */
 </style>

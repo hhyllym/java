@@ -305,6 +305,13 @@
 用户权限筛选 + 重置密码、发系统通知、管理员会话 7 天过期。前端 `vite build` 与后端 `mvn compile`
 均实测通过。
 
+### ✅ 5.9 所有页面统一成首页尺寸（2026-11-25）
+- **关键坑**：`#app` 是 `body`（flex 容器）的子项，默认 shrink-to-fit 只有 300 多 px；`.card { width:100% }` 继承的是这个窄宽度。已在 `style.css` 给 `#app` 加 `width:100%; max-width:var(--app-w)`，页面才真的铺开。别删掉这条。
+- `style.css` 里 `.card-wide / .card-admin / .card-mp` 不再单独加宽，全部走首页的 `--app-w` / `--app-h`；后台表格和棋盘放不下时允许卡片内横向滚动，别改回 `overflow-x: hidden` 的裁切写法。
+- 页面内部的旧限宽已移除：LoginView 460px、RegisterView 500px、DashboardView 760px、AdminLoginView 380px。以后加页面不要再加「限宽居中」规则，否则又变回窄条。
+- 加高过的内部容器：ChatView 消息区（min 420px / max 72vh）、HallView 消息列表（min 320px / 60vh）、FriendsView 邀请列表 360px、AdminView `.checks` 240px、PetView `.pet-stage` 280px。
+- 改完跑过 `npm run build`（vite 5.4.21）通过。注意 `node_modules` 开机被清，构建前先 `npm install`。
+
 ---
 
 ## 6. 文件地图（前端）

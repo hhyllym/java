@@ -876,7 +876,7 @@ export default {
 .confirm-sheet .sheet-tip { font-size: 13px; }
 
 /* 邀请组队 */
-.invite-list { display: flex; flex-direction: column; gap: 6px; max-height: 260px; overflow-y: auto; }
+.invite-list { display: flex; flex-direction: column; gap: 6px; max-height: 360px; overflow-y: auto; }
 .invite-row {
   display: flex; align-items: center; gap: 9px; padding: 8px 10px;
   background: var(--panel); border-radius: 11px; border: 1.5px solid transparent;

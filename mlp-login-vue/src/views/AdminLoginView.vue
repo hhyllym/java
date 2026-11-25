@@ -105,7 +105,7 @@ export default {
 }
 .login-card {
   width: 100%;
-  max-width: 380px;
+  /* 与首页一致：铺满卡片，不再限宽成 380px 窄条 */
   background: var(--card, #fff);
   border-radius: var(--radius, 18px);
   box-shadow: var(--shadow, 0 16px 40px rgba(160, 108, 213, .18));

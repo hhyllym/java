@@ -880,7 +880,7 @@ export default {
   border: 1.5px solid #e4dcf5; border-radius: 10px; font-size: 13px; outline: none; font-family: inherit;
 }
 .modal input:focus, .modal select:focus, .modal textarea:focus { border-color: #a06cd5; }
-.checks { margin-top: 6px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; max-height: 160px; overflow: auto; }
+.checks { margin-top: 6px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; max-height: 240px; overflow: auto; }
 .chk { display: flex; align-items: center; gap: 6px; font-weight: 400; font-size: 13px; margin: 0; }
 .lbl { font-size: 12.5px; font-weight: 700; color: #6b6380; }
 .modal-bar { display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px; }

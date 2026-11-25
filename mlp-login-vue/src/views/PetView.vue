@@ -387,7 +387,7 @@ export default {
   border: 1.5px solid var(--border); text-align: left;
 }
 .pet-stage {
-  position: relative; height: 216px; border-radius: 13px; overflow: hidden;
+  position: relative; height: 280px; border-radius: 13px; overflow: hidden;
   display: flex; align-items: center; justify-content: center;
   background: linear-gradient(180deg, #e9f5ff 0%, #fdf0f8 58%, #f3e7fb 100%);
   cursor: pointer;

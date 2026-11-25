@@ -90,10 +90,14 @@ body[data-theme="night"] {
   --bg1: #1e1830; --bg2: #251d3a; --bg3: #1a2333; --bg4: #2a1e35;
 }
 
-/* 主题切换器 */
+/* 主题切换器：固定在页面右上角（卡片外），所有页面同一位置 */
 .themes {
   display: flex; justify-content: flex-end; gap: 8px;
-  padding: 12px 20px 0; position: relative; z-index: 2;
+  padding: 0;
+  position: fixed;
+  top: calc(var(--page-pad) - 2px);
+  right: var(--page-pad);
+  z-index: 30;
 }
 .theme-dot {
   width: 18px; height: 18px; border-radius: 50%;
@@ -145,9 +149,8 @@ body {
   max-width: var(--app-w);
 }
 
-/* 手机端：主题圆点行也收窄一点，别顶到屏幕边缘 */
+/* 手机端：主题圆点同样固定在右上角，位置跟着页面内边距走 */
 @media (max-width: 767px) {
-  .themes { padding: 10px 14px 0; }
   .head { padding: 22px 20px 6px; }
   .tabs { margin: 18px 20px 0; }
   form { padding: 16px 20px 24px; }

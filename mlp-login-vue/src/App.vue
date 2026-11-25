@@ -3,32 +3,33 @@
   <ParticleBg />
   <ClickSparkle />
 
+  <!-- 主题切换固定在页面右上角，放在卡片外面，避免受卡片动画/滚动影响 -->
+  <div class="themes">
+    <button
+      class="theme-dot sound-toggle"
+      :class="{ muted: soundMuted }"
+      :title="soundMuted ? '音效已关闭 · 点我开启' : '音效开启中 · 点我静音'"
+      @click="toggleSound"
+    >{{ soundMuted ? '🔇' : '🔊' }}</button>
+    <button
+      class="theme-dot auto"
+      :class="{ active: theme === 'auto' }"
+      title="自动变色：每 8 秒 smooth 切换一套主题"
+      @click="startAuto"
+    ></button>
+    <button
+      v-for="t in themeList"
+      :key="t.name"
+      class="theme-dot"
+      :class="{ active: theme === t.name }"
+      :style="{ '--dot': t.color }"
+      :title="t.title"
+      @click="pickTheme(t.name)"
+    ></button>
+  </div>
+
   <div class="card" :class="{ 'card-wide': $route.meta.wide, 'card-admin': $route.meta.admin, 'card-mp': $route.meta.mp, 'card-plain': $route.meta.plain }">
     <div class="card-rainbow"></div>
-    <div class="themes">
-      <button
-        class="theme-dot sound-toggle"
-        :class="{ muted: soundMuted }"
-        :title="soundMuted ? '音效已关闭 · 点我开启' : '音效开启中 · 点我静音'"
-        @click="toggleSound"
-      >{{ soundMuted ? '🔇' : '🔊' }}</button>
-      <button
-        class="theme-dot auto"
-        :class="{ active: theme === 'auto' }"
-        title="自动变色：每 8 秒 smooth 切换一套主题"
-        @click="startAuto"
-      ></button>
-      <button
-        v-for="t in themeList"
-        :key="t.name"
-        class="theme-dot"
-        :class="{ active: theme === t.name }"
-        :style="{ '--dot': t.color }"
-        :title="t.title"
-        @click="pickTheme(t.name)"
-      ></button>
-    </div>
-
     <router-view />
   </div>
 

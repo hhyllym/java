@@ -396,6 +396,8 @@ export default {
 .dash { position: relative; }
 .dash-back {
   position: absolute; top: 8px; left: 14px;
+  /* 全局 .dash button 有 width:100%，返回按钮要显式改回自适应，否则会撑出卡片 14px */
+  width: auto;
   border: none; cursor: pointer;
   padding: 4px 12px;
   border-radius: 999px;

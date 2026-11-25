@@ -28,7 +28,7 @@ const router = createRouter({
     { path: '/dashboard', name: 'dashboard', component: DashboardView, meta: { requiresAuth: true } },
     { path: '/earn', name: 'earn', component: EarnView, meta: { requiresAuth: true } },
     { path: '/shop', name: 'shop', component: ShopView, meta: { requiresAuth: true, wide: true } },
-    { path: '/pet', name: 'pet', component: PetView, meta: { requiresAuth: true } },
+    { path: '/pet', name: 'pet', component: PetView, meta: { requiresAuth: true, boxed: true } },
     { path: '/message', name: 'message', component: MessageCenterView, meta: { requiresAuth: true } },
     { path: '/fortune', name: 'fortune', component: FortuneView, meta: { requiresAuth: true } },
     { path: '/learn', name: 'learn', component: LearnView, meta: { requiresAuth: true } },

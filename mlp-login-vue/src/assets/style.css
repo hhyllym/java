@@ -90,15 +90,20 @@ body[data-theme="night"] {
   --bg1: #1e1830; --bg2: #251d3a; --bg3: #1a2333; --bg4: #2a1e35;
 }
 
-/* 主题切换器：固定在页面右上角（卡片外），所有页面同一位置 */
+/* 主题切换器：固定在页面右上角（卡片外），所有页面同一位置。
+   平时透明隐藏，鼠标移上去才浮现（含音效/自动变色/各主题圆点）。 */
 .themes {
   display: flex; justify-content: flex-end; gap: 8px;
-  padding: 0;
+  padding: 8px;
+  margin: -8px; /* 撑大悬停热区，别让透明时点不到 */
   position: fixed;
   top: calc(var(--page-pad) - 2px);
   right: var(--page-pad);
   z-index: 30;
+  opacity: 0;
+  transition: opacity .25s ease;
 }
+.themes:hover, .themes:focus-within { opacity: 1; }
 .theme-dot {
   width: 18px; height: 18px; border-radius: 50%;
   border: 2px solid #fff; background: var(--dot); cursor: pointer;
@@ -155,6 +160,8 @@ body {
   .tabs { margin: 18px 20px 0; }
   form { padding: 16px 20px 24px; }
   .home { padding: 18px 16px 22px; }
+  /* 手机没有 hover，圆点保持淡淡可见，否则没法点 */
+  .themes { opacity: .55; }
 }
 @keyframes bgShift {
   0% { background-position: 0% 50%; }

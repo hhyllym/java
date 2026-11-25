@@ -312,6 +312,7 @@
 - **所有页面去框（2026-11-25 用户要求）**：全部页面和登录页一样只保留内容——`style.css` 的 `.card` 全局改成透明背景/无边框阴影/无动画/圆角 0，删除旧 `body:not([data-theme]) .card` 半透明白底覆盖规则，`.card > .card-rainbow { display:none }` 全局隐藏彩虹条。各页面宽度不变（登录 460px、其余 `--app-w`）。
 - **聊天页例外（2026-11-25 用户要求）**：只有聊天页保留原白框——路由 `meta.boxed: true` → App.vue 加 `card-boxed` → 恢复白底/圆角/阴影/彩虹条。别把它也去掉框。
 - **主题切换器位置（2026-11-25）**：`.themes` 已从 `.card` 内部移到卡片外，用 `position:fixed; top/right:var(--page-pad)` 固定在页面右上角；所有页面共用，别再放回卡片里，否则登录页会又跑到 logo 上方。
+- **主题圆点默认隐藏（2026-11-25）**：`.themes` 桌面端 `opacity:0`，`:hover/:focus-within` 时浮现（padding+负 margin 撑大热区）；手机端没有 hover，保留 `opacity:.55`，别设成 0 否则点不到。
 - 加高过的内部容器：ChatView 消息区（min 420px / max 72vh）、HallView 消息列表（min 320px / 60vh）、FriendsView 邀请列表 360px、AdminView `.checks` 240px、PetView `.pet-stage` 280px。
 - 改完跑过 `npm run build`（vite 5.4.21）通过。注意 `node_modules` 开机被清，构建前先 `npm install`。
 

@@ -10,7 +10,7 @@ set "FRONT_ALREADY=0"
 
 echo ==========================================================
 echo   小马乐园 - 一键启动
-echo   前端 http://192.168.68.10:%FRONT_PORT%      后端 http://192.168.68.10:%BACK_PORT%
+echo   前端 http://localhost:%FRONT_PORT%      后端 http://localhost:%BACK_PORT%
 echo ==========================================================
 echo.
 
@@ -44,7 +44,7 @@ echo.
 goto :front
 
 :back_ready
-echo [1/3] 后端 OK  -^>  http://192.168.68.10:%BACK_PORT%   (接口前缀 /api)
+echo [1/3] 后端 OK  -^>  http://localhost:%BACK_PORT%   (接口前缀 /api)
 echo.
 
 rem -------------------- 第二步：前端 --------------------
@@ -64,7 +64,7 @@ echo.
 goto :summary
 
 :front_ready
-echo [2/3] 前端 OK  -^>  http://192.168.68.10:%FRONT_PORT%
+echo [2/3] 前端 OK  -^>  http://localhost:%FRONT_PORT%
 echo.
 
 rem -------------------- 第三步：汇总 --------------------
@@ -80,8 +80,8 @@ if "%FRONT_ALREADY%"=="1" (
     call "%~dp0打开网页.bat" %FRONT_PORT%
 )
 echo ----------------------------------------------------------
-echo   在浏览器打开 http://192.168.68.10:%FRONT_PORT% 就是小马乐园页面
-echo   登录 / 注册接口走 http://192.168.68.10:%BACK_PORT%/api/auth/*
+echo   在浏览器打开 http://localhost:%FRONT_PORT% 就是小马乐园页面
+echo   登录 / 注册接口走 http://localhost:%BACK_PORT%/api/auth/*
 echo   停止服务：双击 停止全部.bat
 echo   起不来  ：双击 环境检测.bat
 echo ----------------------------------------------------------

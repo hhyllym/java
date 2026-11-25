@@ -232,7 +232,7 @@ const args = ['-Dfile.encoding=UTF-8', '-cp', cp, MAIN_CLASS]
 const bg = process.argv.includes('--bg')
 
 if (!bg) {
-  console.log(`[后端] 启动中 ... http://192.168.68.10:${APP_PORT}/api`)
+  console.log(`[后端] 启动中 ... http://localhost:${APP_PORT}/api`)
   console.log(`[后端] 工程目录 : ${BACKEND_DIR}`)
   console.log(`[后端] JDK      : ${JAVA_HOME}`)
   console.log(`[后端] 日志     : ${LOG}`)
@@ -243,7 +243,7 @@ if (!bg) {
   const child = spawn(javaExe, args, { cwd: BACKEND_DIR, env, stdio: ['ignore', out, out] })
   child.unref()
   fs.writeFileSync(PID_FILE, String(child.pid), 'utf8')
-  console.log(`[后端] 后台启动 PID=${child.pid}  http://192.168.68.10:${APP_PORT}/api`)
+  console.log(`[后端] 后台启动 PID=${child.pid}  http://localhost:${APP_PORT}/api`)
   console.log(`[后端] JDK : ${JAVA_HOME}`)
   console.log(`[后端] 日志: ${LOG}`)
 }

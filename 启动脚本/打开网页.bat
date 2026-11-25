@@ -13,6 +13,6 @@ if %_N% GEQ 120 goto :open
 ping -n 2 127.0.0.1 >nul
 goto :wait
 :open
-start "" "http://localhost:%PORT%/"
+start "" "http://192.168.68.10:%PORT%/"
 endlocal
 exit /b

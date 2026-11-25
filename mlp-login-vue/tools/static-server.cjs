@@ -2,7 +2,7 @@
 /*
  * 零依赖静态服务器（兜底用）
  * 1) 把 dist/ 当静态站点跑起来（支持 Vue Router 的 history 模式回退到 index.html）
- * 2) 把 /api/** 反向代理到后端 http://localhost:8081
+ * 2) 把 /api/** 反向代理到后端 http://192.168.68.10:8081
  *
  * 用法:  node tools/static-server.cjs [端口] [--no-open]
  * 依赖:  只用 Node 内置模块，不需要 node_modules
@@ -64,11 +64,11 @@ function sendFile(res, file) {
 
 function proxy(req, res) {
   const opts = {
-    host: 'localhost',
+    host: '192.168.68.10',
     port: BACK_PORT,
     method: req.method,
     path: req.url,
-    headers: Object.assign({}, req.headers, { host: 'localhost:' + BACK_PORT })
+    headers: Object.assign({}, req.headers, { host: '192.168.68.10:' + BACK_PORT })
   };
   const up = http.request(opts, (upRes) => {
     res.writeHead(upRes.statusCode || 502, upRes.headers);
@@ -128,12 +128,12 @@ server.on('error', (e) => {
 server.listen(PORT, () => {
   console.log('');
   console.log('  星糖谷 - 静态预览（兜底模式）已启动');
-  console.log('  网页地址 : http://localhost:' + PORT + '/');
-  console.log('  接口代理 : /api  ->  http://localhost:' + BACK_PORT);
+  console.log('  网页地址 : http://192.168.68.10:' + PORT + '/');
+  console.log('  接口代理 : /api  ->  http://192.168.68.10:' + BACK_PORT);
   console.log('  静态目录 : ' + DIST);
   console.log('  要停止   : 在本窗口按 Ctrl+C');
   console.log('');
   if (!NO_OPEN) {
-    exec('start "" "http://localhost:' + PORT + '/"');
+    exec('start "" "http://192.168.68.10:' + PORT + '/"');
   }
 });

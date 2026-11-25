@@ -161,19 +161,23 @@ body {
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
+/* 所有页面统一去框：背景透明、无边框阴影，内容直接浮在渐变背景上（和登录页一样）。
+   各页面宽度照旧：登录页 460px（card-plain），其余走 --app-w。 */
 .card {
   width: 100%; max-width: var(--app-w);
-  background: var(--card);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+  border: 0;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
   /* 首页内容比一屏长，所以在卡片内部滚动（body 是 overflow:hidden 的） */
   max-height: var(--app-h);
   overflow-x: hidden;
   overflow-y: auto;
   position: relative;
   z-index: 1;
-  border: 1px solid rgba(255,255,255,.7);
-  animation: cardIn .6s cubic-bezier(.22,.61,.36,1) both;
+  animation: none;
 }
 /* 所有页面（含加宽页 / 后台 / 游戏）统一使用首页的卡片尺寸：
    宽度走 --app-w，高度走 --app-h，不再给某几类页面单独加宽。
@@ -1018,14 +1022,7 @@ body:not([data-theme]) .float-cloud { display: none; }
 body[data-theme] .bg-bubble,
 body[data-theme] .bg-ribbon { display: none; }
 
-/* 默认粉色主题：页面和背景更融，其它主题完全不受影响 */
-body:not([data-theme]) .card {
-  background: linear-gradient(180deg, rgba(255,255,255,.94), rgba(255,255,255,.86));
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,.85);
-  box-shadow: 0 18px 46px rgba(160,108,213,.14);
-}
+/* 默认粉色主题：所有页面和登录页一样只保留内容，卡片不画框 */
 body:not([data-theme]) .card-rainbow { opacity: .82; }
 body:not([data-theme]) .bg-bubble-core { opacity: .56; }
 body:not([data-theme]) .bg-ribbon-piece { opacity: .88; }
@@ -1088,20 +1085,23 @@ body:not([data-theme]) .float-dessert { opacity: .26; }
   50%     { transform: translateY(-18px) rotate(9deg); }
 }
 
-/* ===== 登录页：恢复原来的窄幅内容，去掉外层白框，只保留内容 ===== */
+/* ===== 登录页：只保留 460px 窄幅居中，其余去框样式已全局化 ===== */
 body .card.card-plain {
   width: min(460px, 100%);
   max-width: min(460px, 100%);
   margin-left: auto;
   margin-right: auto;
-  background: transparent;
-  border: 0;
-  border-radius: 0;
-  box-shadow: none;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-  animation: none;
-  overflow-x: hidden;
-  overflow-y: auto;
 }
-.card-plain > .card-rainbow { display: none; }
+/* 顶部彩虹条：所有页面都不显示（和登录页一样，只保留内容） */
+.card > .card-rainbow { display: none; }
+
+/* ===== 聊天页例外（2026-11-25 用户要求）：保留原来的白框卡片 =====
+   路由 meta.boxed → App.vue 加 card-boxed → 这里恢复白底/圆角/阴影/彩虹条。 */
+.card.card-boxed {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(255,255,255,.7);
+  animation: cardIn .6s cubic-bezier(.22,.61,.36,1) both;
+}
+.card.card-boxed > .card-rainbow { display: block; }

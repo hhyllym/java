@@ -39,7 +39,7 @@ const router = createRouter({
     { path: '/diary', name: 'diary', component: DiaryView, meta: { requiresAuth: true } },
     { path: '/game/:id', name: 'game', component: GameView, meta: { requiresAuth: true, mp: true } },
     { path: '/friends', name: 'friends', component: FriendsView, meta: { requiresAuth: true } },
-    { path: '/chat/:id', name: 'chat', component: ChatView, meta: { requiresAuth: true } },
+    { path: '/chat/:id', name: 'chat', component: ChatView, meta: { requiresAuth: true, boxed: true } },
     { path: '/login', name: 'login', component: LoginView, meta: { plain: true } },
     { path: '/register', name: 'register', component: RegisterView },
     { path: '/admin/login', name: 'adminLogin', component: AdminLoginView },

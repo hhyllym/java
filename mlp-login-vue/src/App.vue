@@ -28,7 +28,7 @@
     ></button>
   </div>
 
-  <div class="card" :class="{ 'card-wide': $route.meta.wide, 'card-admin': $route.meta.admin, 'card-mp': $route.meta.mp, 'card-plain': $route.meta.plain }">
+  <div class="card" :class="{ 'card-wide': $route.meta.wide, 'card-admin': $route.meta.admin, 'card-mp': $route.meta.mp, 'card-plain': $route.meta.plain, 'card-boxed': $route.meta.boxed }">
     <div class="card-rainbow"></div>
     <router-view />
   </div>

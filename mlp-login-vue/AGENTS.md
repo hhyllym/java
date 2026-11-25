@@ -310,6 +310,7 @@
 - `style.css` 里 `.card-wide / .card-admin / .card-mp` 不再单独加宽，全部走首页的 `--app-w` / `--app-h`；后台表格和棋盘放不下时允许卡片内横向滚动，别改回 `overflow-x: hidden` 的裁切写法。
 - 页面内部的旧限宽已移除：RegisterView 500px、DashboardView 760px、AdminLoginView 380px。以后加页面不要再加「限宽居中」规则，否则又变回窄条。
 - **登录页例外（2026-11-25 用户要求）**：登录页恢复原来的 460px 窄幅内容，并且去掉外层白框——路由 `meta.plain: true` → App.vue 给卡片加 `card-plain` → `style.css` 里 `.card.card-plain` 透明背景/无边框阴影/隐藏顶部彩虹条/居中。别把登录页改回全宽白卡。
+- **主题切换器位置（2026-11-25）**：`.themes` 已从 `.card` 内部移到卡片外，用 `position:fixed; top/right:var(--page-pad)` 固定在页面右上角；所有页面共用，别再放回卡片里，否则登录页会又跑到 logo 上方。
 - 加高过的内部容器：ChatView 消息区（min 420px / max 72vh）、HallView 消息列表（min 320px / 60vh）、FriendsView 邀请列表 360px、AdminView `.checks` 240px、PetView `.pet-stage` 280px。
 - 改完跑过 `npm run build`（vite 5.4.21）通过。注意 `node_modules` 开机被清，构建前先 `npm install`。
 

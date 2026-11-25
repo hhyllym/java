@@ -3,7 +3,7 @@
   <ParticleBg />
   <ClickSparkle />
 
-  <div class="card" :class="{ 'card-wide': $route.meta.wide, 'card-admin': $route.meta.admin, 'card-mp': $route.meta.mp }">
+  <div class="card" :class="{ 'card-wide': $route.meta.wide, 'card-admin': $route.meta.admin, 'card-mp': $route.meta.mp, 'card-plain': $route.meta.plain }">
     <div class="card-rainbow"></div>
     <div class="themes">
       <button

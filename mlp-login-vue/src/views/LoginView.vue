@@ -239,8 +239,10 @@ export default {
   font-size: 11.5px;
   color: #a08a4d;
 }
-/* 网页版宽屏：与首页一致，表单区铺满卡片，不再限宽成窄条 */
+/* 网页版宽屏：登录页恢复原来的窄幅内容，不做全宽铺开 */
 @media (min-width: 768px) {
+  .head, form, .admin-entry, .switch-hint { max-width: 460px; margin-left: auto; margin-right: auto; }
+  .tabs { max-width: 460px; margin-left: auto; margin-right: auto; }
   .head { padding-top: 40px; }
 }
 </style>

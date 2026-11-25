@@ -40,7 +40,7 @@ const router = createRouter({
     { path: '/game/:id', name: 'game', component: GameView, meta: { requiresAuth: true, mp: true } },
     { path: '/friends', name: 'friends', component: FriendsView, meta: { requiresAuth: true } },
     { path: '/chat/:id', name: 'chat', component: ChatView, meta: { requiresAuth: true } },
-    { path: '/login', name: 'login', component: LoginView },
+    { path: '/login', name: 'login', component: LoginView, meta: { plain: true } },
     { path: '/register', name: 'register', component: RegisterView },
     { path: '/admin/login', name: 'adminLogin', component: AdminLoginView },
     { path: '/admin', name: 'admin', component: AdminView, meta: { requiresAdmin: true, admin: true } }

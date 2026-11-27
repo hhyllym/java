@@ -10,7 +10,7 @@
  */
 export const PET3D_KINDS = [
   'cat', 'dog', 'bird', 'rabbit', 'fox', 'bear', 'hamster', 'penguin',
-  'mouse', 'squirrel', 'ragdoll', 'corgi', 'shiba', 'budgie'
+  'mouse', 'squirrel', 'ragdoll', 'corgi', 'shiba', 'budgie', 'goose'
 ]
 
 export const PET3D_CONFIG = {
@@ -22,11 +22,12 @@ export const PET3D_CONFIG = {
     head: [1.02, 1, .94], body: [.94, .88, .86], tailSpeed: 1.7
   },
   dog: {
-    name: '萨摩耶', group: '狗', desc: '一身白云，永远在笑',
-    fur: 0xfffaf0, furLight: 0xffffff, belly: 0xfffdf8, earInner: 0xffd9cf,
-    eye: 0x4a382c, nose: 0x5b4638, blush: 0xffb3bd, accent: 0xe8dcc8,
-    ear: 'triangle', tail: 'curl', smile: true, fluff: .95,
-    head: [1.04, 1, .95], body: [.98, .9, .9], tailSpeed: 3.6
+    // QQ 宠物同款白毛小狗：纯白蓬松毛、小圆耳、黑豆眼、黑鼻、吐舌、蓬松尾
+    name: 'QQ狗狗', group: '狗', desc: '一团白云，黑豆眼永远在笑',
+    fur: 0xfffdfb, furLight: 0xffffff, belly: 0xffffff, earInner: 0xffd8e0,
+    eye: 0x241d28, nose: 0x3a3038, blush: 0xf6b3c2, accent: 0xece4d8,
+    ear: 'round', tail: 'bushy', tailTip: 0xffffff, smile: true, fluff: 1,
+    head: [1.06, 1.02, .96], body: [1, .92, .92], tailSpeed: 3.2
   },
   bird: {
     name: '玄凤鹦鹉', group: '鸟', desc: '黄冠羽 + 橙腮红，会歪头看你',
@@ -63,12 +64,23 @@ export const PET3D_CONFIG = {
     ear: 'round', tail: 'ball', cheek: .95, hold: 'seed', fluff: .45,
     head: [1.08, .98, .96], body: [1, .92, .94], tailSpeed: 1.6
   },
-  penguin: {
-    name: '小企鹅', group: '鸟', desc: '左右摇摆，翅膀拍个不停',
-    fur: 0x6f86a8, furLight: 0x9db4d2, belly: 0xffffff, earInner: 0x6f86a8,
-    eye: 0x25384f, nose: 0xf0a24a, blush: 0xf2a0b0, accent: 0x4d6486,
+  goose: {
+    // QQ 宠物同款蒜头鹅：灰白蓬松毛、橙扁嘴橙脚、头顶小揪、圆胖身体
+    name: '蒜头鹅', group: '鸟', desc: '一团灰云，头顶呆毛一翘一翘',
+    fur: 0xd6d3d8, furLight: 0xf2eff2, belly: 0xfaf7f8, earInner: 0xd6d3d8,
+    eye: 0x2a2630, nose: 0xf59b3c, blush: 0xf0aeb8, accent: 0xc9c4cc,
+    tuft: true, footColor: 0xf0902e, beakColor: 0xf59b3c, beakDark: 0xdd7f28,
     ear: 'none', tail: 'none', wing: true, beak: true, feet: true,
-    fluff: .25, head: [1, 1.08, .94], body: [.94, 1.08, .9], tailSpeed: 1.8
+    fluff: 1, head: [1.06, 1.04, .96], body: [1.02, 1.06, .96], tailSpeed: 1.6
+  },
+  penguin: {
+    // QQ 宠物 Q 哥哥：黑身白肚、黄嘴黄脚、红围巾、大眼白
+    name: 'Q企鹅', group: '鸟', desc: 'QQ 同款，红围巾一戴就能卖萌',
+    fur: 0x2b2a30, furLight: 0x4a4852, belly: 0xfffaf5, earInner: 0x2b2a30,
+    eye: 0x231a24, nose: 0xffbe3d, blush: 0xf6a0b0, accent: 0x2b2a30,
+    scarf: 0xe0392f, scarfTail: true, footColor: 0xffb02e, beakColor: 0xffbe3d, eyeBig: true,
+    ear: 'none', tail: 'none', wing: true, beak: true, feet: true,
+    fluff: .3, head: [1.05, 1.02, .95], body: [1, 1.04, .94], tailSpeed: 1.8
   },
   mouse: {
     name: '花枝鼠', group: '鼠', desc: '大圆耳、细长尾，跑得飞快',

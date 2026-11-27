@@ -1,16 +1,23 @@
 <template>
-  <div class="admin-login">
-    <div class="login-card">
-      <div class="badge">🛠 后台管理系统</div>
+  <div>
+    <div class="particle-layer" ref="particleLayer"></div>
+    <div class="head">
       <div class="logo">🦄</div>
       <h1>管理员登录</h1>
-      <p class="sub">仅限管理员进入 · 普通用户请回首页</p>
+      <p>仅限管理员进入 · 普通用户请回首页</p>
+    </div>
 
-      <div v-if="netError" class="net-err">{{ netError }}</div>
+    <div class="tabs">
+      <router-link to="/login" class="tab">用户登录</router-link>
+      <span class="tab active">管理员登录</span>
+    </div>
 
-      <form novalidate @submit.prevent="handleLogin">
-        <div class="field">
-          <label for="adminName">管理员账号</label>
+    <div v-if="netError" class="net-err">{{ netError }}</div>
+
+    <form novalidate @submit.prevent="handleLogin">
+      <div class="field">
+        <label for="adminName">管理员账号</label>
+        <div class="input-wrap">
           <input
             id="adminName"
             v-model="form.username"
@@ -19,32 +26,36 @@
             autocomplete="username"
             :class="{ invalid: errors.username }"
           />
-          <div class="err">{{ errors.username }}</div>
         </div>
+        <div class="err">{{ errors.username }}</div>
+      </div>
 
-        <div class="field">
-          <label for="adminPw">管理员密码</label>
-          <div class="pw-wrap">
-            <input
-              id="adminPw"
-              v-model="form.password"
-              :type="show ? 'text' : 'password'"
-              placeholder="请输入管理员密码"
-              autocomplete="current-password"
-              :class="{ invalid: errors.password }"
-            />
-            <button type="button" class="toggle" @click="show = !show">{{ show ? '隐藏' : '显示' }}</button>
-          </div>
-          <div class="err">{{ errors.password }}</div>
+      <div class="field">
+        <label for="adminPw">管理员密码</label>
+        <div class="input-wrap">
+          <input
+            id="adminPw"
+            v-model="form.password"
+            :type="show ? 'text' : 'password'"
+            placeholder="请输入管理员密码"
+            autocomplete="current-password"
+            :class="{ invalid: errors.password }"
+          />
+          <button type="button" class="toggle-pw" @click="show = !show">
+            {{ show ? '隐藏' : '显示' }}
+          </button>
         </div>
+        <div class="err">{{ errors.password }}</div>
+      </div>
 
-        <button type="submit" class="submit" :disabled="submitting">
+      <div class="submit-wrap">
+        <button type="submit" class="submit" ref="loginBtn" :class="{ popping: rainbow }" :disabled="submitting">
           {{ submitting ? '登录中…' : '进入后台管理系统' }}
         </button>
-      </form>
+      </div>
+    </form>
 
-      <router-link to="/home" class="back">« 返回首页</router-link>
-    </div>
+    <router-link to="/home" class="back-link">« 返回首页</router-link>
   </div>
 </template>
 
@@ -60,16 +71,54 @@ export default {
       show: false,
       errors: {},
       netError: '',
-      submitting: false
+      submitting: false,
+      rainbow: false
     }
   },
   methods: {
+    burstParticles() {
+      const layer = this.$refs.particleLayer
+      const btn = this.$refs.loginBtn
+      if (!layer || !btn) return
+      const rect = btn.getBoundingClientRect()
+      const cx = rect.left + rect.width / 2
+      const cy = rect.top + rect.height / 2
+      const colors = ['#ff5d8f', '#ffb347', '#ffe14d', '#7be36a', '#4dd0e1', '#7b6cff', '#e07bff']
+      const N = 30
+      for (let i = 0; i < N; i++) {
+        const p = document.createElement('span')
+        p.className = 'particle'
+        const color = colors[i % colors.length]
+        const size = 6 + Math.random() * 6
+        p.style.background = color
+        p.style.left = cx + 'px'
+        p.style.top = cy + 'px'
+        p.style.width = size + 'px'
+        p.style.height = size + 'px'
+        layer.appendChild(p)
+        const angle = (Math.PI * 2 * i) / N + Math.random() * 0.6
+        const dist = 70 + Math.random() * 110
+        const dx = Math.cos(angle) * dist
+        const dy = Math.sin(angle) * dist - 40
+        const dur = 650 + Math.random() * 450
+        p.animate([
+          { transform: 'translate(-50%, -50%) translate(0, 0) scale(1)', opacity: 1 },
+          { transform: `translate(-50%, -50%) translate(${dx}px, ${dy}px) scale(.3)`, opacity: 0 }
+        ], { duration: dur, easing: 'cubic-bezier(.22,.61,.36,1)' }).onfinish = () => p.remove()
+      }
+    },
     async handleLogin() {
       if (this.submitting) return
-      this.errors = {}
-      this.netError = ''
+      this.burstParticles()
+      this.rainbow = false
+      this.$nextTick(() => {
+        this.rainbow = true
+        setTimeout(() => { this.rainbow = false }, 450)
+      })
       const username = this.form.username.trim()
       const password = this.form.password
+      this.errors = {}
+      this.netError = ''
       if (!username) { this.errors.username = '请输入管理员账号'; return }
       if (!password) { this.errors.password = '请输入管理员密码'; return }
 
@@ -96,59 +145,27 @@ export default {
 </script>
 
 <style scoped>
-.admin-login {
-  min-height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
+/* 与前台登录页一致：粒子层全屏覆盖、不挡点击 */
+.particle-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  overflow: hidden;
 }
-.login-card {
-  width: 100%;
-  /* 与首页一致：铺满卡片，不再限宽成 380px 窄条 */
-  background: var(--card, #fff);
-  border-radius: var(--radius, 18px);
-  box-shadow: var(--shadow, 0 16px 40px rgba(160, 108, 213, .18));
-  padding: 28px 26px 22px;
-  text-align: center;
+.submit-wrap { position: relative; }
+.submit { position: relative; z-index: 1; }
+/* 点击：按钮轻微弹一下（与前台登录一致） */
+.submit.popping { animation: pop .45s ease; }
+@keyframes pop {
+  0% { transform: scale(.95); }
+  45% { transform: scale(1.04); }
+  100% { transform: none; }
 }
-.badge {
-  display: inline-block;
-  font-size: 12px;
-  font-weight: 800;
-  color: #7c5cbf;
-  background: #efe9fb;
-  border-radius: 999px;
-  padding: 5px 12px;
-  margin-bottom: 10px;
-}
-.logo { font-size: 46px; line-height: 1; margin-bottom: 4px; }
-.login-card h1 { margin: 6px 0 2px; font-size: 22px; color: var(--text, #4a3f5c); }
-.sub { margin: 0 0 18px; font-size: 12.5px; color: var(--muted, #9088a0); }
-.field { text-align: left; margin-bottom: 14px; }
-.field label { display: block; font-size: 13px; font-weight: 700; color: var(--text, #4a3f5c); margin-bottom: 6px; }
-.field input {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 11px 13px;
-  border: 1.5px solid var(--border, #ece6f3);
-  border-radius: 12px;
-  font-size: 14px;
-  background: #fff;
-  color: var(--text, #4a3f5c);
-  outline: none;
-}
-.field input:focus { border-color: var(--primary, #a06cd5); }
-.field input.invalid { border-color: var(--danger, #e06666); }
-.pw-wrap { position: relative; }
-.pw-wrap .toggle {
-  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
-  border: none; background: transparent; color: var(--primary, #a06cd5);
-  font-size: 12px; cursor: pointer; font-weight: 700;
-}
-.err { color: var(--danger, #e06666); font-size: 12px; min-height: 16px; margin-top: 4px; }
+
+/* 连不上后端的提示条（后台登录独有） */
 .net-err {
-  margin: 0 0 14px;
+  margin: 14px 28px 0;
   padding: 10px 13px;
   border-radius: 12px;
   background: #fdeaea;
@@ -160,20 +177,33 @@ export default {
   animation: netErrIn .25s ease;
 }
 @keyframes netErrIn { from { opacity: 0; transform: translateY(-5px); } }
-.submit {
-  width: 100%;
-  margin-top: 4px;
-  padding: 12px;
-  border: none;
-  border-radius: 12px;
-  background: linear-gradient(135deg, var(--primary, #a06cd5), #c89bf0);
-  color: #fff;
-  font-size: 15px;
-  font-weight: 800;
-  cursor: pointer;
-  transition: .2s;
+
+/* 返回首页：仿照前台登录页底部入口 */
+.back-link {
+  display: block;
+  margin: 4px auto 0;
+  padding: 0 28px 18px;
+  text-align: center;
+  font-size: 12.5px;
+  color: var(--muted);
+  text-decoration: none;
+  letter-spacing: .5px;
+  transition: color .15s ease;
 }
-.submit:hover { filter: brightness(1.05); }
-.submit:disabled { opacity: .7; cursor: default; }
-.back { display: inline-block; margin-top: 14px; font-size: 13px; color: var(--primary, #a06cd5); text-decoration: none; font-weight: 700; }
+.back-link:hover { color: var(--primary); text-decoration: underline; }
+
+/* 网页版宽屏：顶部间距与前台登录页一致（宽度由 .card-plain 统一限制为 460px） */
+@media (min-width: 768px) {
+  .head { padding-top: 40px; }
+}
+</style>
+
+<style>
+/* 粒子是 JS 动态创建的 DOM，带不上 scoped 的 data-v 属性，必须用全局样式 */
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  box-shadow: 0 0 6px rgba(255, 255, 255, .6);
+}
 </style>

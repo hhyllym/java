@@ -173,7 +173,9 @@ function buildEye(headG, sign, c) {
   g.add(eyeball)
 
   // 眼白嵌进脸里，只让虹膜和双高光微微浮出表面，避免"两个黑球凸在脸外"
-  ball(eyeball, .205, 0xfffdfa, [0, 0, .65], [1, 1.14, .6])
+  // QQ 企鹅是标志性的大眼白，配置 eyeBig 时整体放大
+  const ew = c.eyeBig ? 1.28 : 1
+  ball(eyeball, .205 * ew, 0xfffdfa, [0, 0, .65], [1, 1.14, .6])
   ball(eyeball, .135, c.eye, [sign * .012, -.012, .745], [1, 1.1, .42],
     { roughness: .18, clearcoat: 1, clearcoatRoughness: .05, sheen: 0 })
   ball(eyeball, .072, 0x2f2436, [sign * .012, -.018, .795], [1, 1.1, .38],
@@ -218,9 +220,12 @@ function buildPet(root, kind) {
       ball(bodyG, .21, c.furLight, [sx * .42, pawY, .34 - sz * .34], [1, .78, 1.05])
     }
   }
-  // 鸟/企鹅的橙脚
+  // 鸟/企鹅的脚（QQ 企鹅用配置里的黄色，其他物种仍用原橙色）
   if (c.feet) for (const sx of [-1, 1])
-    ball(bodyG, .24, 0xf0a24a, [sx * .3, -.58, .38], [1.1, .4, 1.35])
+    ball(bodyG, .24, c.footColor || 0xf0a24a, [sx * .3, -.58, .38], [1.1, .4, 1.35])
+
+  // 围巾（QQ 企鹅标志）：这里只放垂下的那条，围巾环在头部代码里挂到 headG 上
+  // （头的球体很大，围巾环必须贴着头的下沿才露出来）
 
   // 条纹（狸花猫 / 柴犬脸部）
   if (c.stripe) {
@@ -266,6 +271,21 @@ function buildPet(root, kind) {
   hshell.scale.set(...(c.head || [1, 1, .94]))
   headG.add(hshell)
 
+  // 围巾环（QQ 企鹅）：贴在头球下沿外侧，绕一圈；垂下的那条在身体代码里
+  if (c.scarf) {
+    const hs = c.head || [1, 1, .94]
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(.86 * hs[0] * .96, .15, 12, 32), makeMat(c.scarf))
+    ring.rotation.x = Math.PI / 2
+    ring.position.set(0, -.5, 0)
+    headG.add(ring)
+    // 正面加厚一片，让围巾在正脸看得见
+    ball(headG, .22, c.scarf, [0, -.52, .78], [1.7, .85, .55])
+    if (c.scarfTail) {
+      const st = ball(headG, .2, c.scarf, [.52, -.78, .68], [.75, 1.8, .45])
+      st.rotation.z = -.3
+    }
+  }
+
   // 重点色面罩 / 脸部浅斑
   if (c.patch) ball(headG, .54, c.patch, [0, .3, .5], [1.12, .78, .5])
   if (c.facePatch) ball(headG, .52, c.facePatch, [0, -.06, .58], [1.16, .92, .42])
@@ -281,6 +301,13 @@ function buildPet(root, kind) {
   // 冠羽（玄凤）
   if (c.crest) for (let i = -1; i <= 1; i++)
     cone(headG, .075, .62, c.furLight, [i * .13, 1.06, -.06], [-.3, 0, -i * .28], 8)
+
+  // 头顶小揪（QQ 蒜头鹅的呆毛）：两三个小球叠出翘起的毛撮
+  if (c.tuft) {
+    ball(headG, .17, c.furLight, [-.05, .9, .02], [1, 1.3, .9])
+    ball(headG, .12, c.furLight, [.09, 1.02, .04], [1, 1.4, 1])
+    ball(headG, .075, c.furLight, [.16, 1.14, .06], [1, 1.3, 1])
+  }
 
   // 眼睛
   const eL = buildEye(headG, -1, c), eR = buildEye(headG, 1, c)
@@ -304,8 +331,15 @@ function buildPet(root, kind) {
   // 吻部 + 鼻子 + 嘴（吻部微微贴出脸面，不做成凸起的"口罩"）
   ball(headG, .26, c.belly, [0, -.32, .66], [1.08, .62, .42])
   if (c.beak) {
-    cone(headG, .17, .3, 0xffc061, [0, -.26, .86], [Math.PI / 2, 0, 0], 10)
-    cone(headG, .13, .22, 0xf0a24a, [0, -.38, .84], [Math.PI / 2, 0, 0], 10)
+    const bc = c.beakColor || 0xffc061
+    if (c.beakColor) {
+      // QQ 企鹅的扁黄嘴：用压扁的球，比尖锥更像鸭/鹅嘴
+      ball(headG, .24, bc, [0, -.28, .82], [1.15, .5, .5])
+      ball(headG, .19, c.beakDark || bc, [0, -.36, .8], [1.05, .35, .42])
+    } else {
+      cone(headG, .17, .3, bc, [0, -.26, .86], [Math.PI / 2, 0, 0], 10)
+      cone(headG, .13, .22, 0xf0a24a, [0, -.38, .84], [Math.PI / 2, 0, 0], 10)
+    }
   } else {
     ball(headG, .095, c.nose, [0, -.22, .9], [1.25, .8, .6], { roughness: .35, clearcoat: .6 })
     arc(headG, .13, .022, 0x8a5f70, [0, -.44, .84], Math.PI)

@@ -11,7 +11,7 @@
  Target Server Version : 80039 (8.0.39)
  File Encoding         : 65001
 
- Date: 20/11/2026 16:57:53
+ Date: 27/11/2026 16:56:56
 */
 
 SET NAMES utf8mb4;
@@ -137,7 +137,7 @@ CREATE TABLE `t_game_score`  (
   `create_time` datetime NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_game`(`game_id` ASC, `score` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 12 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 33 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_game_score
@@ -153,6 +153,50 @@ INSERT INTO `t_game_score` VALUES (8, 'snake', 5, 10, '2026-11-08 21:47:26');
 INSERT INTO `t_game_score` VALUES (9, 'rps', 5, 25, '2026-11-08 22:12:43');
 INSERT INTO `t_game_score` VALUES (10, 'snake', 1, 1, '2026-11-08 22:47:33');
 INSERT INTO `t_game_score` VALUES (11, 'snake', 1, 0, '2026-11-08 22:49:36');
+INSERT INTO `t_game_score` VALUES (12, 'rps', 7, 22, '2026-11-27 16:49:31');
+INSERT INTO `t_game_score` VALUES (13, 'jump', 6, 98, '2026-11-27 16:49:37');
+INSERT INTO `t_game_score` VALUES (14, 'rps', 7, 40, '2026-11-27 16:50:37');
+INSERT INTO `t_game_score` VALUES (15, 'petbattle', 7, 104, '2026-11-27 16:50:57');
+INSERT INTO `t_game_score` VALUES (16, 'whack', 7, 96, '2026-11-27 16:51:37');
+INSERT INTO `t_game_score` VALUES (17, 'mine', 6, 112, '2026-11-27 16:51:44');
+INSERT INTO `t_game_score` VALUES (18, 'glide', 7, 170, '2026-11-27 16:51:52');
+INSERT INTO `t_game_score` VALUES (19, 'glide', 7, 160, '2026-11-27 16:52:03');
+INSERT INTO `t_game_score` VALUES (20, 'glide', 7, 245, '2026-11-27 16:52:17');
+INSERT INTO `t_game_score` VALUES (21, 'mine', 6, 109, '2026-11-27 16:52:39');
+INSERT INTO `t_game_score` VALUES (22, 'glide', 7, 460, '2026-11-27 16:52:40');
+INSERT INTO `t_game_score` VALUES (23, 'jump', 7, 78, '2026-11-27 16:53:03');
+INSERT INTO `t_game_score` VALUES (24, 'mine', 6, 81, '2026-11-27 16:53:07');
+INSERT INTO `t_game_score` VALUES (25, 'jump', 7, 59, '2026-11-27 16:53:21');
+INSERT INTO `t_game_score` VALUES (26, 'jump', 7, 20, '2026-11-27 16:53:40');
+INSERT INTO `t_game_score` VALUES (27, 'mine', 6, 125, '2026-11-27 16:53:55');
+INSERT INTO `t_game_score` VALUES (28, 'mine', 7, 143, '2026-11-27 16:55:15');
+INSERT INTO `t_game_score` VALUES (29, 'mine', 7, 122, '2026-11-27 16:55:27');
+INSERT INTO `t_game_score` VALUES (30, 'mine', 7, 99, '2026-11-27 16:55:41');
+INSERT INTO `t_game_score` VALUES (31, 'mine', 7, 88, '2026-11-27 16:55:58');
+INSERT INTO `t_game_score` VALUES (32, 'mine', 6, 107, '2026-11-27 16:55:59');
+
+-- ----------------------------
+-- Table structure for t_hall_message
+-- ----------------------------
+DROP TABLE IF EXISTS `t_hall_message`;
+CREATE TABLE `t_hall_message`  (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `user_id` bigint NULL DEFAULT NULL COMMENT '发送者 id（系统公告可为空）',
+  `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '发送者名字（展示用）',
+  `avatar` varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '发送者头像 emoji',
+  `content` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '消息内容',
+  `msg_type` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'text' COMMENT 'text 文本 / system 系统提示',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '发送时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_t_hall_message_time`(`create_time` ASC) USING BTREE,
+  INDEX `idx_t_hall_message_user`(`user_id` ASC) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '星糖谷大厅公共聊天' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of t_hall_message
+-- ----------------------------
+INSERT INTO `t_hall_message` VALUES (1, NULL, '星糖谷', '🏠', '欢迎来到星糖大厅！这里所有小马都能聊天，也可以发起游戏邀请，喊上朋友一起玩～', 'system', '2026-11-27 15:34:55');
+INSERT INTO `t_hall_message` VALUES (2, 5, '钱钱钱', '', '1', 'text', '2026-11-27 15:37:53');
 
 -- ----------------------------
 -- Table structure for t_message
@@ -172,7 +216,7 @@ CREATE TABLE `t_message`  (
   INDEX `idx_t_message_type`(`type` ASC) USING BTREE,
   INDEX `idx_t_message_to`(`to_id` ASC) USING BTREE,
   INDEX `idx_t_message_from`(`from_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 10 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '小马王国消息中心（留言板 / 私信 / 系统通知）' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 11 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '小马王国消息中心（留言板 / 私信 / 系统通知）' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_message
@@ -186,6 +230,7 @@ INSERT INTO `t_message` VALUES (6, 'NOTIFY', NULL, '星糖谷', 4, NULL, '欢迎
 INSERT INTO `t_message` VALUES (7, 'NOTIFY', NULL, '星糖谷', 5, NULL, '欢迎来到星糖谷，钱钱钱！记得去首页抽你的「今日幸运小马」🎲', 1, '2026-11-02 10:43:26');
 INSERT INTO `t_message` VALUES (8, 'NOTIFY', NULL, '小马乐园', 6, NULL, '欢迎来到小马乐园，qqq！记得去首页抽你的「今日幸运小马」🎲', 1, '2026-11-20 16:52:29');
 INSERT INTO `t_message` VALUES (9, 'NOTIFY', 2, 'admin', -1, NULL, '你好', 1, '2026-11-20 16:53:45');
+INSERT INTO `t_message` VALUES (10, 'NOTIFY', NULL, '小马乐园', 7, NULL, '欢迎来到小马乐园，aaa！记得去首页抽你的「今日幸运小马」🎲', 0, '2026-11-27 16:48:36');
 
 -- ----------------------------
 -- Table structure for t_pet
@@ -234,7 +279,7 @@ CREATE TABLE `t_pet_cosmetic`  (
 -- ----------------------------
 INSERT INTO `t_pet_cosmetic` VALUES (1, 1, 'cosmetic-hat', 2, 0, '2026-10-17 21:44:06');
 INSERT INTO `t_pet_cosmetic` VALUES (2, 1, 'cosmetic-bow', 1, 0, '2026-10-17 21:44:06');
-INSERT INTO `t_pet_cosmetic` VALUES (3, 6, 'cosmetic-bow', 5, 1, '2026-11-20 16:53:51');
+INSERT INTO `t_pet_cosmetic` VALUES (3, 6, 'cosmetic-bow', 5, 0, '2026-11-20 16:53:51');
 
 -- ----------------------------
 -- Table structure for t_point_log
@@ -249,7 +294,7 @@ CREATE TABLE `t_point_log`  (
   `create_time` datetime NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_user`(`user_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 66 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 80 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_point_log
@@ -302,6 +347,20 @@ INSERT INTO `t_point_log` VALUES (62, 6, 0, 'shop', '兑换：图鉴收藏家称
 INSERT INTO `t_point_log` VALUES (63, 6, 0, 'shop', '兑换：图鉴收藏家称号 -500', '2026-11-20 16:53:55');
 INSERT INTO `t_point_log` VALUES (64, 6, 2, 'pet', '喂食宠物', '2026-11-20 16:54:02');
 INSERT INTO `t_point_log` VALUES (65, 6, 2, 'pet', '喂食宠物', '2026-11-20 16:54:05');
+INSERT INTO `t_point_log` VALUES (66, 7, 22, 'game-reward', '游戏「猜拳争霸」破纪录奖励 +22', '2026-11-27 16:49:31');
+INSERT INTO `t_point_log` VALUES (67, 6, 98, 'game-reward', '游戏「小马跳跳跑」破纪录奖励 +98', '2026-11-27 16:49:37');
+INSERT INTO `t_point_log` VALUES (68, 7, 18, 'game-reward', '游戏「猜拳争霸」破纪录奖励 +18', '2026-11-27 16:50:37');
+INSERT INTO `t_point_log` VALUES (69, 5, 0, 'shop', '兑换：虎皮鹦鹉蛋 -200', '2026-11-27 16:50:44');
+INSERT INTO `t_point_log` VALUES (70, 7, 104, 'game-reward', '游戏「宠物单挑」破纪录奖励 +104', '2026-11-27 16:50:57');
+INSERT INTO `t_point_log` VALUES (71, 7, 96, 'game-reward', '游戏「森林躲猫猫」破纪录奖励 +96', '2026-11-27 16:51:37');
+INSERT INTO `t_point_log` VALUES (72, 6, 112, 'game-reward', '游戏「星糖扫雷」破纪录奖励 +112', '2026-11-27 16:51:44');
+INSERT INTO `t_point_log` VALUES (73, 7, 170, 'game-reward', '游戏「流光穿越」破纪录奖励 +170', '2026-11-27 16:51:52');
+INSERT INTO `t_point_log` VALUES (74, 7, 75, 'game-reward', '游戏「流光穿越」破纪录奖励 +75', '2026-11-27 16:52:17');
+INSERT INTO `t_point_log` VALUES (75, 7, 215, 'game-reward', '游戏「流光穿越」破纪录奖励 +215', '2026-11-27 16:52:40');
+INSERT INTO `t_point_log` VALUES (76, 7, 78, 'game-reward', '游戏「小马跳跳跑」破纪录奖励 +78', '2026-11-27 16:53:03');
+INSERT INTO `t_point_log` VALUES (77, 6, 13, 'game-reward', '游戏「星糖扫雷」破纪录奖励 +13', '2026-11-27 16:53:55');
+INSERT INTO `t_point_log` VALUES (78, 7, 10000, 'newbie-10000', '新人大礼包', '2026-11-27 16:53:58');
+INSERT INTO `t_point_log` VALUES (79, 7, 143, 'game-reward', '游戏「星糖扫雷」破纪录奖励 +143', '2026-11-27 16:55:15');
 
 -- ----------------------------
 -- Table structure for t_pony
@@ -329,7 +388,7 @@ CREATE TABLE `t_pony`  (
 INSERT INTO `t_pony` VALUES (1, '星澜', 'Lumina Gleam', 'twilight', '📖', '#b79cf0', '传说', '星辉书阁的管理员，把复杂知识整理成清楚清单，六色心印就是她归纳出来的。', 0, 1, '2026-11-11 09:07:49');
 INSERT INTO `t_pony` VALUES (2, '泡芙', 'Puffette', 'pinkie', '🎈', '#f7a8c4', '稀有', '糖霜镇的甜点师，随身带着彩纸和糖霜，走到哪儿哪儿就开起小派对。', 0, 2, '2026-11-11 09:07:49');
 INSERT INTO `t_pony` VALUES (3, '云驰', 'Zephyr Cloud', 'dash', '⚡', '#8fc7f0', '稀有', '流云城的信使队长，一眨眼穿过整片云海，答应过的事从不迟到。', 0, 3, '2026-11-11 09:07:49');
-INSERT INTO `t_pony` VALUES (4, '金穗', 'Harvesta', 'applejack', '🍎', '#f0a06a', '稀有', '金穗果园的园主，戴一顶草帽，说话算数，最见不得账目含糊。', 0, 4, '2026-11-11 09:07:49');
+INSERT INTO `t_pony` VALUES (4, '金穗', 'Harvesta', 'applejack', '🍎', '#f0a06a', '稀有', '金穗果园的园主，戴一顶草帽，说话算数，最见不得账目含糊。', 1, 4, '2026-11-11 09:07:49');
 INSERT INTO `t_pony` VALUES (5, '茸茸', 'Mossy Fluff', 'fluttershy', '🦋', '#a7e3c9', '稀有', '住在林边小屋的照料员，听得懂小动物的心思，连胆小的松鼠都愿意靠近。', 0, 5, '2026-11-11 09:07:49');
 INSERT INTO `t_pony` VALUES (6, '绮罗', 'Silkara', 'rarity', '💎', '#f7e08a', '稀有', '缎带工坊的主理人，一匹缎带几颗玻璃珠就能让旧衣焕然一新，最舍得分给朋友。', 0, 6, '2026-11-11 09:07:49');
 INSERT INTO `t_pony` VALUES (7, '曦光院长', 'Matron Solia', 'star', '☀️', '#f7c94c', '传说', '星辉学院的创办人，掌管白昼与开学典礼，星澜的老师。', 0, 7, '2026-11-11 09:07:49');
@@ -591,7 +650,7 @@ CREATE TABLE `t_task_progress`  (
   `claimed` tinyint NULL DEFAULT 0,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_user_day_task`(`user_id` ASC, `day` ASC, `task_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 37 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 43 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_task_progress
@@ -619,6 +678,12 @@ INSERT INTO `t_task_progress` VALUES (33, 6, '2026-11-20', 'daily_gift', 1, 0);
 INSERT INTO `t_task_progress` VALUES (34, 6, '2026-11-20', 'daily_pet', 2, 0);
 INSERT INTO `t_task_progress` VALUES (35, 6, '2026-11-20', 'daily_shop', 1, 0);
 INSERT INTO `t_task_progress` VALUES (36, 6, '2026-11-20', 'daily_login', 1, 0);
+INSERT INTO `t_task_progress` VALUES (37, 6, '2026-11-27', 'daily_view', 1, 0);
+INSERT INTO `t_task_progress` VALUES (38, 5, '2026-11-27', 'daily_login', 1, 0);
+INSERT INTO `t_task_progress` VALUES (39, 7, '2026-11-27', 'daily_game', 1, 0);
+INSERT INTO `t_task_progress` VALUES (40, 6, '2026-11-27', 'daily_game', 1, 0);
+INSERT INTO `t_task_progress` VALUES (41, 5, '2026-11-27', 'daily_shop', 1, 0);
+INSERT INTO `t_task_progress` VALUES (42, 7, '2026-11-27', 'daily_gift', 1, 0);
 
 -- ----------------------------
 -- Table structure for t_user
@@ -634,7 +699,7 @@ CREATE TABLE `t_user`  (
   `permission` tinyint NOT NULL DEFAULT 1 COMMENT '1=鏅??鐢ㄦ埛 0=鏅??绠＄悊鍛?2=瓒呯骇绠＄悊鍛',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_t_user_name`(`name` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '小马王国用户表（没有邮箱、没有手机号）' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '小马王国用户表（没有邮箱、没有手机号）' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_user
@@ -643,8 +708,9 @@ INSERT INTO `t_user` VALUES (1, '巴啦啦', '', 126, 'Bll123456', '2026-10-28 0
 INSERT INTO `t_user` VALUES (2, 'admin', '', 2147483647, 'Admin@1234yy', '2026-10-28 09:39:48', 2);
 INSERT INTO `t_user` VALUES (3, '哇哇哇', '', 0, 'Www123456', '2026-10-30 16:07:54', 1);
 INSERT INTO `t_user` VALUES (4, '啦啦啦', '', 0, 'Lll123456', '2026-10-30 16:26:34', 1);
-INSERT INTO `t_user` VALUES (5, '钱钱钱', '', 10018, 'Qqq123456', '2026-11-02 10:43:26', 1);
-INSERT INTO `t_user` VALUES (6, 'qqq', '', 1272615590, 'qqq123456', '2026-11-20 16:52:29', 1);
+INSERT INTO `t_user` VALUES (5, '钱钱钱', '', 9818, 'Qqq123456', '2026-11-02 10:43:26', 1);
+INSERT INTO `t_user` VALUES (6, 'qqq', '', 1272615813, 'qqq123456', '2026-11-20 16:52:29', 1);
+INSERT INTO `t_user` VALUES (7, 'aaa', '', 10921, 'abc123', '2026-11-27 16:48:36', 1);
 
 -- ----------------------------
 -- Table structure for t_user_item
@@ -658,7 +724,7 @@ CREATE TABLE `t_user_item`  (
   `update_time` datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_user_item`(`user_id` ASC, `item_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of t_user_item
@@ -669,5 +735,6 @@ INSERT INTO `t_user_item` VALUES (3, 6, 'pet-egg-budgie', 1, '2026-11-20 16:53:4
 INSERT INTO `t_user_item` VALUES (4, 6, 'pet-food', 3, '2026-11-20 16:53:47');
 INSERT INTO `t_user_item` VALUES (5, 6, 'pet-cake', 4, '2026-11-20 16:53:49');
 INSERT INTO `t_user_item` VALUES (6, 6, 'title-collector', 5, '2026-11-20 16:53:54');
+INSERT INTO `t_user_item` VALUES (7, 5, 'pet-egg-budgie', 1, '2026-11-27 16:50:44');
 
 SET FOREIGN_KEY_CHECKS = 1;

@@ -57,7 +57,8 @@ const ROSTER = [
   { icon: '🐰', kind: 'rabbit', name: '垂耳兔', hp: 40, atk: 9 },
   { icon: '🦜', kind: 'budgie', name: '虎皮鹦鹉', hp: 36, atk: 13 },
   { icon: '🐹', kind: 'hamster', name: '金丝熊', hp: 48, atk: 9 },
-  { icon: '🦊', kind: 'fox', name: '小狐狸', hp: 42, atk: 12 }
+  { icon: '🦊', kind: 'fox', name: '小狐狸', hp: 42, atk: 12 },
+  { icon: '🪿', kind: 'goose', name: '蒜头鹅', hp: 46, atk: 11 }
 ]
 const rand = (n) => Math.floor(Math.random() * n)
 const pick1 = (arr) => arr[rand(arr.length)]

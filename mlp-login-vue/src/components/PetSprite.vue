@@ -594,6 +594,59 @@
           </g>
         </g>
 
+        <!-- ==================== 蒜头鹅（QQ 宠物同款） ==================== -->
+        <g v-else-if="safeKind === 'goose'" class="ps-animal ps-goose">
+          <!-- 橙脚 -->
+          <path d="M48 96 q-9 6 -13 9 q11 2 17 -5 z" fill="#f0902e" stroke="#d3771f" stroke-width="1" stroke-linejoin="round" />
+          <path d="M72 96 q9 6 13 9 q-11 2 -17 -5 z" fill="#f0902e" stroke="#d3771f" stroke-width="1" stroke-linejoin="round" />
+
+          <g class="ps-head">
+            <!-- 灰白身体 + 浅肚 -->
+            <path d="M60 28 C79 28 90 45 90 68 C90 88 78 100 60 100 C42 100 30 88 30 68 C30 45 41 28 60 28 Z"
+                  :fill="'url(#' + uid + 'head)'" :stroke="palette.line" stroke-width="1.8" />
+            <path d="M60 28 C79 28 90 45 90 68 C90 88 78 100 60 100 C42 100 30 88 30 68 C30 45 41 28 60 28 Z"
+                  :fill="'url(#' + uid + 'shade)'" />
+            <path d="M60 44 C74 44 82 57 82 74 C82 88 73 97 60 97 C47 97 38 88 38 74 C38 57 46 44 60 44 Z"
+                  fill="#faf7f8" opacity=".9" />
+            <ellipse class="ps-shine" cx="46" cy="42" rx="10" ry="5" fill="#ffffff" opacity=".4" transform="rotate(-28 46 42)" />
+            <ellipse cx="60" cy="60" rx="27" ry="30" :fill="'url(#' + uid + 'gloss)'" />
+            <!-- 头顶呆毛（蒜头鹅标志小揪） -->
+            <g class="ps-ahoge">
+              <path d="M56 29 q-4 -11 3 -15 q3 8 7 11 M63 28 q6 -9 11 -7 q-6 5 -7 10"
+                    :fill="palette.head1" :stroke="palette.line" stroke-width="1" stroke-linejoin="round" />
+            </g>
+            <!-- 小翅膀 -->
+            <g class="ps-wing ps-wing-l">
+              <path d="M32 58 q-13 8 -9 25 q3 8 12 2 q5 -9 3 -24 z" :fill="palette.body2" :stroke="palette.line" stroke-width="1.3" />
+            </g>
+            <g class="ps-wing ps-wing-r">
+              <path d="M88 58 q13 8 9 25 q-3 8 -12 2 q-5 -9 -3 -24 z" :fill="palette.body2" :stroke="palette.line" stroke-width="1.3" />
+            </g>
+
+            <g class="ps-eyes">
+              <ellipse cx="48" cy="57" rx="7.6" ry="9.2" fill="#ffffff" :stroke="palette.line" stroke-width=".9" />
+              <ellipse cx="48.4" cy="57.8" rx="5.5" ry="7.3" :fill="'url(#' + uid + 'iris)'" />
+              <ellipse cx="48.4" cy="58.4" rx="2.9" ry="4.9" fill="#2a2630" />
+              <circle cx="45.8" cy="54.5" r="2.3" fill="#ffffff" />
+              <circle cx="51.2" cy="61" r="1.2" fill="#ffffff" opacity=".9" />
+              <ellipse cx="72" cy="57" rx="7.6" ry="9.2" fill="#ffffff" :stroke="palette.line" stroke-width=".9" />
+              <ellipse cx="71.6" cy="57.8" rx="5.5" ry="7.3" :fill="'url(#' + uid + 'iris)'" />
+              <ellipse cx="71.6" cy="58.4" rx="2.9" ry="4.9" fill="#2a2630" />
+              <circle cx="68.8" cy="54.5" r="2.3" fill="#ffffff" />
+              <circle cx="74.2" cy="61" r="1.2" fill="#ffffff" opacity=".9" />
+            </g>
+            <g class="ps-eyes-smile">
+              <path d="M41 57 q7 -8 14 0 M65 57 q7 -8 14 0" fill="none" stroke="#3a3340" stroke-width="2.6" stroke-linecap="round" />
+            </g>
+
+            <ellipse cx="36" cy="69" rx="7" ry="4.4" :fill="'url(#' + uid + 'blush)'" />
+            <ellipse cx="84" cy="69" rx="7" ry="4.4" :fill="'url(#' + uid + 'blush)'" />
+            <!-- 橙扁嘴 -->
+            <path d="M53 67 L67 67 L60 73 Z" fill="#f59b3c" stroke="#dd7f28" stroke-width="1" stroke-linejoin="round" />
+            <path d="M54.5 71 L65.5 71 L60 77 Z" fill="#e8892c" stroke="#d3771f" stroke-width=".8" stroke-linejoin="round" />
+          </g>
+        </g>
+
         <!-- ==================== 花枝鼠（小家鼠） ==================== -->
         <g v-else-if="safeKind === 'mouse'" class="ps-animal">
           <!-- 细长卷尾 -->
@@ -924,6 +977,11 @@ const PALETTES = {
     head1: '#e9f7ff', head2: '#9ad4f0', body1: '#c9ecfb', body2: '#82c2e6',
     eye: '#3f6f96', eyeLight: '#a3d6f2', accent: '#5fb2d9', line: '#79b8db',
     inner: '#fff0b8', name: '虎皮鹦鹉'
+  },
+  goose: {
+    head1: '#f4f1f3', head2: '#c9c4cc', body1: '#e2dee3', body2: '#b4aeb8',
+    eye: '#3a3340', eyeLight: '#8a7f92', accent: '#a9a2ae', line: '#9f98a6',
+    inner: '#ffcf9a', name: '蒜头鹅'
   }
 }
 
@@ -950,8 +1008,8 @@ export default {
     return { uid: 'ps' + (++seq), photoFailed: false }
   },
   computed: {
-    /** 图片加载失败时自动回退到内置 SVG 形象 */
-    usePhoto() { return !this.photoFailed },
+    /** 图片加载失败时自动回退到内置 SVG 形象；没有 webp 的种类（如蒜头鹅）直接用 SVG */
+    usePhoto() { return !this.photoFailed && !!PET_PHOTOS[this.safeKind] },
     photoSrc() { return '/pets/' + (PET_PHOTOS[this.safeKind] || 'cat') + '.webp' },
     liveStyle() {
       const n = parseInt(String(this.uid).slice(2), 10) || 0

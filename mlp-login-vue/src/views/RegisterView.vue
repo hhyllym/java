@@ -296,8 +296,10 @@ export default {
   45% { transform: scale(1.04); }
   100% { transform: scale(1); }
 }
-/* 网页版宽屏：与首页一致，表单区铺满卡片，不再限宽成窄条 */
+/* 网页版宽屏：与登录页一致的 460px 窄幅居中（宽度由 .card-plain 统一限制） */
 @media (min-width: 768px) {
+  .head, form { max-width: 460px; margin-left: auto; margin-right: auto; }
+  .tabs { max-width: 460px; margin-left: auto; margin-right: auto; }
   .head { padding-top: 40px; }
 }
 </style>

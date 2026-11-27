@@ -68,6 +68,7 @@ public final class ShopDefs {
                 item("pet-egg-corgi", "柯基犬蛋", "🐕", 200, "pet", "小短腿大耳朵，走路屁股扭扭", "corgi"),
                 item("pet-egg-shiba", "柴犬蛋", "🦮", 200, "pet", "圆脸微笑，有点小傲娇", "shiba"),
                 item("pet-egg-budgie", "虎皮鹦鹉蛋", "🦜", 200, "pet", "蓝黄配色，叽叽喳喳学你说话", "budgie"),
+                item("pet-egg-goose", "蒜头鹅蛋", "🪿", 200, "pet", "QQ 同款，灰绒绒头顶一撮呆毛", "goose"),
                 item("pet-food", "宠物口粮", "🥣", 60, "food", "喂宠物用，饱食度 +25", ""),
                 item("pet-cake", "宠物蛋糕", "🍰", 150, "food", "丰盛的一餐，饱食度 +50", ""),
                 item("pet-milk", "温牛奶", "🥛", 80, "food", "睡前喝一杯，心情 +20", ""),
@@ -109,7 +110,7 @@ public final class ShopDefs {
         return k;
     }
 
-    /** 宠物种类：14 种真实品种的 3D 毛绒小伙伴 */
+    /** 宠物种类：15 种真实品种的 3D 毛绒小伙伴 */
     public static Map<String, Object> petKind(String kind) {
         String k = normalizePetKind(kind);
         Map<String, Object> m = new LinkedHashMap<>();
@@ -129,6 +130,7 @@ public final class ShopDefs {
             case "corgi":    m.put("name", "柯基犬");     m.put("emoji", "🐕"); break;
             case "shiba":    m.put("name", "柴犬");       m.put("emoji", "🦮"); break;
             case "budgie":   m.put("name", "虎皮鹦鹉");   m.put("emoji", "🦜"); break;
+            case "goose":    m.put("name", "蒜头鹅");     m.put("emoji", "🪿"); break;
             default:         m.put("name", "小宠物");     m.put("emoji", "🐾"); break;
         }
         return m;
